@@ -1,0 +1,65 @@
+# Android Studio and IntelliJ IDEA
+*.iml
+.idea/
+.kotlin/
+
+# Gradle ca*hes and generated build output
+.gr*dle/
+**/build/
+
+# Local Android SD***onfiguration
+local.properties
+
+#***tive build output
+.externalNativ***ild/
+.cxx/
+
+# Android Studio cap***es
+captures/
+
+# Operating-system***tadata
+.DS_Store
+Thumbs.db
+Deskt***ini
+
+# Android packages and gene***ed release artifacts
+*.apk
+*.aab***apks
+*.mapping
+mapping.txt
+outpu***etadata.json
+
+# Logs, diagnostic***tput and memory dumps
+*.log
+*.hp***
+*.trace
+hs_err_pid*
+
+# Local au**t reports and rollback material
+p**se10_*
+**/phase10_*
+*rollback*/
+****rollback*/
+
+# Signing keys, keys**res and certificates
+*.jks
+*.keys***e
+*.p12
+*.pfx
+*.pem
+*.key
+*.der
+***Local signing and secret configu***ion
+keystore.properties
+signing.***perties
+secrets.properties
+.env
+***v.*
+google-services.json
+
+# Temp**ary and backup files
+*.tmp
+*.temp***bak
+*.backup
+*.orig
+*~
