@@ -36,6 +36,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,9 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.AmbientMode
 import androidx.wear.compose.foundation.rememberAmbientModeManager
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
+import ch.hygro.padelscore.billing.SupporterBillingManager
+import ch.hygro.padelscore.billing.SupporterBillingState
 import ch.hygro.padelscore.logic.PadelScoreEngine
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
@@ -56,19 +60,60 @@ import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
+    private lateinit var supporterBillingManager: SupporterBillingManager
+    private val supporterBillingState =
+        mutableStateOf(SupporterBillingState())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        supporterBillingManager = SupporterBillingManager(
+            context = applicationContext,
+            onStateChanged = { updatedState ->
+                runOnUiThread {
+                    supporterBillingState.value = updatedState
+                }
+            }
+        )
+
         setContent {
             PadelScoreTheme {
-                PadelScoreApp()
+                PadelScoreApp(
+                    supporterBillingState = supporterBillingState.value,
+                    onRefreshSupporterPurchases = {
+                        supporterBillingManager.refresh()
+                    },
+                    onLaunchSupporterPurchase = { activity ->
+                        supporterBillingManager.launchPurchase(activity)
+                    }
+                )
             }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        supporterBillingManager.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        supporterBillingManager.refresh()
+    }
+
+    override fun onDestroy() {
+        supporterBillingManager.close()
+        super.onDestroy()
+    }
+
 }
 
 @Composable
-private fun PadelScoreApp() {
+private fun PadelScoreApp(
+    supporterBillingState: SupporterBillingState,
+    onRefreshSupporterPurchases: () -> Unit,
+    onLaunchSupporterPurchase: (Activity) -> Unit
+) {
     val context = LocalContext.current
     val activity = context as? Activity
     val view = LocalView.current
@@ -106,6 +151,10 @@ private fun PadelScoreApp() {
     var lastAcceptedPointAtMillis by remember { mutableStateOf(0L) }
     var showExitConfirmation by remember { mutableStateOf(false) }
     var showMatchHistory by remember { mutableStateOf(false) }
+    var matchHistoryEntries by remember {
+        mutableStateOf(matchHistoryRepository.loadEntries())
+    }
+    var showSupporter by remember { mutableStateOf(false) }
 
     fun updateMatch(newState: MatchState) {
         matchState = newState
@@ -135,10 +184,27 @@ private fun PadelScoreApp() {
         return
     }
 
+    if (showSupporter) {
+        BackHandler { showSupporter = false }
+        SupporterScreen(
+            state = supporterBillingState,
+            onPurchase = {
+                activity?.let(onLaunchSupporterPurchase)
+            },
+            onRestorePurchases = onRefreshSupporterPurchases,
+            onBack = { showSupporter = false }
+        )
+        return
+    }
+
     if (showMatchHistory) {
         BackHandler { showMatchHistory = false }
         MatchHistoryScreen(
-            entries = matchHistoryRepository.loadEntries(),
+            entries = matchHistoryEntries,
+            onDeleteMatch = { matchId ->
+                matchHistoryRepository.removeByMatchId(matchId)
+                matchHistoryEntries = matchHistoryRepository.loadEntries()
+            },
             onBack = { showMatchHistory = false }
         )
         return
@@ -147,6 +213,7 @@ private fun PadelScoreApp() {
     if (showConfiguration) {
         StartScreen(
             initialConfiguration = matchState.configuration,
+            isSupporterActive = supporterBillingState.isSupporterActive,
             onStartMatch = { configuration ->
                 history.clear()
                 updateMatch(
@@ -158,7 +225,14 @@ private fun PadelScoreApp() {
                 )
                 showConfiguration = false
             },
-            onOpenHistory = { showMatchHistory = true }
+            onOpenHistory = {
+                matchHistoryEntries = matchHistoryRepository.loadEntries()
+                showMatchHistory = true
+            },
+            onOpenSupporter = {
+                showSupporter = true
+                onRefreshSupporterPurchases()
+            }
         )
         return
     }
@@ -407,7 +481,7 @@ private fun ScoreStatistics(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Games $games",
+            text = stringResource(R.string.games_with_count, games),
             color = Color.White.copy(alpha = 0.9f),
             fontSize = 12.sp,
             lineHeight = 13.sp,
@@ -418,7 +492,7 @@ private fun ScoreStatistics(
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "Sets $sets",
+            text = stringResource(R.string.sets_with_count, sets),
             color = Color.White.copy(alpha = 0.9f),
             fontSize = 12.sp,
             lineHeight = 13.sp,
@@ -554,7 +628,7 @@ private fun CenterScoreArea(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (isResetHolding) "HALTEN" else "RESET",
+                text = if (isResetHolding) stringResource(R.string.hold_to_reset) else stringResource(R.string.reset),
                 color = Color.White,
                 fontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
@@ -590,30 +664,32 @@ private fun performScoreHapticFeedback(
     }
 }
 
+@Composable
 private fun centerLabel(state: MatchState): String {
     return when {
         state.phase == MatchPhase.MATCH_FINISHED &&
-                state.ourSets > state.opponentSets -> "MATCH GEWONNEN"
+                state.ourSets > state.opponentSets -> stringResource(R.string.match_won)
 
         state.phase == MatchPhase.MATCH_FINISHED &&
-                state.opponentSets > state.ourSets -> "MATCH VERLOREN"
+                state.opponentSets > state.ourSets -> stringResource(R.string.match_lost)
 
-        state.phase == MatchPhase.MATCH_TIE_BREAK -> "MATCH-TIE-BREAK"
-        state.isTieBreak -> "TIE-BREAK"
-        state.isStarPointActive -> "STAR POINT"
-        state.isGoldenPointActive -> "GOLDEN POINT"
-        state.advantageTeam == Team.OPPONENT -> "VORTEIL OBEN"
-        state.advantageTeam == Team.US -> "VORTEIL UNTEN"
+        state.phase == MatchPhase.MATCH_TIE_BREAK -> stringResource(R.string.match_tie_break)
+        state.isTieBreak -> stringResource(R.string.tie_break)
+        state.isStarPointActive -> stringResource(R.string.star_point)
+        state.isGoldenPointActive -> stringResource(R.string.golden_point)
+        state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_top)
+        state.advantageTeam == Team.US -> stringResource(R.string.advantage_bottom)
         state.opponentPoints == 3 && state.ourPoints == 3 -> deuceLabel(state)
-        else -> "GAMES"
+        else -> stringResource(R.string.games)
     }
 }
 
+@Composable
 private fun deuceLabel(state: MatchState): String {
     return when (state.configuration.scoringMode) {
-        ScoringMode.STAR_POINT -> "DEUCE ${state.deuceReturnCount + 1}"
+        ScoringMode.STAR_POINT -> stringResource(R.string.deuce_with_count, state.deuceReturnCount + 1)
         ScoringMode.CLASSIC_ADVANTAGE,
-        ScoringMode.GOLDEN_POINT -> "DEUCE"
+        ScoringMode.GOLDEN_POINT -> stringResource(R.string.deuce)
     }
 }
 
@@ -636,6 +712,7 @@ private fun centerLabelColor(state: MatchState): Color {
 private fun centerLabelFontSize(state: MatchState) =
     if (PadelScoreEngine.isMatchFinished(state)) 8.sp else 9.sp
 
+@Composable
 private fun pointText(
     state: MatchState,
     team: Team
@@ -655,7 +732,7 @@ private fun pointText(
     }
 
     if (state.advantageTeam == team) {
-        return "AD"
+        return stringResource(R.string.advantage_abbr)
     }
 
     val normalPoints = when (team) {
@@ -671,11 +748,12 @@ private fun pointText(
     }
 }
 
+@Composable
 private fun scoringModeLabel(scoringMode: ScoringMode): String {
     return when (scoringMode) {
-        ScoringMode.CLASSIC_ADVANTAGE -> "VORTEIL"
-        ScoringMode.GOLDEN_POINT -> "GOLDEN"
-        ScoringMode.STAR_POINT -> "STAR"
+        ScoringMode.CLASSIC_ADVANTAGE -> stringResource(R.string.advantage)
+        ScoringMode.GOLDEN_POINT -> stringResource(R.string.golden_abbr)
+        ScoringMode.STAR_POINT -> stringResource(R.string.star_abbr)
     }
 }
 

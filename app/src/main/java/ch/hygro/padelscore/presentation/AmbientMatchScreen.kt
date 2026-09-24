@@ -11,11 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
@@ -84,14 +86,14 @@ private fun AmbientTeamScore(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "G $games",
+                text = stringResource(R.string.games_abbr, games),
                 color = Color(0xFF8A8A8A),
                 fontSize = 8.sp,
                 lineHeight = 9.sp,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "S $sets",
+                text = stringResource(R.string.sets_abbr, sets),
                 color = Color(0xFF8A8A8A),
                 fontSize = 8.sp,
                 lineHeight = 9.sp,
@@ -101,6 +103,7 @@ private fun AmbientTeamScore(
     }
 }
 
+@Composable
 private fun ambientPointText(
     state: MatchState,
     team: Team
@@ -119,7 +122,7 @@ private fun ambientPointText(
         }
     }
 
-    if (state.advantageTeam == team) return "AD"
+    if (state.advantageTeam == team) return stringResource(R.string.advantage_abbr)
 
     val points = when (team) {
         Team.OPPONENT -> state.opponentPoints
@@ -134,14 +137,15 @@ private fun ambientPointText(
     }
 }
 
+@Composable
 private fun ambientStatusText(state: MatchState): String {
     return when {
-        state.phase == MatchPhase.MATCH_TIE_BREAK -> "MATCH-TIE-BREAK"
-        state.isTieBreak -> "TIE-BREAK"
-        state.isStarPointActive -> "STAR POINT"
-        state.isGoldenPointActive -> "GOLDEN POINT"
-        state.advantageTeam == Team.OPPONENT -> "VORTEIL OBEN"
-        state.advantageTeam == Team.US -> "VORTEIL UNTEN"
+        state.phase == MatchPhase.MATCH_TIE_BREAK -> stringResource(R.string.match_tie_break)
+        state.isTieBreak -> stringResource(R.string.tie_break)
+        state.isStarPointActive -> stringResource(R.string.star_point)
+        state.isGoldenPointActive -> stringResource(R.string.golden_point)
+        state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_top)
+        state.advantageTeam == Team.US -> stringResource(R.string.advantage_bottom)
         else -> "${state.opponentGames} : ${state.ourGames}"
     }
 }

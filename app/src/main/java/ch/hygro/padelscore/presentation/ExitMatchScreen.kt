@@ -14,11 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
 
 @Composable
 fun ExitMatchScreen(
@@ -34,7 +36,7 @@ fun ExitMatchScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "MATCH VERLASSEN?",
+            text = stringResource(R.string.exit_match_title),
             color = Color.White,
             fontSize = 13.sp,
             lineHeight = 14.sp,
@@ -44,7 +46,7 @@ fun ExitMatchScreen(
         )
 
         Text(
-            text = "Der Spielstand bleibt gespeichert.",
+            text = stringResource(R.string.exit_match_message),
             color = Color.LightGray,
             fontSize = 9.sp,
             lineHeight = 10.sp,
@@ -54,13 +56,13 @@ fun ExitMatchScreen(
         )
 
         ExitActionButton(
-            text = "WEITERSPIELEN",
+            text = stringResource(R.string.continue_match),
             backgroundColor = Color(0xFF195F3B),
             onClick = onContinueMatch
         )
 
         ExitActionButton(
-            text = "APP SCHLIESSEN",
+            text = stringResource(R.string.close_app),
             backgroundColor = Color(0xFF8B2525),
             onClick = onCloseApp
         )

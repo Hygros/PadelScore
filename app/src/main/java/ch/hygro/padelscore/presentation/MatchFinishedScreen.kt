@@ -15,11 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchState
 
 @Composable
@@ -40,7 +42,7 @@ fun MatchFinishedScreen(
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
-            text = if (weWon) "MATCH GEWONNEN" else "MATCH VERLOREN",
+            text = if (weWon) stringResource(R.string.match_won) else stringResource(R.string.match_lost),
             color = if (weWon) Color(0xFF66E59A) else Color(0xFFFF7B72),
             fontSize = 13.sp,
             lineHeight = 14.sp,
@@ -64,28 +66,28 @@ fun MatchFinishedScreen(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Statistic(
-                label = "DAUER",
+                label = stringResource(R.string.duration),
                 value = matchDurationText(matchState)
             )
             Statistic(
-                label = "PUNKTE",
+                label = stringResource(R.string.points),
                 value = matchState.totalPointsPlayed.toString()
             )
             Statistic(
-                label = "GAMES",
+                label = stringResource(R.string.games),
                 value = matchState.totalGamesPlayed.toString()
             )
         }
 
         FinishedActionButton(
-            text = "UNDO",
+            text = stringResource(R.string.undo),
             backgroundColor = if (canUndo) Color(0xFF3A3A3A) else Color(0xFF1B1B1B),
             enabled = canUndo,
             onClick = onUndo
         )
 
         FinishedActionButton(
-            text = "NEUES MATCH",
+            text = stringResource(R.string.new_match),
             backgroundColor = Color(0xFF195F3B),
             enabled = true,
             onClick = onNewMatch
@@ -153,6 +155,7 @@ private fun FinishedActionButton(
     }
 }
 
+@Composable
 private fun completedSetsText(state: MatchState): String {
     val normalSets = state.completedSets.joinToString(separator = "  ") { result ->
         "${result.opponentGames}:${result.ourGames}"
@@ -162,7 +165,11 @@ private fun completedSetsText(state: MatchState): String {
         state.opponentMatchTieBreakPoints > 0 ||
         state.ourMatchTieBreakPoints > 0
     ) {
-        "MTB ${state.opponentMatchTieBreakPoints}:${state.ourMatchTieBreakPoints}"
+        stringResource(
+            R.string.match_tie_break_result,
+            state.opponentMatchTieBreakPoints,
+            state.ourMatchTieBreakPoints
+        )
     } else {
         ""
     }
@@ -170,7 +177,13 @@ private fun completedSetsText(state: MatchState): String {
     return listOf(normalSets, matchTieBreak)
         .filter { it.isNotBlank() }
         .joinToString(separator = "  ")
-        .ifBlank { "Sätze ${state.opponentSets}:${state.ourSets}" }
+        .ifBlank {
+            stringResource(
+                R.string.sets_result,
+                state.opponentSets,
+                state.ourSets
+            )
+        }
 }
 
 private fun matchDurationText(state: MatchState): String {

@@ -14,11 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
+import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 
 @Composable
@@ -36,7 +39,7 @@ fun ResumeMatchScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "LAUFENDES MATCH",
+            text = stringResource(R.string.ongoing_match),
             color = Color.White,
             fontSize = 13.sp,
             lineHeight = 14.sp,
@@ -56,13 +59,13 @@ fun ResumeMatchScreen(
         )
 
         ActionButton(
-            text = "FORTSETZEN",
+            text = stringResource(R.string.resume),
             backgroundColor = Color(0xFF195F3B),
             onClick = onContinueMatch
         )
 
         ActionButton(
-            text = "VERWERFEN",
+            text = stringResource(R.string.discard),
             backgroundColor = Color(0xFF8B2525),
             onClick = onDiscardMatch
         )
@@ -98,20 +101,37 @@ private fun ActionButton(
     }
 }
 
+@Composable
 private fun matchSummary(state: MatchState): String {
-    val setScore = "Sätze ${state.opponentSets}:${state.ourSets}"
+    val setScore = stringResource(
+        R.string.sets_result,
+        state.opponentSets,
+        state.ourSets
+    )
 
     return when {
         state.isTieBreak -> {
-            "$setScore  TB ${state.opponentTieBreakPoints}:${state.ourTieBreakPoints}"
+            "$setScore  " + stringResource(
+                R.string.tie_break_result,
+                state.opponentTieBreakPoints,
+                state.ourTieBreakPoints
+            )
         }
 
-        state.phase == ch.hygro.padelscore.model.MatchPhase.MATCH_TIE_BREAK -> {
-            "$setScore  MTB ${state.opponentMatchTieBreakPoints}:${state.ourMatchTieBreakPoints}"
+        state.phase == MatchPhase.MATCH_TIE_BREAK -> {
+            "$setScore  " + stringResource(
+                R.string.match_tie_break_result,
+                state.opponentMatchTieBreakPoints,
+                state.ourMatchTieBreakPoints
+            )
         }
 
         else -> {
-            "$setScore  Games ${state.opponentGames}:${state.ourGames}"
+            "$setScore  " + stringResource(
+                R.string.games_result,
+                state.opponentGames,
+                state.ourGames
+            )
         }
     }
 }

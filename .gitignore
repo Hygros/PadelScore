@@ -63,3 +63,5 @@ google-services.json
 *.backup
 *.orig
 *~
+# Local tool artifacts
+.artifacts/
