@@ -8,13 +8,12 @@ title: Privacy Policy for Padel Score
 
 Padel Score is a standalone Wear OS application for keeping score during padel matches.
 
-## Data collection
+## Data collection by Padel Score
 
-Padel Score does not collect, transmit, sell, or share personal data or sensitive user data.
+Padel Score does not require a user account and does not collect, sell, or share personal or sensitive user data with the developer.
 
 The app does not use:
 
-- user accounts;
 - advertising;
 - analytics;
 - crash reporting;
@@ -25,8 +24,6 @@ The app does not use:
 - contact information;
 - advertising identifiers; or
 - a phone companion application.
-
-The app does not have permission to access the Internet.
 
 ## Local app data
 
@@ -43,13 +40,25 @@ Padel Score stores the following information locally in the app's private storag
 
 This information is used only to provide the app's scoring, resume, undo, and match-history functions.
 
-The locally stored information is not transmitted to the developer or to third parties.
+The locally stored match information is not transmitted to the developer.
+
+## Optional supporter purchase
+
+Padel Score may offer an optional one-time supporter purchase through Google Play Billing.
+
+Google Play processes the purchase and payment information under Google's own terms and privacy policies. Payment information is not provided to the developer.
+
+The app receives information needed to display available supporter products, start the purchase process, determine the purchase result, and recognize the supporter purchase.
+
+Padel Score does not operate a developer-controlled billing server or independently store payment-card information.
+
+The supporter purchase is optional and does not affect the app's core scoring functions.
 
 ## Data backup
 
 Android system backup is disabled for Padel Score.
 
-Locally stored match information is therefore not backed up by the app to a developer-controlled service or restored through Android Auto Backup.
+Locally stored match information is not backed up by the app to a developer-controlled service or restored through Android Auto Backup.
 
 ## Data deletion
 
@@ -57,17 +66,20 @@ Padel Score does not provide user accounts.
 
 Users can delete locally stored information by:
 
-- deleting individual match-history entries where supported by the app;
 - clearing the app's storage through the device settings; or
 - uninstalling the app.
 
-Uninstalling the app removes its locally stored data from the device.
+Uninstalling the app removes its locally stored match data from the device.
+
+Purchase records managed by Google Play are controlled by Google and are not deleted by clearing Padel Score's local app storage.
 
 ## Third-party services
 
-Padel Score does not integrate advertising, analytics, crash-reporting, social, or cloud-storage services.
+Padel Score integrates Google Play Billing solely for the optional supporter purchase.
 
-Google Play may process information independently when users download or update the app. Such processing is governed by Google's own privacy policies and is not controlled by Padel Score.
+Google Play may also process information independently when users download, update, or purchase through the app. Such processing is governed by Google's own privacy policies and is not controlled by Padel Score.
+
+Padel Score does not integrate advertising, analytics, crash-reporting, social, or developer-controlled cloud-storage services.
 
 ## Children's privacy
 
@@ -77,7 +89,9 @@ The app does not knowingly collect personal information from children or other u
 
 ## Security
 
-All match information is stored in the app's private local storage on the Wear OS device. No method of local storage can be guaranteed to be completely secure, but Padel Score does not transmit this information over a network.
+Match information is stored in the app's private local storage on the Wear OS device. Padel Score does not transmit match information to the developer.
+
+No method of electronic storage or processing can be guaranteed to be completely secure.
 
 ## Changes to this privacy policy
 
