@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.foundation.AmbientMode
 import androidx.wear.compose.foundation.rememberAmbientModeManager
 import androidx.wear.compose.material3.Text
@@ -65,6 +66,7 @@ class MainActivity : ComponentActivity() {
         mutableStateOf(SupporterBillingState())
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         supporterBillingManager = SupporterBillingManager(

@@ -36,7 +36,7 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 30
         targetSdk = 37
-        versionCode = 1
+        versionCode = 5
         versionName = "1.0"
     }
 
@@ -55,7 +55,11 @@ android {
     buildTypes {
         release {
             optimization {
-                enable = false
+                enable = true
+            }
+
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
             }
 
             if (hasUploadSigningConfiguration) {
@@ -96,4 +100,10 @@ dependencies {
 
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.ui.tooling)
+
+    constraints {
+        implementation("androidx.fragment:fragment:1.9.1") {
+            because("Update outdated transitive Fragment dependency")
+        }
+    }
 }

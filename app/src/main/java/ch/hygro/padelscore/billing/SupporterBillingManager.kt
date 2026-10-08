@@ -2,6 +2,7 @@ package ch.hygro.padelscore.billing
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import ch.hygro.padelscore.R
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
@@ -20,6 +21,10 @@ class SupporterBillingManager(
     initialState: SupporterBillingState = SupporterBillingState(),
     private val onStateChanged: (SupporterBillingState) -> Unit
 ) : PurchasesUpdatedListener {
+
+    private companion object {
+        const val TAG = "PadelScoreBilling"
+    }
 
     private val applicationContext = context.applicationContext
 
@@ -66,6 +71,12 @@ class SupporterBillingManager(
                 override fun onBillingSetupFinished(
                     billingResult: BillingResult
                 ) {
+                    Log.d(
+                        TAG,
+                        "onBillingSetupFinished: " +
+                                "responseCode=${billingResult.responseCode}, " +
+                                "debugMessage=${billingResult.debugMessage}"
+                    )
                     connectionStarted = false
 
                     if (closed) return
@@ -81,6 +92,7 @@ class SupporterBillingManager(
                 }
 
                 override fun onBillingServiceDisconnected() {
+                    Log.w(TAG, "onBillingServiceDisconnected")
                     connectionStarted = false
 
                     if (closed) return
@@ -173,11 +185,26 @@ class SupporterBillingManager(
                 )
                 .build()
 
+        Log.d(
+            TAG,
+            "Launching billing flow: " +
+                    "productId=${currentProductDetails.productId}, " +
+                    "formattedPrice=${offerDetails.formattedPrice}, " +
+                    "offerToken=${offerDetails.offerToken}"
+        )
+
         val billingResult =
             billingClient.launchBillingFlow(
                 activity,
                 billingFlowParams
             )
+
+        Log.d(
+            TAG,
+            "launchBillingFlow: " +
+                    "responseCode=${billingResult.responseCode}, " +
+                    "debugMessage=${billingResult.debugMessage}"
+        )
 
         if (
             billingResult.responseCode !=
@@ -213,8 +240,15 @@ class SupporterBillingManager(
         purchases: List<Purchase>?
     ) {
         if (closed) return
-
         purchaseFlowInProgress = false
+
+        Log.d(
+            TAG,
+            "onPurchasesUpdated: " +
+                    "responseCode=${billingResult.responseCode}, " +
+                    "debugMessage=${billingResult.debugMessage}, " +
+                    "purchaseCount=${purchases?.size ?: 0}"
+        )
 
         when (billingResult.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
@@ -276,11 +310,56 @@ class SupporterBillingManager(
                 .setProductList(listOf(product))
                 .build()
 
+        Log.d(
+            TAG,
+            "Querying product details: " +
+                    "productId=$SUPPORTER_PRODUCT_ID, " +
+                    "productType=${BillingClient.ProductType.INAPP}"
+        )
+
         billingClient.queryProductDetailsAsync(params) {
                 billingResult,
                 productDetailsResult ->
 
             if (closed) return@queryProductDetailsAsync
+
+            Log.d(
+                TAG,
+                "queryProductDetailsAsync: " +
+                        "responseCode=${billingResult.responseCode}, " +
+                        "debugMessage=${billingResult.debugMessage}, " +
+                        "fetchedCount=${productDetailsResult.productDetailsList.size}, " +
+                        "unfetchedCount=${productDetailsResult.unfetchedProductList.size}"
+            )
+
+            productDetailsResult.productDetailsList.forEach { details ->
+                Log.d(
+                    TAG,
+                    "Fetched product: " +
+                            "productId=${details.productId}, " +
+                            "productType=${details.productType}, " +
+                            "title=${details.title}, " +
+                            "offerCount=${
+                                details.oneTimePurchaseOfferDetailsList?.size ?: 0
+                            }"
+                )
+
+                details.oneTimePurchaseOfferDetailsList
+                    ?.forEachIndexed { index, offer ->
+                        Log.d(
+                            TAG,
+                            "Eligible offer[$index]: " +
+                                    "formattedPrice=${offer.formattedPrice}, " +
+                                    "priceCurrencyCode=${offer.priceCurrencyCode}, " +
+                                    "priceAmountMicros=${offer.priceAmountMicros}, " +
+                                    "offerToken=${offer.offerToken}"
+                        )
+                    }
+            }
+
+            productDetailsResult.unfetchedProductList.forEach { unfetched ->
+                Log.e(TAG, "Unfetched product: $unfetched")
+            }
 
             if (
                 billingResult.responseCode !=
@@ -312,6 +391,12 @@ class SupporterBillingManager(
                     ?.firstOrNull()
 
             if (matchingProduct == null || matchingOffer == null) {
+                Log.e(
+                    TAG,
+                    "Supporter product unavailable: " +
+                            "matchingProductFound=${matchingProduct != null}, " +
+                            "eligibleOfferFound=${matchingOffer != null}"
+                )
                 productDetails = null
                 updateState(
                     state.copy(
@@ -326,6 +411,13 @@ class SupporterBillingManager(
                 return@queryProductDetailsAsync
             }
 
+            Log.d(
+                TAG,
+                "Supporter product available: " +
+                        "productId=${matchingProduct.productId}, " +
+                        "formattedPrice=${matchingOffer.formattedPrice}, " +
+                        "offerToken=${matchingOffer.offerToken}"
+            )
             productDetails = matchingProduct
             updateState(
                 state.copy(
@@ -476,7 +568,7 @@ class SupporterBillingManager(
     }
 
     private fun availabilityAfterProductFailure():
-        SupporterBillingAvailability {
+            SupporterBillingAvailability {
 
         return if (billingClient.isReady) {
             SupporterBillingAvailability.PRODUCT_UNAVAILABLE

@@ -41,7 +41,7 @@ fun SupporterScreen(
             .verticalScroll(rememberScrollState())
             .padding(
                 horizontal = 16.dp,
-                vertical = 8.dp
+                vertical = 9.dp
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp)
