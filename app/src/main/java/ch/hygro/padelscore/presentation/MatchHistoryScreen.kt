@@ -291,12 +291,11 @@ private fun historyResultText(entry: MatchHistoryEntry): String {
         }
 }
 
-private val historyDateFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("dd.MM.yy HH:mm", Locale.getDefault())
-        .withZone(ZoneId.of("Europe/Zurich"))
-
 private fun historyDateText(epochMillis: Long): String =
-    historyDateFormatter.format(Instant.ofEpochMilli(epochMillis))
+    DateTimeFormatter
+        .ofPattern("dd.MM.yy HH:mm", Locale.getDefault())
+        .withZone(ZoneId.of("Europe/Zurich"))
+        .format(Instant.ofEpochMilli(epochMillis))
 
 @Composable
 private fun historyDurationText(entry: MatchHistoryEntry): String {

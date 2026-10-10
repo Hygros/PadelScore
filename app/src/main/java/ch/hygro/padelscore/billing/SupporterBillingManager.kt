@@ -45,7 +45,6 @@ class SupporterBillingManager(
             .enableAutoServiceReconnection()
             .build()
 
-    fun currentState(): SupporterBillingState = state
 
     fun start() {
         if (closed) return
@@ -384,29 +383,19 @@ class SupporterBillingManager(
                     .firstOrNull {
                         it.productId == SUPPORTER_PRODUCT_ID
                     }
+            if (matchingProduct == null) {
+                markProductUnavailable(
+                    "Supporter product unavailable: matching product not found"
+                )
+                return@queryProductDetailsAsync
+            }
 
             val matchingOffer =
-                matchingProduct
-                    ?.oneTimePurchaseOfferDetailsList
+                matchingProduct.oneTimePurchaseOfferDetailsList
                     ?.firstOrNull()
-
-            if (matchingProduct == null || matchingOffer == null) {
-                Log.e(
-                    TAG,
-                    "Supporter product unavailable: " +
-                            "matchingProductFound=${matchingProduct != null}, " +
-                            "eligibleOfferFound=${matchingOffer != null}"
-                )
-                productDetails = null
-                updateState(
-                    state.copy(
-                        availability =
-                            SupporterBillingAvailability.PRODUCT_UNAVAILABLE,
-                        localizedPrice = null,
-                        isRefreshing = false,
-                        userMessage =
-                            applicationContext.getString(R.string.supporter_product_unavailable)
-                    )
+            if (matchingOffer == null) {
+                markProductUnavailable(
+                    "Supporter product unavailable: eligible offer not found"
                 )
                 return@queryProductDetailsAsync
             }
@@ -429,6 +418,21 @@ class SupporterBillingManager(
                 )
             )
         }
+    }
+
+    private fun markProductUnavailable(logMessage: String) {
+        Log.e(TAG, logMessage)
+        productDetails = null
+        updateState(
+            state.copy(
+                availability = SupporterBillingAvailability.PRODUCT_UNAVAILABLE,
+                localizedPrice = null,
+                isRefreshing = false,
+                userMessage = applicationContext.getString(
+                    R.string.supporter_product_unavailable
+                )
+            )
+        )
     }
 
     private fun queryExistingPurchases() {

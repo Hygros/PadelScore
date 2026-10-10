@@ -25,9 +25,7 @@
     <string name="best_of_three">BEST OF 3</string>
     <string name="two_sets_match_tb">2 + MATCH-TB</string>
     <string name="exit_match_title">EXIT MATCH?</string>
-    <string name="exit_match_message">The score will remain saved.</string>
     <string name="continue_match">CONTINUE PLAYING</string>
-    <string name="close_app">CLOSE APP</string>
     <string name="match_won">MATCH WON</string>
     <string name="match_lost">MATCH LOST</string>
     <string name="deuce">DEUCE</string>
@@ -43,13 +41,13 @@
     <string name="no_matches_yet">NO MATCHES YET</string>
     <string name="won">WON</string>
     <string name="lost">LOST</string>
-    <string name="history_stats_format">%1$d Games · %2$d Points · %3$s</string>
-    <string name="hours_format">%d:%02d h</string>
+    <string name="history_stats_format">Games: %1$d · Points: %2$d · %3$s</string>
+    <string name="hours_format">%1$d:%2$02d h</string>
     <string name="minutes_format">%d min</string>
     <string name="delete_match_title">DELETE MATCH?</string>
     <string name="delete_match_message">This match will be permanently removed from your history.</string>
     <string name="delete">DELETE</string>
-    <string name="cancel">CANCEL</string>
+    <string name="cancel">Cancel</string>
     <string name="supporter_thanks_title">THANK YOU FOR YOUR\nSUPPORT!</string>
     <string name="supporter_active_message">Your supporter status is active and supports the further development of Padel Score.</string>
     <string name="supporter_active_status">SUPPORTER ACTIVE</string>
@@ -89,4 +87,6 @@
     <string name="generic_billing_error">Google Play could not process the request.</string>
     <string name="purchase_pending_user_message">The purchase is still pending. Supporter status will be activated after successful payment.</string>
     <string name="purchase_acknowledge_error">The purchase was detected but could not yet be confirmed. Please try restoring again.</string>
+    <string name="back_to_home">BACK TO HOME</string>
+    <string name="back_to_home_message">Returning home discards the current match.</string>
 </resources>

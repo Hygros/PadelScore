@@ -65,3 +65,13 @@ google-services.json
 *~
 # Local tool artifacts
 .artifacts/
+
+# APK signature sidecar files
+*.idsig
+
+# Android lint output
+lint-results*.html
+lint-results*.xml
+*.apks
+*.aab
+

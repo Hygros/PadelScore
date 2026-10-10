@@ -1,6 +1,9 @@
+@file:Suppress("unused")
+
 package ch.hygro.padelscore.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +27,10 @@ import ch.hygro.padelscore.model.Team
 
 @Composable
 fun AmbientMatchScreen(
-    matchState: MatchState
+    matchState: MatchState,
+    onAddPointOur: () -> Unit,
+    onAddPointOpponent: () -> Unit,
+    isMatchFinished: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -38,7 +44,9 @@ fun AmbientMatchScreen(
             points = ambientPointText(matchState, Team.OPPONENT),
             games = matchState.opponentGames,
             sets = matchState.opponentSets,
-            isServing = matchState.servingTeam == Team.OPPONENT
+            isServing = matchState.servingTeam == Team.OPPONENT,
+            enabled = !isMatchFinished,
+            onClick = onAddPointOpponent
         )
 
         Text(
@@ -55,7 +63,9 @@ fun AmbientMatchScreen(
             points = ambientPointText(matchState, Team.US),
             games = matchState.ourGames,
             sets = matchState.ourSets,
-            isServing = matchState.servingTeam == Team.US
+            isServing = matchState.servingTeam == Team.US,
+            enabled = !isMatchFinished,
+            onClick = onAddPointOur
         )
     }
 }
@@ -65,10 +75,12 @@ private fun AmbientTeamScore(
     points: String,
     games: Int,
     sets: Int,
-    isServing: Boolean
+    isServing: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(

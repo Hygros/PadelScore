@@ -60,7 +60,6 @@ fun SupporterScreen(
             text = stringResource(R.string.back),
             enabled = true,
             backgroundColor = Color(0xFF3A3A3A),
-            contentColor = Color.White,
             onClick = onBack
         )
     }
@@ -173,7 +172,6 @@ private fun InactiveSupporterContent(
                 state.purchaseStatus !=
                 SupporterPurchaseStatus.PURCHASE_IN_PROGRESS,
         backgroundColor = Color(0xFF3A3A3A),
-        contentColor = Color.White,
         onClick = onRestorePurchases
     )
 }
@@ -195,8 +193,7 @@ private fun PurchaseAvailabilityContent(
                 },
                 enabled = state.canStartPurchase,
                 backgroundColor = Color(0xFF195F3B),
-                contentColor = Color.White,
-                onClick = onPurchase
+                    onClick = onPurchase
             )
         }
 
@@ -312,7 +309,6 @@ private fun SupporterActionButton(
     text: String,
     enabled: Boolean,
     backgroundColor: Color,
-    contentColor: Color,
     onClick: () -> Unit
 ) {
     val displayedBackgroundColor = if (enabled) {
@@ -322,9 +318,9 @@ private fun SupporterActionButton(
     }
 
     val displayedContentColor = if (enabled) {
-        contentColor
+        Color.White
     } else {
-        contentColor.copy(alpha = 0.55f)
+        Color.White.copy(alpha = 0.55f)
     }
 
     Box(

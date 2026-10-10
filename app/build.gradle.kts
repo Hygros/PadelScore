@@ -36,7 +36,7 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 30
         targetSdk = 37
-        versionCode = 5
+        versionCode = 6
         versionName = "1.0"
     }
 
@@ -81,6 +81,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.wear:wear-ongoing:1.1.0")
+    implementation("androidx.core:core:1.19.1")
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)
     implementation(libs.compose.foundation)

@@ -25,7 +25,7 @@ import ch.hygro.padelscore.R
 @Composable
 fun ExitMatchScreen(
     onContinueMatch: () -> Unit,
-    onCloseApp: () -> Unit
+    onBackToHome: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -46,7 +46,7 @@ fun ExitMatchScreen(
         )
 
         Text(
-            text = stringResource(R.string.exit_match_message),
+            text = stringResource(R.string.back_to_home_message),
             color = Color.LightGray,
             fontSize = 9.sp,
             lineHeight = 10.sp,
@@ -62,9 +62,9 @@ fun ExitMatchScreen(
         )
 
         ExitActionButton(
-            text = stringResource(R.string.close_app),
-            backgroundColor = Color(0xFF8B2525),
-            onClick = onCloseApp
+            text = stringResource(R.string.back_to_home),
+            backgroundColor = Color(0xFF3A3A3A),
+            onClick = onBackToHome
         )
     }
 }

@@ -25,9 +25,7 @@
     <string name="best_of_three">BEST OF 3</string>
     <string name="two_sets_match_tb">2 + MATCH-TB</string>
     <string name="exit_match_title">MATCH VERLASSEN?</string>
-    <string name="exit_match_message">Der Spielstand bleibt gespeichert.</string>
     <string name="continue_match">WEITERSPIELEN</string>
-    <string name="close_app">APP SCHLIESSEN</string>
     <string name="match_won">MATCH GEWONNEN</string>
     <string name="match_lost">MATCH VERLOREN</string>
     <string name="deuce">DEUCE</string>
@@ -43,8 +41,8 @@
     <string name="no_matches_yet">NOCH KEINE MATCHES</string>
     <string name="won">GEWONNEN</string>
     <string name="lost">VERLOREN</string>
-    <string name="history_stats_format">%1$d Games · %2$d Punkte · %3$s</string>
-    <string name="hours_format">%d:%02d h</string>
+    <string name="history_stats_format">Games: %1$d · Punkte: %2$d · %3$s</string>
+    <string name="hours_format">%1$d:%2$02d h</string>
     <string name="minutes_format">%d min</string>
     <string name="delete_match_title">MATCH LÖSCHEN?</string>
     <string name="delete_match_message">Dieses Match wird dauerhaft aus dem Verlauf gelöscht.</string>
@@ -89,4 +87,6 @@
     <string name="generic_billing_error">Google Play konnte die Anfrage nicht verarbeiten.</string>
     <string name="purchase_pending_user_message">Der Kauf ist noch ausstehend. Der Supporter-Status wird nach erfolgreicher Zahlung aktiviert.</string>
     <string name="purchase_acknowledge_error">Der Kauf wurde erkannt, konnte aber noch nicht bestätigt werden. Bitte versuche die Wiederherstellung erneut.</string>
+    <string name="back_to_home">ZURÜCK ZUM START</string>
+    <string name="back_to_home_message">Zurückkehren verwirft das laufende Spiel.</string>
 </resources>

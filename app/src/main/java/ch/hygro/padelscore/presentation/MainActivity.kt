@@ -1,6 +1,10 @@
 package ch.hygro.padelscore.presentation
 
 import android.app.Activity
+import android.Manifest
+import android.content.Intent
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
 import android.os.Bundle
 import android.os.SystemClock
 import androidx.activity.ComponentActivity
@@ -22,13 +26,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
+import android.util.Log
+import android.view.MotionEvent
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -43,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.foundation.AmbientMode
+import androidx.wear.compose.foundation.LocalAmbientModeManager
+import androidx.wear.compose.foundation.AmbientTickEffect
 import androidx.wear.compose.foundation.rememberAmbientModeManager
 import androidx.wear.compose.material3.Text
 import ch.hygro.padelscore.R
@@ -58,6 +70,8 @@ import ch.hygro.padelscore.storage.MatchHistoryRepository
 import ch.hygro.padelscore.storage.MatchRepository
 import ch.hygro.padelscore.vibration.HapticFeedbackManager
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : ComponentActivity() {
 
@@ -65,9 +79,86 @@ class MainActivity : ComponentActivity() {
     private val supporterBillingState =
         mutableStateOf(SupporterBillingState())
 
+    private lateinit var matchQuietMode: MatchQuietModeController
+    private lateinit var ongoingMatch: OngoingMatchController
+    private lateinit var wristDisplayController: WristDisplayController
+    val wristLowered = mutableStateOf(false)
+
+    fun setWristDetectionEnabled(enabled: Boolean) {
+        wristDisplayController.setEnabled(enabled)
+    }
+    private val resumeFromOngoing = mutableStateOf(false)
+    private val permissionPreferences by lazy {
+        getSharedPreferences("permission_onboarding", MODE_PRIVATE)
+    }
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (::ongoingMatch.isInitialized) ongoingMatch.refresh()
+        if (!granted) android.widget.Toast.makeText(
+            this, "Allow notifications in app settings to keep the match available on your watch.",
+            android.widget.Toast.LENGTH_LONG
+        ).show()
+    }
+
+    fun updateOngoingMatch(active: Boolean, state: MatchState) {
+        ongoingMatch.update(active, state)
+    }
+
+    fun requestNotificationsOnFirstStartScreen() {
+        if (Build.VERSION.SDK_INT < 33) return
+        if (permissionPreferences.getBoolean("notifications_prompted", false)) return
+        // Persist the first visit so declining does not interrupt later matches.
+        permissionPreferences.edit()
+            .putBoolean("notifications_prompted", true)
+            .apply()
+        if (androidx.core.content.ContextCompat.checkSelfPermission(
+                this, Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN &&
+            ::wristDisplayController.isInitialized
+        ) {
+            wristDisplayController.onInteraction()
+        }
+        if (event.actionMasked == MotionEvent.ACTION_DOWN ||
+            event.actionMasked == MotionEvent.ACTION_UP ||
+            event.actionMasked == MotionEvent.ACTION_CANCEL
+        ) {
+            Log.d("PadelInput", "touch=${event.actionMasked} x=${event.x.toInt()} y=${event.y.toInt()}")
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(OngoingMatchController.EXTRA_RESUME_MATCH, false)) {
+            resumeFromOngoing.value = true
+        }
+    }
+
+
+    fun setMatchQuietMode(active: Boolean) {
+        if (::matchQuietMode.isInitialized) matchQuietMode.setMatchActive(active)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        matchQuietMode = MatchQuietModeController(this)
+        ongoingMatch = OngoingMatchController(this)
+        wristDisplayController = WristDisplayController(this) { lowered ->
+            wristLowered.value = lowered
+        }
+        resumeFromOngoing.value = intent.getBooleanExtra(
+            OngoingMatchController.EXTRA_RESUME_MATCH, false
+        )
 
         supporterBillingManager = SupporterBillingManager(
             context = applicationContext,
@@ -82,6 +173,8 @@ class MainActivity : ComponentActivity() {
             PadelScoreTheme {
                 PadelScoreApp(
                     supporterBillingState = supporterBillingState.value,
+                    resumeFromOngoing = resumeFromOngoing.value,
+                    onResumeFromOngoingHandled = { resumeFromOngoing.value = false },
                     onRefreshSupporterPurchases = {
                         supporterBillingManager.refresh()
                     },
@@ -101,9 +194,20 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         supporterBillingManager.refresh()
+        matchQuietMode.onResume()
+        ongoingMatch.refresh()
+        wristDisplayController.onResume()
+    }
+
+    override fun onPause() {
+        wristDisplayController.onPause()
+        matchQuietMode.onPause()
+        super.onPause()
     }
 
     override fun onDestroy() {
+        wristDisplayController.close()
+        matchQuietMode.close()
         supporterBillingManager.close()
         super.onDestroy()
     }
@@ -113,6 +217,28 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun PadelScoreApp(
     supporterBillingState: SupporterBillingState,
+    resumeFromOngoing: Boolean,
+    onResumeFromOngoingHandled: () -> Unit,
+    onRefreshSupporterPurchases: () -> Unit,
+    onLaunchSupporterPurchase: (Activity) -> Unit
+) {
+    val ambientManager = rememberAmbientModeManager()
+    CompositionLocalProvider(LocalAmbientModeManager provides ambientManager) {
+        PadelScoreContent(
+            supporterBillingState = supporterBillingState,
+            resumeFromOngoing = resumeFromOngoing,
+            onResumeFromOngoingHandled = onResumeFromOngoingHandled,
+            onRefreshSupporterPurchases = onRefreshSupporterPurchases,
+            onLaunchSupporterPurchase = onLaunchSupporterPurchase
+        )
+    }
+}
+
+@Composable
+private fun PadelScoreContent(
+    supporterBillingState: SupporterBillingState,
+    resumeFromOngoing: Boolean,
+    onResumeFromOngoingHandled: () -> Unit,
     onRefreshSupporterPurchases: () -> Unit,
     onLaunchSupporterPurchase: (Activity) -> Unit
 ) {
@@ -122,7 +248,7 @@ private fun PadelScoreApp(
     val hapticFeedbackManager = remember(view) {
         HapticFeedbackManager(view)
     }
-    val ambientModeManager = rememberAmbientModeManager()
+    val ambientModeManager = checkNotNull(LocalAmbientModeManager.current)
     val isAmbientMode =
         ambientModeManager.currentAmbientMode is AmbientMode.Ambient
 
@@ -150,7 +276,7 @@ private fun PadelScoreApp(
             addAll(initialSnapshot.undoHistory)
         }
     }
-    var lastAcceptedPointAtMillis by remember { mutableStateOf(0L) }
+    var lastAcceptedPointAtMillis by remember { mutableLongStateOf(0L) }
     var showExitConfirmation by remember { mutableStateOf(false) }
     var showMatchHistory by remember { mutableStateOf(false) }
     var matchHistoryEntries by remember {
@@ -164,6 +290,113 @@ private fun PadelScoreApp(
             currentState = newState,
             undoHistory = history
         )
+    }
+
+    val matchFinished = PadelScoreEngine.isMatchFinished(matchState)
+
+    fun saveCurrentStateToHistory() {
+        history.add(matchState)
+        if (history.size > MAX_HISTORY_SIZE) history.removeAt(0)
+    }
+
+    fun addPoint(team: Team) {
+        if (PadelScoreEngine.isMatchFinished(matchState)) return
+
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastAcceptedPointAtMillis < POINT_INPUT_LOCK_MILLIS) {
+            Log.d("PadelInput", "point rejected: debounce team=$team")
+            return
+        }
+        Log.d("PadelInput", "point accepted team=$team ambient=$isAmbientMode")
+
+        lastAcceptedPointAtMillis = now
+        saveCurrentStateToHistory()
+
+        val previousState = matchState
+        val newState = PadelScoreEngine.awardPoint(previousState, team)
+
+        if (
+            previousState.phase != MatchPhase.MATCH_FINISHED &&
+            newState.phase == MatchPhase.MATCH_FINISHED
+        ) {
+            matchHistoryRepository.saveCompletedMatch(newState)
+        }
+        updateMatch(newState)
+        performScoreHapticFeedback(
+            previousState = previousState,
+            newState = newState,
+            manager = hapticFeedbackManager
+        )
+    }
+
+    fun undoLastPoint() {
+        if (history.isNotEmpty()) {
+            lastAcceptedPointAtMillis = 0L
+            updateMatch(history.removeAt(history.lastIndex))
+            hapticFeedbackManager.undo()
+        }
+    }
+
+    fun resetMatch() {
+        val currentConfiguration = matchState.configuration
+        lastAcceptedPointAtMillis = 0L
+        history.clear()
+        updateMatch(MatchState(configuration = currentConfiguration))
+        showExitConfirmation = false
+        showResumePrompt = false
+        showConfiguration = true
+    }
+
+    val isActiveMatch = !showConfiguration && !showResumePrompt &&
+        !showMatchHistory && !showSupporter && !matchFinished
+    val isReducedDisplay = isAmbientMode ||
+        (isActiveMatch && (activity as? MainActivity)?.wristLowered?.value == true)
+    DisposableEffect(activity, isActiveMatch, isAmbientMode) {
+        (activity as? MainActivity)?.setWristDetectionEnabled(isActiveMatch && !isAmbientMode)
+        onDispose { (activity as? MainActivity)?.setWristDetectionEnabled(false) }
+    }
+    LaunchedEffect(resumeFromOngoing) {
+        if (resumeFromOngoing) {
+            if (hasRunningSavedMatch(matchState)) {
+                showResumePrompt = false
+                showConfiguration = false
+                showMatchHistory = false
+                showSupporter = false
+            }
+            onResumeFromOngoingHandled()
+        }
+    }
+    LaunchedEffect(showConfiguration, showResumePrompt, showMatchHistory, showSupporter) {
+        if (showConfiguration && !showResumePrompt && !showMatchHistory && !showSupporter) {
+            (activity as? MainActivity)?.requestNotificationsOnFirstStartScreen()
+        }
+    }
+    // A saved match remains ongoing even when the resume prompt is visible.
+    val hasOngoingMatch = !showConfiguration && !matchFinished &&
+        (isActiveMatch || hasRunningSavedMatch(matchState))
+    LaunchedEffect(hasOngoingMatch, matchState) {
+        (activity as? MainActivity)?.updateOngoingMatch(hasOngoingMatch, matchState)
+    }
+    // Do not cancel the ongoing notification in onPause or effect disposal.
+    DisposableEffect(activity, isActiveMatch) {
+        (activity as? MainActivity)?.setMatchQuietMode(isActiveMatch)
+        onDispose { (activity as? MainActivity)?.setMatchQuietMode(false) }
+    }
+    var ambientClock by remember {
+        mutableStateOf(java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date()))
+    }
+    ambientModeManager.AmbientTickEffect {
+        ambientClock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+    }
+    LaunchedEffect(isReducedDisplay, isAmbientMode) {
+        while (isReducedDisplay && !isAmbientMode) {
+            ambientClock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+            delay(1.minutes)
+        }
+    }
+    LaunchedEffect(isAmbientMode) {
+        ambientClock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+        Log.d("PadelInput", "ambient=$isAmbientMode activeMatch=$isActiveMatch")
     }
 
     if (showResumePrompt) {
@@ -217,6 +450,7 @@ private fun PadelScoreApp(
             initialConfiguration = matchState.configuration,
             isSupporterActive = supporterBillingState.isSupporterActive,
             onStartMatch = { configuration ->
+                lastAcceptedPointAtMillis = 0L
                 history.clear()
                 updateMatch(
                     MatchState(
@@ -239,14 +473,6 @@ private fun PadelScoreApp(
         return
     }
 
-    if (
-        isAmbientMode &&
-        matchState.phase != MatchPhase.MATCH_FINISHED
-    ) {
-        AmbientMatchScreen(matchState = matchState)
-        return
-    }
-
     BackHandler(enabled = !showExitConfirmation) {
         showExitConfirmation = true
     }
@@ -260,10 +486,7 @@ private fun PadelScoreApp(
             onContinueMatch = {
                 showExitConfirmation = false
             },
-            onCloseApp = {
-                showExitConfirmation = false
-                activity?.finish()
-            }
+            onBackToHome = { resetMatch() }
         )
         return
     }
@@ -294,57 +517,6 @@ private fun PadelScoreApp(
         return
     }
 
-    val matchFinished = PadelScoreEngine.isMatchFinished(matchState)
-
-    fun saveCurrentStateToHistory() {
-        history.add(matchState)
-        if (history.size > MAX_HISTORY_SIZE) history.removeAt(0)
-    }
-
-    fun addPoint(team: Team) {
-        if (PadelScoreEngine.isMatchFinished(matchState)) return
-
-        val now = SystemClock.elapsedRealtime()
-        if (now - lastAcceptedPointAtMillis < POINT_INPUT_LOCK_MILLIS) return
-
-        lastAcceptedPointAtMillis = now
-        saveCurrentStateToHistory()
-
-        val previousState = matchState
-        val newState = PadelScoreEngine.awardPoint(previousState, team)
-
-        if (
-            previousState.phase != MatchPhase.MATCH_FINISHED &&
-            newState.phase == MatchPhase.MATCH_FINISHED
-        ) {
-            matchHistoryRepository.saveCompletedMatch(newState)
-        }
-        updateMatch(newState)
-        performScoreHapticFeedback(
-            previousState = previousState,
-            newState = newState,
-            manager = hapticFeedbackManager
-        )
-    }
-
-    fun undoLastPoint() {
-        if (history.isNotEmpty()) {
-            lastAcceptedPointAtMillis = 0L
-            updateMatch(history.removeAt(history.lastIndex))
-            hapticFeedbackManager.undo()
-        }
-    }
-
-    fun resetMatch() {
-        val currentConfiguration = matchState.configuration
-        lastAcceptedPointAtMillis = 0L
-        history.clear()
-        updateMatch(MatchState(configuration = currentConfiguration))
-        showExitConfirmation = false
-        showResumePrompt = false
-        showConfiguration = true
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -361,18 +533,25 @@ private fun PadelScoreApp(
             isServing = matchState.servingTeam == Team.OPPONENT,
             statsAtTop = true,
             enabled = !matchFinished,
+            ambient = isReducedDisplay,
             onClick = { addPoint(Team.OPPONENT) }
         )
 
-        CenterScoreArea(
+        Box(
             modifier = Modifier.fillMaxWidth().height(54.dp),
-            matchState = matchState,
-            canUndo = history.isNotEmpty(),
-            canChangeScoringMode = false,
-            onUndo = { undoLastPoint() },
-            onReset = { resetMatch() },
-            onChangeScoringMode = { }
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            CenterScoreArea(
+                modifier = Modifier.fillMaxSize().alpha(if (isReducedDisplay) 0f else 1f),
+                matchState = matchState,
+                canUndo = !isReducedDisplay && history.isNotEmpty(),
+                onUndo = { if (!isReducedDisplay) undoLastPoint() },
+                onReset = { if (!isReducedDisplay) resetMatch() }
+            )
+            if (isReducedDisplay) {
+                Text(text = ambientClock, color = Color.White, fontSize = 12.sp)
+            }
+        }
 
         ScoreArea(
             modifier = Modifier.fillMaxWidth().weight(1f),
@@ -383,6 +562,7 @@ private fun PadelScoreApp(
             isServing = matchState.servingTeam == Team.US,
             statsAtTop = false,
             enabled = !matchFinished,
+            ambient = isReducedDisplay,
             onClick = { addPoint(Team.US) }
         )
     }
@@ -398,9 +578,12 @@ private fun ScoreArea(
     isServing: Boolean,
     statsAtTop: Boolean,
     enabled: Boolean,
+    ambient: Boolean,
     onClick: () -> Unit
 ) {
-    val displayedBackgroundColor = if (enabled) {
+    val displayedBackgroundColor = if (ambient) {
+        Color.Black
+    } else if (enabled) {
         backgroundColor
     } else {
         backgroundColor.copy(alpha = 0.58f)
@@ -419,7 +602,8 @@ private fun ScoreArea(
         if (statsAtTop) {
             ScoreStatistics(
                 games = games,
-                sets = sets
+                sets = sets,
+                ambient = ambient
             )
         }
 
@@ -436,8 +620,8 @@ private fun ScoreArea(
                 } else {
                     Color.White.copy(alpha = 0.70f)
                 },
-                fontSize = 45.sp,
-                lineHeight = 45.sp,
+                fontSize = if (ambient) 30.sp else 45.sp,
+                lineHeight = if (ambient) 30.sp else 45.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 maxLines = 1
@@ -446,7 +630,7 @@ private fun ScoreArea(
             if (isServing) {
                 Text(
                     text = "●",
-                    color = Color(0xFFFFD54F),
+                    color = if (ambient) Color.White else Color(0xFFFFD54F),
                     fontSize = 15.sp,
                     lineHeight = 15.sp,
                     fontWeight = FontWeight.Bold,
@@ -464,7 +648,8 @@ private fun ScoreArea(
         if (!statsAtTop) {
             ScoreStatistics(
                 games = games,
-                sets = sets
+                sets = sets,
+                ambient = ambient
             )
         }
     }
@@ -473,7 +658,8 @@ private fun ScoreArea(
 @Composable
 private fun ScoreStatistics(
     games: Int,
-    sets: Int
+    sets: Int,
+    ambient: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -484,8 +670,8 @@ private fun ScoreStatistics(
     ) {
         Text(
             text = stringResource(R.string.games_with_count, games),
-            color = Color.White.copy(alpha = 0.9f),
-            fontSize = 12.sp,
+            color = if (ambient) Color.White else Color.White.copy(alpha = 0.9f),
+            fontSize = if (ambient) 9.sp else 12.sp,
             lineHeight = 13.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1
@@ -495,8 +681,8 @@ private fun ScoreStatistics(
 
         Text(
             text = stringResource(R.string.sets_with_count, sets),
-            color = Color.White.copy(alpha = 0.9f),
-            fontSize = 12.sp,
+            color = if (ambient) Color.White else Color.White.copy(alpha = 0.9f),
+            fontSize = if (ambient) 9.sp else 12.sp,
             lineHeight = 13.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1
@@ -509,10 +695,8 @@ private fun CenterScoreArea(
     modifier: Modifier,
     matchState: MatchState,
     canUndo: Boolean,
-    canChangeScoringMode: Boolean,
     onUndo: () -> Unit,
-    onReset: () -> Unit,
-    onChangeScoringMode: () -> Unit
+    onReset: () -> Unit
 ) {
     val hapticFeedback = LocalHapticFeedback.current
 
@@ -527,7 +711,7 @@ private fun CenterScoreArea(
     LaunchedEffect(isResetHolding) {
         if (isResetHolding) {
             resetPerformed = false
-            delay(RESET_HOLD_DURATION_MILLIS)
+            delay(RESET_HOLD_DURATION_MILLIS.milliseconds)
 
             if (isResetHolding) {
                 resetPerformed = true
@@ -565,12 +749,7 @@ private fun CenterScoreArea(
         }
 
         Column(
-            modifier = Modifier
-                .width(82.dp)
-                .clickable(
-                    enabled = canChangeScoringMode,
-                    onClick = onChangeScoringMode
-                ),
+            modifier = Modifier.width(82.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -590,12 +769,8 @@ private fun CenterScoreArea(
                 } else {
                     scoringModeLabel(matchState.configuration.scoringMode)
                 },
-                color = if (canChangeScoringMode) {
-                    Color(0xFFFFD54F)
-                } else {
-                    Color.White
-                },
-                fontSize = if (canChangeScoringMode) 8.sp else 15.sp,
+                color = Color.White,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 maxLines = 1
