@@ -1,5 +1,7 @@
 # 🎾 Padel Score for Wear OS
 
+<!--suppress ALL -->
+
 <p align="center">
   <img src="app/src/main/ic_launcher-playstore.png" width="128" height="128" alt="Padel Score App Icon" />
 </p>
@@ -55,8 +57,7 @@
 ### Download APK Release
 Download the latest APK directly from the [GitHub Releases](https://github.com/Hygros/PadelScore/releases) page.
 
-- **`PadelScore-v1.0-debug.apk`**: Pre-signed debug APK, ready to sideload directly onto any Wear OS watch.
-- **`PadelScore-v1.0-release-unsigned.apk`**: Unsigned release APK for custom signing.
+- **`PadelScore-v1.6.0`**: Signed APK
 
 ### Installing on Wear OS Smartwatch
 
@@ -77,6 +78,7 @@ You can install the APK onto your Wear OS watch using **ADB over Wi-Fi**:
 
 ---
 
+<a id="privacy"></a>
 ## 🔒 Privacy & Network Usage
 
 Padel Score is built with privacy in mind:
@@ -89,45 +91,6 @@ Padel Score is built with privacy in mind:
 **Match Scoring & History**: Operates 100% offline. All match data, undo state, and history logs are stored strictly in local device storage.
 
 **Optional Supporter Page**: The Support screen connects locally to Google Play Services via the official Google Play Billing Library to handle optional voluntary tips/purchases through your Google Play Account.
-
----
-
-## 🛠️ Requirements & Building from Source
-
-### Prerequisites
-- **Java**: JDK 25 (required for the Gradle daemon)
-- **Gradle**: 9.6.0 (via included Gradle Wrapper `gradlew`)
-- **Android SDK**: Compile SDK 37, Minimum SDK 30 (Wear OS 3.0+)
-
-### Build Commands
-
-Run the included Gradle wrapper from PowerShell or Terminal:
-
-```powershell
-# Set JAVA_HOME to JDK 25
-$env:JAVA_HOME = 'C:\Program Files\Android\Android Studio\jbr' # or your JDK 25 path
-$env:Path = "$env:JAVA_HOME\bin;$env:Path"
-
-# Run Unit Tests
-.\gradlew.bat testDebugUnitTest
-
-# Assemble Debug APK (signed with debug keystore)
-.\gradlew.bat assembleDebug
-
-# Assemble Release APK
-.\gradlew.bat assembleRelease
-```
-
-Generated APKs will be located in:
-- Debug APK: `app/build/outputs/apk/debug/app-debug.apk`
-- Release APK: `app/build/outputs/apk/release/app-release-unsigned.apk`
-
-### Signing Release Builds
-Release signing can be configured via environment variables:
-- `PADELSCORE_UPLOAD_STORE_FILE`
-- `PADELSCORE_UPLOAD_STORE_PASSWORD`
-- `PADELSCORE_UPLOAD_KEY_ALIAS`
-- `PADELSCORE_UPLOAD_KEY_PASSWORD`
 
 ---
 

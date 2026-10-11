@@ -81,7 +81,7 @@ android {
 }
 
 dependencies {
-    implementation("androidx.wear:wear-ongoing:1.1.0")
+    implementation(libs.wear.ongoing)
     implementation("androidx.core:core:1.19.1")
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)

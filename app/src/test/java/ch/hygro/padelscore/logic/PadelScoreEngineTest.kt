@@ -45,7 +45,7 @@ class PadelScoreEngineTest {
     @Test
     fun starPoint_firstDeuce_usesNormalAdvantage() {
         val result = PadelScoreEngine.awardPoint(
-            starState(opponentPoints = 3, ourPoints = 3),
+            starState(),
             Team.US
         )
 
@@ -57,7 +57,7 @@ class PadelScoreEngineTest {
 
     @Test
     fun starPoint_firstReturnToDeuce_increasesCounter() {
-        var state = starState(opponentPoints = 3, ourPoints = 3)
+        var state = starState()
 
         state = PadelScoreEngine.awardPoint(state, Team.US)
         state = PadelScoreEngine.awardPoint(state, Team.OPPONENT)
@@ -72,8 +72,6 @@ class PadelScoreEngineTest {
     @Test
     fun starPoint_secondDeuce_usesNormalAdvantage() {
         val state = starState(
-            opponentPoints = 3,
-            ourPoints = 3,
             deuceReturnCount = 1
         )
 
@@ -87,8 +85,6 @@ class PadelScoreEngineTest {
     @Test
     fun starPoint_secondReturnToDeuce_activatesStarPoint() {
         var state = starState(
-            opponentPoints = 3,
-            ourPoints = 3,
             deuceReturnCount = 1
         )
 
@@ -105,8 +101,6 @@ class PadelScoreEngineTest {
     @Test
     fun starPoint_activeNextPoint_winsGame() {
         val state = starState(
-            opponentPoints = 3,
-            ourPoints = 3,
             deuceReturnCount = 2,
             isStarPointActive = true
         )
@@ -125,8 +119,6 @@ class PadelScoreEngineTest {
     @Test
     fun starPoint_advantageWinnerBeforeThirdDeuce_winsGameNormally() {
         var state = starState(
-            opponentPoints = 3,
-            ourPoints = 3,
             deuceReturnCount = 1
         )
 
@@ -140,7 +132,7 @@ class PadelScoreEngineTest {
 
     @Test
     fun classicAdvantage_deuceThenAdvantageThenGame() {
-        var state = classicState(opponentPoints = 3, ourPoints = 3)
+        var state = classicState()
 
         state = PadelScoreEngine.awardPoint(state, Team.US)
         assertEquals(Team.US, state.advantageTeam)
@@ -158,7 +150,7 @@ class PadelScoreEngineTest {
 
     @Test
     fun classicAdvantage_opponentPointAgainstAdvantage_returnsToDeuce() {
-        var state = classicState(opponentPoints = 3, ourPoints = 3)
+        var state = classicState()
 
         state = PadelScoreEngine.awardPoint(state, Team.US)
         assertEquals(Team.US, state.advantageTeam)
@@ -174,7 +166,7 @@ class PadelScoreEngineTest {
     @Test
     fun classicAdvantage_pointFromFortyThirty_winsGame() {
         val result = PadelScoreEngine.awardPoint(
-            classicState(opponentPoints = 2, ourPoints = 3),
+            classicState(opponentPoints = 2),
             Team.US
         )
         assertEquals(1, result.ourGames)
@@ -184,7 +176,7 @@ class PadelScoreEngineTest {
     @Test
     fun goldenPoint_reachingFortyAll_activatesGoldenPoint() {
         val result = PadelScoreEngine.awardPoint(
-            goldenState(opponentPoints = 2, ourPoints = 3),
+            goldenState(opponentPoints = 2),
             Team.OPPONENT
         )
 
@@ -200,8 +192,6 @@ class PadelScoreEngineTest {
     fun goldenPoint_atFortyAll_nextPointWinsGameForOurTeam() {
         val result = PadelScoreEngine.awardPoint(
             goldenState(
-                opponentPoints = 3,
-                ourPoints = 3,
                 isGoldenPointActive = true
             ),
             Team.US
@@ -219,8 +209,6 @@ class PadelScoreEngineTest {
     fun goldenPoint_atFortyAll_nextPointWinsGameForOpponent() {
         val result = PadelScoreEngine.awardPoint(
             goldenState(
-                opponentPoints = 3,
-                ourPoints = 3,
                 isGoldenPointActive = true
             ),
             Team.OPPONENT
@@ -571,8 +559,8 @@ class PadelScoreEngineTest {
     }
 
     private fun classicState(
-        opponentPoints: Int = 0,
-        ourPoints: Int = 0
+        opponentPoints: Int = 3,
+        ourPoints: Int = 3
     ): MatchState {
         return MatchState(
             opponentPoints = opponentPoints,
@@ -584,14 +572,12 @@ class PadelScoreEngineTest {
     }
 
     private fun starState(
-        opponentPoints: Int = 0,
-        ourPoints: Int = 0,
         deuceReturnCount: Int = 0,
         isStarPointActive: Boolean = false
     ): MatchState {
         return MatchState(
-            opponentPoints = opponentPoints,
-            ourPoints = ourPoints,
+            opponentPoints = 3,
+            ourPoints = 3,
             configuration = MatchConfiguration(
                 scoringMode = ScoringMode.STAR_POINT
             ),
@@ -601,8 +587,8 @@ class PadelScoreEngineTest {
     }
 
     private fun goldenState(
-        opponentPoints: Int = 0,
-        ourPoints: Int = 0,
+        opponentPoints: Int = 3,
+        ourPoints: Int = 3,
         isGoldenPointActive: Boolean = false
     ): MatchState {
         return MatchState(

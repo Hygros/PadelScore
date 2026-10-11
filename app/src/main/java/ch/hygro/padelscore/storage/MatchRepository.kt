@@ -10,6 +10,7 @@ import ch.hygro.padelscore.model.SetResult
 import ch.hygro.padelscore.model.Team
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.core.content.edit
 
 class MatchRepository(context: Context) {
 
@@ -52,9 +53,9 @@ class MatchRepository(context: Context) {
                 }
             )
 
-        preferences.edit()
-            .putString(KEY_SNAPSHOT_JSON, snapshot.toString())
-            .apply()
+        preferences.edit {
+            putString(KEY_SNAPSHOT_JSON, snapshot.toString())
+        }
     }
 
     private fun decodeSnapshot(json: JSONObject): MatchSnapshot {

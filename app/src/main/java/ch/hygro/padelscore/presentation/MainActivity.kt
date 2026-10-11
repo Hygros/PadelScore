@@ -72,6 +72,7 @@ import ch.hygro.padelscore.vibration.HapticFeedbackManager
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import androidx.core.content.edit
 
 class MainActivity : ComponentActivity() {
 
@@ -109,9 +110,9 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT < 33) return
         if (permissionPreferences.getBoolean("notifications_prompted", false)) return
         // Persist the first visit so declining does not interrupt later matches.
-        permissionPreferences.edit()
-            .putBoolean("notifications_prompted", true)
-            .apply()
+        permissionPreferences.edit {
+            putBoolean("notifications_prompted", true)
+        }
         if (androidx.core.content.ContextCompat.checkSelfPermission(
                 this, Manifest.permission.POST_NOTIFICATIONS
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED

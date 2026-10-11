@@ -36,13 +36,13 @@ object PadelScoreEngine {
         val isDeuce = state.opponentPoints == 3 && state.ourPoints == 3
 
         if (isDeuce) {
-            return when {
-                state.advantageTeam == null -> countedState.copy(
+            return when (state.advantageTeam) {
+                null -> countedState.copy(
                     advantageTeam = team,
                     isGoldenPointActive = false,
                     isStarPointActive = false
                 )
-                state.advantageTeam == team -> awardGame(countedState, team)
+                team -> awardGame(countedState, team)
                 else -> countedState.copy(
                     advantageTeam = null,
                     isGoldenPointActive = false,
@@ -84,13 +84,13 @@ object PadelScoreEngine {
                 return awardGame(countedState, team)
             }
 
-            return when {
-                state.advantageTeam == null -> countedState.copy(
+            return when (state.advantageTeam) {
+                null -> countedState.copy(
                     advantageTeam = team,
                     isGoldenPointActive = false,
                     isStarPointActive = false
                 )
-                state.advantageTeam == team -> awardGame(countedState, team)
+                team -> awardGame(countedState, team)
                 else -> {
                     val returns = state.deuceReturnCount + 1
                     countedState.copy(

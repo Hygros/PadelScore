@@ -10,6 +10,7 @@ import ch.hygro.padelscore.model.SetResult
 import ch.hygro.padelscore.model.Team
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.core.content.edit
 
 class MatchHistoryRepository(context: Context) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
@@ -56,7 +57,7 @@ class MatchHistoryRepository(context: Context) {
 
     private fun saveEntries(entries: List<MatchHistoryEntry>) {
         val array = JSONArray().apply { entries.forEach { put(encodeEntry(it)) } }
-        preferences.edit().putString(KEY_HISTORY_JSON, array.toString()).apply()
+        preferences.edit { putString(KEY_HISTORY_JSON, array.toString()) }
     }
 
     private fun encodeEntry(entry: MatchHistoryEntry) = JSONObject()

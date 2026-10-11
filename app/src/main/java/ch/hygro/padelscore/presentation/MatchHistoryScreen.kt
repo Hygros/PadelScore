@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +33,6 @@ import ch.hygro.padelscore.model.MatchHistoryEntry
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun MatchHistoryScreen(
@@ -291,11 +291,16 @@ private fun historyResultText(entry: MatchHistoryEntry): String {
         }
 }
 
-private fun historyDateText(epochMillis: Long): String =
-    DateTimeFormatter
-        .ofPattern("dd.MM.yy HH:mm", Locale.getDefault())
-        .withZone(ZoneId.of("Europe/Zurich"))
-        .format(Instant.ofEpochMilli(epochMillis))
+@Composable
+private fun historyDateText(epochMillis: Long): String {
+    val locale = LocalConfiguration.current.locales[0]
+    val formatter = remember(locale) {
+        DateTimeFormatter
+            .ofPattern("dd.MM.yy HH:mm", locale)
+            .withZone(ZoneId.of("Europe/Zurich"))
+    }
+    return formatter.format(Instant.ofEpochMilli(epochMillis))
+}
 
 @Composable
 private fun historyDurationText(entry: MatchHistoryEntry): String {

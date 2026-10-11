@@ -13,6 +13,7 @@ import android.service.notification.Condition
 import android.service.notification.ZenPolicy
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.core.content.edit
 
 /** Owns only the app's rule; never changes the user's global DND policy. */
 class MatchQuietModeController(private val activity: Activity) {
@@ -118,7 +119,7 @@ class MatchQuietModeController(private val activity: Activity) {
         // Remember the choice; do not repeatedly interrupt matches on watches
         // that do not expose the policy-access screen. Access is still checked
         // on every resume, so a later grant enables automatic mode.
-        preferences.edit().putBoolean("manual_mode_acknowledged", true).apply()
+        preferences.edit { putBoolean("manual_mode_acknowledged", true)}
     }
 
     private fun openManualSettings() {
@@ -141,7 +142,7 @@ class MatchQuietModeController(private val activity: Activity) {
         try {
             var id = preferences.getString("rule_id", null)
             if (id != null && manager.getAutomaticZenRule(id) == null) {
-                preferences.edit().remove("rule_id").apply()
+                preferences.edit {remove("rule_id")}
                 id = null
             }
             if (id == null) {
