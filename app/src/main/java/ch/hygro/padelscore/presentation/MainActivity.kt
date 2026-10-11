@@ -61,6 +61,7 @@ import ch.hygro.padelscore.R
 import ch.hygro.padelscore.billing.SupporterBillingManager
 import ch.hygro.padelscore.billing.SupporterBillingState
 import ch.hygro.padelscore.logic.PadelScoreEngine
+import ch.hygro.padelscore.logic.ServeCalculator
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.ScoringMode
@@ -280,6 +281,7 @@ private fun PadelScoreContent(
     var lastAcceptedPointAtMillis by remember { mutableLongStateOf(0L) }
     var showExitConfirmation by remember { mutableStateOf(false) }
     var showMatchHistory by remember { mutableStateOf(false) }
+    var showCourtChange by remember { mutableStateOf(false) }
     var matchHistoryEntries by remember {
         mutableStateOf(matchHistoryRepository.loadEntries())
     }
@@ -315,6 +317,8 @@ private fun PadelScoreContent(
 
         val previousState = matchState
         val newState = PadelScoreEngine.awardPoint(previousState, team)
+        val courtChange = ServeCalculator.isCourtChange(previousState, newState)
+        showCourtChange = courtChange
 
         if (
             previousState.phase != MatchPhase.MATCH_FINISHED &&
@@ -326,13 +330,16 @@ private fun PadelScoreContent(
         performScoreHapticFeedback(
             previousState = previousState,
             newState = newState,
-            manager = hapticFeedbackManager
+            manager = hapticFeedbackManager,
+            scoringTeam = team,
+            isCourtChange = courtChange
         )
     }
 
     fun undoLastPoint() {
         if (history.isNotEmpty()) {
             lastAcceptedPointAtMillis = 0L
+            showCourtChange = false
             updateMatch(history.removeAt(history.lastIndex))
             hapticFeedbackManager.undo()
         }
@@ -341,6 +348,7 @@ private fun PadelScoreContent(
     fun resetMatch() {
         val currentConfiguration = matchState.configuration
         lastAcceptedPointAtMillis = 0L
+        showCourtChange = false
         history.clear()
         updateMatch(MatchState(configuration = currentConfiguration))
         showExitConfirmation = false
@@ -525,6 +533,8 @@ private fun PadelScoreContent(
             .padding(horizontal = 8.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val isDeuceCourt = ServeCalculator.isDeuceCourtServe(matchState.pointsInCurrentGame)
+
         ScoreArea(
             modifier = Modifier.fillMaxWidth().weight(1f),
             pointText = pointText(matchState, Team.OPPONENT),
@@ -532,6 +542,7 @@ private fun PadelScoreContent(
             sets = matchState.opponentSets,
             backgroundColor = Color(0xFF8B2525),
             isServing = matchState.servingTeam == Team.OPPONENT,
+            isDeuceCourt = isDeuceCourt,
             statsAtTop = true,
             enabled = !matchFinished,
             ambient = isReducedDisplay,
@@ -545,6 +556,7 @@ private fun PadelScoreContent(
             CenterScoreArea(
                 modifier = Modifier.fillMaxSize().alpha(if (isReducedDisplay) 0f else 1f),
                 matchState = matchState,
+                showCourtChange = showCourtChange,
                 canUndo = !isReducedDisplay && history.isNotEmpty(),
                 onUndo = { if (!isReducedDisplay) undoLastPoint() },
                 onReset = { if (!isReducedDisplay) resetMatch() }
@@ -561,6 +573,7 @@ private fun PadelScoreContent(
             sets = matchState.ourSets,
             backgroundColor = Color(0xFF195F3B),
             isServing = matchState.servingTeam == Team.US,
+            isDeuceCourt = isDeuceCourt,
             statsAtTop = false,
             enabled = !matchFinished,
             ambient = isReducedDisplay,
@@ -577,6 +590,7 @@ private fun ScoreArea(
     sets: Int,
     backgroundColor: Color,
     isServing: Boolean,
+    isDeuceCourt: Boolean,
     statsAtTop: Boolean,
     enabled: Boolean,
     ambient: Boolean,
@@ -629,19 +643,18 @@ private fun ScoreArea(
             )
 
             if (isServing) {
+                val alignment = if (isDeuceCourt) {
+                    if (statsAtTop) Alignment.BottomEnd else Alignment.TopEnd
+                } else {
+                    if (statsAtTop) Alignment.BottomStart else Alignment.TopStart
+                }
                 Text(
                     text = "●",
                     color = if (ambient) Color.White else Color(0xFFFFD54F),
                     fontSize = 15.sp,
                     lineHeight = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(
-                        if (statsAtTop) {
-                            Alignment.BottomStart
-                        } else {
-                            Alignment.TopStart
-                        }
-                    )
+                    modifier = Modifier.align(alignment)
                 )
             }
         }
@@ -695,6 +708,7 @@ private fun ScoreStatistics(
 private fun CenterScoreArea(
     modifier: Modifier,
     matchState: MatchState,
+    showCourtChange: Boolean,
     canUndo: Boolean,
     onUndo: () -> Unit,
     onReset: () -> Unit
@@ -755,8 +769,8 @@ private fun CenterScoreArea(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = centerLabel(matchState),
-                color = centerLabelColor(matchState),
+                text = centerLabel(matchState, showCourtChange),
+                color = if (showCourtChange) Color(0xFFFF9800) else centerLabelColor(matchState),
                 fontSize = centerLabelFontSize(matchState),
                 lineHeight = 9.sp,
                 fontWeight = FontWeight.Bold,
@@ -819,8 +833,15 @@ private fun CenterScoreArea(
 private fun performScoreHapticFeedback(
     previousState: MatchState,
     newState: MatchState,
-    manager: HapticFeedbackManager
+    manager: HapticFeedbackManager,
+    scoringTeam: Team,
+    isCourtChange: Boolean
 ) {
+    if (isCourtChange) {
+        manager.courtChange()
+        return
+    }
+
     when {
         newState.phase == MatchPhase.MATCH_FINISHED &&
                 previousState.phase != MatchPhase.MATCH_FINISHED -> {
@@ -837,13 +858,18 @@ private fun performScoreHapticFeedback(
         }
 
         newState.totalPointsPlayed > previousState.totalPointsPlayed -> {
-            manager.point()
+            if (scoringTeam == Team.US) {
+                manager.pointUs()
+            } else {
+                manager.pointOpponent()
+            }
         }
     }
 }
 
 @Composable
-private fun centerLabel(state: MatchState): String {
+private fun centerLabel(state: MatchState, showCourtChange: Boolean): String {
+    if (showCourtChange) return stringResource(R.string.change_sides)
     return when {
         state.phase == MatchPhase.MATCH_FINISHED &&
                 state.ourSets > state.opponentSets -> stringResource(R.string.match_won)

@@ -32,7 +32,10 @@ object PadelScoreEngine {
     }
 
     private fun awardClassicAdvantagePoint(state: MatchState, team: Team): MatchState {
-        val countedState = state.copy(totalPointsPlayed = state.totalPointsPlayed + 1)
+        val countedState = state.copy(
+            totalPointsPlayed = state.totalPointsPlayed + 1,
+            pointsInCurrentGame = state.pointsInCurrentGame + 1
+        )
         val isDeuce = state.opponentPoints == 3 && state.ourPoints == 3
 
         if (isDeuce) {
@@ -55,7 +58,10 @@ object PadelScoreEngine {
     }
 
     private fun awardGoldenPoint(state: MatchState, team: Team): MatchState {
-        val countedState = state.copy(totalPointsPlayed = state.totalPointsPlayed + 1)
+        val countedState = state.copy(
+            totalPointsPlayed = state.totalPointsPlayed + 1,
+            pointsInCurrentGame = state.pointsInCurrentGame + 1
+        )
         val isGoldenPoint = state.opponentPoints == 3 && state.ourPoints == 3
 
         if (isGoldenPoint) return awardGame(countedState, team)
@@ -76,7 +82,10 @@ object PadelScoreEngine {
     }
 
     private fun awardStarPoint(state: MatchState, team: Team): MatchState {
-        val countedState = state.copy(totalPointsPlayed = state.totalPointsPlayed + 1)
+        val countedState = state.copy(
+            totalPointsPlayed = state.totalPointsPlayed + 1,
+            pointsInCurrentGame = state.pointsInCurrentGame + 1
+        )
         val isDeuce = state.opponentPoints == 3 && state.ourPoints == 3
 
         if (isDeuce) {
@@ -163,7 +172,8 @@ object PadelScoreEngine {
                 isStarPointActive = false,
                 servingTeam = nextServer,
                 tieBreakFirstServingTeam = nextServer,
-                totalGamesPlayed = totalGames
+                totalGamesPlayed = totalGames,
+                pointsInCurrentGame = 0
             )
         }
 
@@ -195,7 +205,8 @@ object PadelScoreEngine {
             isGoldenPointActive = false,
             isStarPointActive = false,
             servingTeam = nextServer,
-            totalGamesPlayed = totalGames
+            totalGamesPlayed = totalGames,
+            pointsInCurrentGame = 0
         )
     }
 
@@ -219,7 +230,8 @@ object PadelScoreEngine {
                     pointsPlayed = pointsPlayed
                 ),
                 tieBreakFirstServingTeam = firstServer,
-                totalPointsPlayed = totalPoints
+                totalPointsPlayed = totalPoints,
+                pointsInCurrentGame = state.pointsInCurrentGame + 1
             )
         }
 
@@ -287,6 +299,7 @@ object PadelScoreEngine {
             },
             completedSets = state.completedSets + result,
             totalGamesPlayed = totalGamesPlayed,
+            pointsInCurrentGame = 0,
             finishedAtEpochMillis = if (finished) System.currentTimeMillis() else null
         )
     }
@@ -333,7 +346,8 @@ object PadelScoreEngine {
                     pointsPlayed = pointsPlayed
                 ),
                 tieBreakFirstServingTeam = firstServer,
-                totalPointsPlayed = totalPoints
+                totalPointsPlayed = totalPoints,
+                pointsInCurrentGame = state.pointsInCurrentGame + 1
             )
         }
 
@@ -344,6 +358,7 @@ object PadelScoreEngine {
             ourMatchTieBreakPoints = ourPoints,
             phase = MatchPhase.MATCH_FINISHED,
             totalPointsPlayed = totalPoints,
+            pointsInCurrentGame = 0,
             finishedAtEpochMillis = System.currentTimeMillis()
         )
     }

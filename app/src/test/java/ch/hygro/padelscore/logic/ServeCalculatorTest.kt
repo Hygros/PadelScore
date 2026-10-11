@@ -78,4 +78,12 @@ class ServeCalculatorTest {
             pointsPlayed = pointsPlayed
         )
     }
+
+    @Test
+    fun testDeuceCourtServe() {
+        org.junit.Assert.assertTrue(ServeCalculator.isDeuceCourtServe(0))
+        org.junit.Assert.assertFalse(ServeCalculator.isDeuceCourtServe(1))
+        org.junit.Assert.assertTrue(ServeCalculator.isDeuceCourtServe(2))
+        org.junit.Assert.assertFalse(ServeCalculator.isDeuceCourtServe(3))
+    }
 }

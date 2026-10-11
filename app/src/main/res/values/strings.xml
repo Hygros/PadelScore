@@ -89,4 +89,5 @@
     <string name="purchase_acknowledge_error">The purchase was detected but could not yet be confirmed. Please try restoring again.</string>
     <string name="back_to_home">BACK TO HOME</string>
     <string name="back_to_home_message">Returning home discards the current match.</string>
+    <string name="change_sides">CHANGE SIDES</string>
 </resources>

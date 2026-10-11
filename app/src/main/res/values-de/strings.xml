@@ -89,4 +89,5 @@
     <string name="purchase_acknowledge_error">Der Kauf wurde erkannt, konnte aber noch nicht bestätigt werden. Bitte versuche die Wiederherstellung erneut.</string>
     <string name="back_to_home">ZURÜCK ZUM START</string>
     <string name="back_to_home_message">Zurückkehren verwirft das laufende Spiel.</string>
+    <string name="change_sides">SEITENWECHSEL</string>
 </resources>

@@ -10,8 +10,28 @@ class HapticFeedbackManager(
 ) {
     private val handler = Handler(Looper.getMainLooper())
 
-    fun point() {
+    fun pointUs() {
         perform(HapticFeedbackConstants.CONFIRM)
+    }
+
+    fun pointOpponent() {
+        perform(HapticFeedbackConstants.CONFIRM)
+        performDelayed(
+            feedbackConstant = HapticFeedbackConstants.CONFIRM,
+            delayMillis = 110L
+        )
+    }
+
+    fun courtChange() {
+        perform(HapticFeedbackConstants.LONG_PRESS)
+        performDelayed(
+            feedbackConstant = HapticFeedbackConstants.CONFIRM,
+            delayMillis = 150L
+        )
+        performDelayed(
+            feedbackConstant = HapticFeedbackConstants.CONFIRM,
+            delayMillis = 280L
+        )
     }
 
     fun gameWon() {

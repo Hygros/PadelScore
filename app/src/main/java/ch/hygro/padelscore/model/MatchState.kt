@@ -40,6 +40,7 @@ data class MatchState(
 
     val totalPointsPlayed: Int = 0,
     val totalGamesPlayed: Int = 0,
+    val pointsInCurrentGame: Int = 0,
 
     val startedAtEpochMillis: Long = 0L,
     val finishedAtEpochMillis: Long? = null
