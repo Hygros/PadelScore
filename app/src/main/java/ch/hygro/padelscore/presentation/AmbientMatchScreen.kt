@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package ch.hygro.padelscore.presentation
 
 import androidx.compose.foundation.background
@@ -14,16 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import ch.hygro.padelscore.R
+import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
+import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
 fun AmbientMatchScreen(
@@ -32,11 +34,16 @@ fun AmbientMatchScreen(
     onAddPointOpponent: () -> Unit,
     isMatchFinished: Boolean
 ) {
+    val isRound = LocalConfiguration.current.isScreenRound
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(horizontal = 24.dp, vertical = 18.dp),
+            .padding(
+                horizontal = if (isRound) 28.dp else 20.dp,
+                vertical = if (isRound) 16.dp else 14.dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -46,6 +53,7 @@ fun AmbientMatchScreen(
             sets = matchState.opponentSets,
             isServing = matchState.servingTeam == Team.OPPONENT,
             enabled = !isMatchFinished,
+            isRound = isRound,
             onClick = onAddPointOpponent
         )
 
@@ -65,6 +73,7 @@ fun AmbientMatchScreen(
             sets = matchState.ourSets,
             isServing = matchState.servingTeam == Team.US,
             enabled = !isMatchFinished,
+            isRound = isRound,
             onClick = onAddPointOur
         )
     }
@@ -77,6 +86,7 @@ private fun AmbientTeamScore(
     sets: Int,
     isServing: Boolean,
     enabled: Boolean,
+    isRound: Boolean,
     onClick: () -> Unit
 ) {
     Column(
@@ -86,15 +96,15 @@ private fun AmbientTeamScore(
         Text(
             text = if (isServing) "•  $points" else points,
             color = Color(0xFFBDBDBD),
-            fontSize = 35.sp,
-            lineHeight = 36.sp,
+            fontSize = if (isRound) 40.sp else 45.sp,
+            lineHeight = if (isRound) 41.sp else 46.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             maxLines = 1
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -159,5 +169,18 @@ private fun ambientStatusText(state: MatchState): String {
         state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_top)
         state.advantageTeam == Team.US -> stringResource(R.string.advantage_bottom)
         else -> "${state.opponentGames} : ${state.ourGames}"
+    }
+}
+
+@WearPreviewDevices
+@Composable
+private fun AmbientMatchScreenPreview() {
+    PadelScoreTheme {
+        AmbientMatchScreen(
+            matchState = MatchState(configuration = MatchConfiguration.normalSet()),
+            onAddPointOur = {},
+            onAddPointOpponent = {},
+            isMatchFinished = false
+        )
     }
 }

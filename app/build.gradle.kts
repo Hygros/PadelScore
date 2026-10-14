@@ -36,7 +36,7 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 30
         targetSdk = 37
-        versionCode = 7
+        versionCode = 8
         versionName = "1.0"
     }
 

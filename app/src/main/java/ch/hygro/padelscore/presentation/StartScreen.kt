@@ -19,17 +19,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import androidx.wear.compose.material3.lazy.transformedHeight
+import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.ScoringMode
 import ch.hygro.padelscore.model.Team
+import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
 fun StartScreen(
@@ -52,156 +60,183 @@ fun StartScreen(
         mutableStateOf(initialConfiguration.firstServingTeam)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(
-                horizontal = 22.dp,
-                vertical = 20.dp
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.new_match),
-            color = Color.White,
-            fontSize = 12.sp,
-            lineHeight = 13.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1
-        )
+    val columnState = rememberTransformingLazyColumnState()
+    val transformationSpec = rememberTransformationSpec()
+    val isRound = LocalConfiguration.current.isScreenRound
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
+    ScreenScaffold(scrollState = columnState) { contentPadding ->
+        TransformingLazyColumn(
+            state = columnState,
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ConfigurationField(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.scoring_mode),
-                value = scoringModeLabel(scoringMode),
-                onClick = {
-                    scoringMode = when (scoringMode) {
-                        ScoringMode.CLASSIC_ADVANTAGE -> {
-                            ScoringMode.GOLDEN_POINT
-                        }
-
-                        ScoringMode.GOLDEN_POINT -> {
-                            ScoringMode.STAR_POINT
-                        }
-
-                        ScoringMode.STAR_POINT -> {
-                            ScoringMode.CLASSIC_ADVANTAGE
-                        }
-                    }
+            item {
+                val itemScope = this
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(top = 1.dp, bottom = 1.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.new_match),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        lineHeight = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
                 }
-            )
+            }
 
-            ConfigurationField(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.match_format),
-                value = matchFormatLabel(matchFormat),
-                onClick = {
-                    matchFormat = when (matchFormat) {
-                        MatchFormat.ONE_SET -> {
-                            MatchFormat.BEST_OF_THREE
+            item {
+                val itemScope = this
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 1f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 1.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    ConfigurationField(
+                        modifier = Modifier.weight(1f),
+                        title = stringResource(R.string.scoring_mode),
+                        value = scoringModeLabel(scoringMode),
+                        onClick = {
+                            scoringMode = when (scoringMode) {
+                                ScoringMode.CLASSIC_ADVANTAGE -> ScoringMode.GOLDEN_POINT
+                                ScoringMode.GOLDEN_POINT -> ScoringMode.STAR_POINT
+                                ScoringMode.STAR_POINT -> ScoringMode.CLASSIC_ADVANTAGE
+                            }
                         }
+                    )
 
-                        MatchFormat.BEST_OF_THREE -> {
-                            MatchFormat.TWO_SETS_AND_MATCH_TIE_BREAK
+                    ConfigurationField(
+                        modifier = Modifier.weight(1f),
+                        title = stringResource(R.string.match_format),
+                        value = matchFormatLabel(matchFormat),
+                        onClick = {
+                            matchFormat = when (matchFormat) {
+                                MatchFormat.ONE_SET -> MatchFormat.BEST_OF_THREE
+                                MatchFormat.BEST_OF_THREE -> MatchFormat.TWO_SETS_AND_MATCH_TIE_BREAK
+                                MatchFormat.TWO_SETS_AND_MATCH_TIE_BREAK -> MatchFormat.ONE_SET
+                            }
                         }
+                    )
+                }
+            }
 
-                        MatchFormat.TWO_SETS_AND_MATCH_TIE_BREAK -> {
-                            MatchFormat.ONE_SET
+            item {
+                val itemScope = this
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 1f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 1.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    ConfigurationField(
+                        modifier = Modifier.weight(1f),
+                        title = stringResource(R.string.set_format),
+                        value = if (shortSet) {
+                            stringResource(R.string.short_set_label)
+                        } else {
+                            stringResource(R.string.normal_set_label)
+                        },
+                        onClick = {
+                            shortSet = !shortSet
                         }
-                    }
+                    )
+
+                    ConfigurationField(
+                        modifier = Modifier.weight(1f),
+                        title = stringResource(R.string.first_serve),
+                        value = if (firstServingTeam == Team.US) {
+                            stringResource(R.string.bottom)
+                        } else {
+                            stringResource(R.string.top)
+                        },
+                        onClick = {
+                            firstServingTeam = firstServingTeam.other()
+                        }
+                    )
                 }
-            )
-        }
+            }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            ConfigurationField(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.set_format),
-                value = if (shortSet) {
-                    stringResource(R.string.short_set_label)
-                } else {
-                    stringResource(R.string.normal_set_label)
-                },
-                onClick = {
-                    shortSet = !shortSet
+            item {
+                val itemScope = this
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 0.92f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(top = 1.dp, bottom = 1.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    StartActionButton(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.matches_history),
+                        backgroundColor = Color(0xFF3A3A3A),
+                        onClick = onOpenHistory
+                    )
+
+                    StartActionButton(
+                        modifier = Modifier.weight(1f),
+                        text = if (isSupporterActive) {
+                            stringResource(R.string.supporter_active)
+                        } else {
+                            stringResource(R.string.supporter_inactive)
+                        },
+                        backgroundColor = if (isSupporterActive) {
+                            Color(0xFF163D29)
+                        } else {
+                            Color(0xFF3A3A3A)
+                        },
+                        contentColor = if (isSupporterActive) {
+                            Color(0xFF66E59A)
+                        } else {
+                            Color.White
+                        },
+                        onClick = onOpenSupporter
+                    )
                 }
-            )
+            }
 
-            ConfigurationField(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.first_serve),
-                value = if (firstServingTeam == Team.US) {
-                    stringResource(R.string.bottom)
-                } else {
-                    stringResource(R.string.top)
-                },
-                onClick = {
-                    firstServingTeam = firstServingTeam.other()
+            item {
+                val itemScope = this
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 0.92f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(top = 1.dp, bottom = 1.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    StartActionButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = stringResource(R.string.start),
+                        backgroundColor = Color(0xFF195F3B),
+                        onClick = {
+                            val configuration = if (shortSet) {
+                                MatchConfiguration.shortSet(
+                                    scoringMode,
+                                    matchFormat,
+                                    firstServingTeam
+                                )
+                            } else {
+                                MatchConfiguration.normalSet(
+                                    scoringMode,
+                                    matchFormat,
+                                    firstServingTeam
+                                )
+                            }
+                            onStartMatch(configuration)
+                        }
+                    )
                 }
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(0.88f),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            StartActionButton(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.matches_history),
-                backgroundColor = Color(0xFF3A3A3A),
-                onClick = onOpenHistory
-            )
-
-            StartActionButton(
-                modifier = Modifier.weight(1f),
-                text = if (isSupporterActive) {
-                    stringResource(R.string.supporter_active)
-                } else {
-                    stringResource(R.string.supporter_inactive)
-                },
-                backgroundColor = if (isSupporterActive) {
-                    Color(0xFF163D29)
-                } else {
-                    Color(0xFF3A3A3A)
-                },
-                contentColor = if (isSupporterActive) {
-                    Color(0xFF66E59A)
-                } else {
-                    Color.White
-                },
-                onClick = onOpenSupporter
-            )
-
-            StartActionButton(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.start),
-                backgroundColor = Color(0xFF195F3B),
-                onClick = {
-                    val configuration = if (shortSet) {
-                        MatchConfiguration.shortSet(
-                            scoringMode,
-                            matchFormat,
-                            firstServingTeam
-                        )
-                    } else {
-                        MatchConfiguration.normalSet(
-                            scoringMode,
-                            matchFormat,
-                            firstServingTeam
-                        )
-                    }
-                    onStartMatch(configuration)
-                }
-            )
+            }
         }
     }
 }
@@ -216,8 +251,8 @@ private fun StartActionButton(
 ) {
     Box(
         modifier = modifier
-            .height(31.dp)
-            .background(backgroundColor, RoundedCornerShape(16.dp))
+            .height(25.dp)
+            .background(backgroundColor, RoundedCornerShape(12.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -225,7 +260,7 @@ private fun StartActionButton(
             text = text,
             color = contentColor,
             fontSize = 8.sp,
-            lineHeight = 11.sp,
+            lineHeight = 9.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             maxLines = 1
@@ -242,16 +277,13 @@ private fun ConfigurationField(
 ) {
     Box(
         modifier = modifier
-            .height(52.dp)
+            .height(32.dp)
             .background(
                 color = Color(0xFF292929),
-                shape = RoundedCornerShape(15.dp)
+                shape = RoundedCornerShape(10.dp)
             )
             .clickable(onClick = onClick)
-            .padding(
-                horizontal = 5.dp,
-                vertical = 3.dp
-            ),
+            .padding(horizontal = 2.dp, vertical = 1.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -262,7 +294,7 @@ private fun ConfigurationField(
                 text = title,
                 color = Color.LightGray,
                 fontSize = 6.sp,
-                lineHeight = 7.sp,
+                lineHeight = 6.5.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 maxLines = 1
@@ -312,5 +344,19 @@ private fun matchFormatLabel(format: MatchFormat): String {
         MatchFormat.TWO_SETS_AND_MATCH_TIE_BREAK -> {
             stringResource(R.string.two_sets_match_tb)
         }
+    }
+}
+
+@WearPreviewDevices
+@Composable
+private fun StartScreenPreview() {
+    PadelScoreTheme {
+        StartScreen(
+            initialConfiguration = MatchConfiguration.normalSet(),
+            isSupporterActive = false,
+            onStartMatch = {},
+            onOpenHistory = {},
+            onOpenSupporter = {}
+        )
     }
 }
