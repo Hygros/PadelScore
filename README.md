@@ -7,14 +7,14 @@
 </p>
 
 <p align="center">
-  <strong>A standalone, privacy-first Wear OS smartwatch app for keeping score during padel matches — 100% offline match scoring, fast, and effortless.</strong>
+  <strong>A standalone, privacy-first Wear OS smartwatch app for keeping score during padel matches — 100% offline, fast, and effortless.</strong>
 </p>
 
 <p align="center">
   <a href="https://github.com/Hygros/PadelScore/releases"><img src="https://img.shields.io/github/v/release/Hygros/PadelScore?color=2e7d32&label=Latest%20Release&style=flat-square" alt="Latest Release" /></a>
   <a href="https://developer.android.com/wear"><img src="https://img.shields.io/badge/Platform-Wear%20OS%203%2B-00C853?style=flat-square&logo=wearos&logoColor=white" alt="Wear OS 3+" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square" alt="License" /></a>
-  <a href="#privacy"><img src="https://img.shields.io/badge/Privacy-100%25%20Offline%20Scoring-brightgreen?style=flat-square" alt="Offline Scoring" /></a>
+  <a href="#privacy"><img src="https://img.shields.io/badge/Privacy-100%25%20Offline-brightgreen?style=flat-square" alt="Offline Scoring" /></a>
 </p>
 
 ---
@@ -22,13 +22,13 @@
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/01_new_match.png" width="210" alt="New Match Setup" />
+  <img src="docs/screenshots/01_new_match.png" width="200" alt="New Match Setup" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/02_match_scoring.png" width="210" alt="Match Scoring" />
+  <img src="docs/screenshots/02_match_scoring.png" width="200" alt="Match Scoring" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/03_match_result.png" width="210" alt="Match Result" />
+  <img src="docs/screenshots/03_match_result.png" width="200" alt="Match Result" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/04_match_history.png" width="210" alt="Match History" />
+  <img src="docs/screenshots/04_match_history.png" width="200" alt="Match History" />
 </p>
 
 <p align="center">
@@ -39,58 +39,34 @@
 
 ## ✨ Features
 
-- 🎾 **Official Padel Scoring Rules**: Standard scoring (`0`, `15`, `30`, `40`), Advantage, Golden Point, and Star Point modes.
-- ⚙️ **Flexible Match Formats**: Single set, Best-of-3 sets, Short sets (to 4 games) or Normal sets (to 6 games), set tie-breaks, and match tie-breaks.
-- 🟡 **Smart Serve Rotation**: Visual serve indicator on screen with precise rotation calculations (including 1-2-2 tie-break sequences).
-- 🎯 **Court-Optimized Interface**: High-contrast, large touch targets designed specifically for quick, reliable taps on smartwatch displays.
-- 📳 **Haptic Feedback & Safety Lock**: Tactile feedback on points and a 300 ms input lock to prevent unintended double-taps during intense play.
-- ↺ **Instant Undo & Safety Reset**: Effortlessly reverse accidental points or long-press to reset match state safely.
-- 📜 **Local Match History**: View saved match details on your wrist, including date, final scores, total points, total games, and duration.
-- 🔋 **Always-On Display (AOD)**: Ambient display support keeps the score visible while conserving watch battery.
-- 🔒 **100% Standalone & Offline Match Scoring**: No companion phone app needed, no internet permissions declared, no user tracking.
-- 💖 **Optional Supporter Feature**: Includes an optional Support page integrated with Google Play In-App Billing for voluntary developer contributions.
+- 🎾 **Official Padel Rules**: Advantage, Golden Point, and Star Point scoring modes.
+- ⚙️ **Flexible Match Formats**: Single set, Best-of-3, Short sets (to 4 games), Normal sets (to 6 games), set tie-breaks, and match tie-breaks.
+- 🟡 **Serve & Court Tracking**: Visual serve indicators (Deuce/Ad court) with 1-2-2 tie-break rotation and court change notifications.
+- 🔕 **Match Quiet Mode**: Optional automatic Do Not Disturb mode during active matches to silence notifications and pop-ups.
+- 🎯 **Court-Optimized UI**: Large touch targets, 300 ms double-tap safety lock, wrist haptics, and Always-On Display (AOD) support.
+- ↺ **Instant Undo & Reset**: Quick point reversal and safety long-press match reset.
+- 📜 **Local Match History**: Save and review past matches on your watch, including scores, durations, and total point breakdowns.
+- 🔒 **100% Standalone & Privacy-First**: No phone app required, no internet permission requested, and zero tracking.
 
 ---
 
-## 🚀 Quick Start / Download
+## 🚀 Installation
 
-### Download APK Release
-Download the latest APK directly from the [GitHub Releases](https://github.com/Hygros/PadelScore/releases) page.
-
-- **`PadelScore-v1.6.0`**: Signed APK
-
-### Installing on Wear OS Smartwatch
-
-You can install the APK onto your Wear OS watch using **ADB over Wi-Fi**:
-
-1. **Enable Developer Options & Wireless Debugging** on your watch (`Settings > System > About > tap Build Number 7 times`, then `Settings > Developer Options > Wireless Debugging`).
-2. **Connect via ADB** on your computer:
-   ```powershell
-   $Adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-   & $Adb connect <WATCH_IP_ADDRESS>:5555
+1. Download the latest APK from [GitHub Releases](https://github.com/Hygros/PadelScore/releases).
+2. Install onto your Wear OS watch using **ADB over Wi-Fi** or a phone sideloading app (e.g. Bugjaeger, Easy Fire Tools):
+   ```bash
+   adb connect <WATCH_IP_ADDRESS>:5555
+   adb install -r PadelScore.apk
    ```
-3. **Install the APK**:
-   ```powershell
-   & $Adb install -r releases/PadelScore-v1.0-debug.apk
-   ```
-
-*Alternatively, you can use phone apps like **Bugjaeger** or **Easy Fire Tools** to sideload the APK directly from your Android phone to your watch over Wi-Fi.*
 
 ---
 
 <a id="privacy"></a>
-## 🔒 Privacy & Network Usage
+## 🔒 Privacy & Permissions
 
-Padel Score is built with privacy in mind:
-
-- ❌ No `android.permission.INTERNET` requested in the app manifest.
-- ❌ No user accounts or logins required.
-- ❌ No analytics, telemetry, crash reporting, or tracking scripts.
-- ❌ No background cloud sync or remote servers.
-
-**Match Scoring & History**: Operates 100% offline. All match data, undo state, and history logs are stored strictly in local device storage.
-
-**Optional Supporter Page**: The Support screen connects locally to Google Play Services via the official Google Play Billing Library to handle optional voluntary tips/purchases through your Google Play Account.
+- ❌ **No Internet Access**: `android.permission.INTERNET` is not requested.
+- ❌ **No Tracking**: No telemetry, analytics, or background cloud sync.
+- 💾 **100% Local**: All match state and history remain strictly on your watch.
 
 ---
 
@@ -98,24 +74,16 @@ Padel Score is built with privacy in mind:
 
 ```text
 app/src/main/java/ch/hygro/padelscore/
-├── billing/        # Google Play Billing Integration for optional Supporter page
+├── billing/        # Optional Supporter page Google Play Billing
 ├── logic/          # Core scoring engine & serve calculator
 ├── model/          # Match configuration and scoring data models
-├── presentation/   # Wear OS Jetpack Compose UI screens & components
+├── presentation/   # Wear OS Jetpack Compose UI & quiet mode controller
 ├── storage/        # Offline local match storage & persistence
 └── vibration/      # Wrist haptic feedback engine
-
-app/src/test/java/ch/hygro/padelscore/logic/  # Comprehensive unit test suite
 ```
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  <sub>Application ID: <code>ch.hygro.padelscore</code></sub>
-</p>
+This project is licensed under the [Apache License 2.0](LICENSE).
