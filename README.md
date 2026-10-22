@@ -37,6 +37,16 @@
 
 ---
 
+## Support the project
+
+If this project has been helpful to you, you can support its continued development:
+
+[☕ Buy me a coffee](https://buymeacoffee.com/YOUR_USERNAME)
+
+Contributions, bug reports, and feature suggestions are equally appreciated.
+
+---
+
 ## ✨ Features
 
 - 🎾 **Official Padel Rules**: Advantage, Golden Point, and Star Point scoring modes.
