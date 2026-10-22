@@ -1,5 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
 pluginManagement {
     repositories {
         google {
@@ -23,7 +22,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
 rootProject.name = "Padel Score"
 include(":app")
- 
+include(":mobile")

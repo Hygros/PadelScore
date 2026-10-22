@@ -1,0 +1,113 @@
+package ch.hygro.padelscore.health
+
+import android.content.Context
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.concurrent.futures.await
+import androidx.core.content.ContextCompat
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.metadata.Device
+import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.services.client.ExerciseUpdateCallback
+import androidx.health.services.client.HealthServices
+import androidx.health.services.client.data.Availability
+import androidx.health.services.client.data.DataType
+import androidx.health.services.client.data.ExerciseConfig
+import androidx.health.services.client.data.ExerciseLapSummary
+import androidx.health.services.client.data.ExerciseType
+import androidx.health.services.client.data.ExerciseUpdate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZoneOffset
+import java.util.UUID
+
+class FitnessTrackerManager(private val context: Context) {
+    private val healthClient = HealthServices.getClient(context)
+    private val exerciseClient = healthClient.exerciseClient
+
+    var averageHeartRate: Int? = null
+
+    private val callback = object : ExerciseUpdateCallback {
+        override fun onExerciseUpdateReceived(update: ExerciseUpdate) {
+            averageHeartRate = update.latestMetrics.getData(DataType.HEART_RATE_BPM_STATS)?.average?.toInt() ?: averageHeartRate
+        }
+        override fun onLapSummaryReceived(lapSummary: ExerciseLapSummary) {}
+        override fun onRegistered() {}
+        override fun onRegistrationFailed(throwable: Throwable) {}
+        override fun onAvailabilityChanged(dataType: DataType<*, *>, availability: Availability) {}
+    }
+
+    suspend fun startWorkout() {
+        averageHeartRate = null
+        try {
+            val capabilities = exerciseClient.getCapabilitiesAsync().await()
+            val supportedTypes = capabilities.supportedExerciseTypes
+            
+            val exerciseType = when {
+                ExerciseType.TENNIS in supportedTypes -> ExerciseType.TENNIS
+                ExerciseType.WORKOUT in supportedTypes -> ExerciseType.WORKOUT
+                else -> return
+            }
+
+            val config = ExerciseConfig(
+                exerciseType = exerciseType,
+                dataTypes = setOf(DataType.HEART_RATE_BPM, DataType.HEART_RATE_BPM_STATS, DataType.CALORIES_TOTAL),
+                isAutoPauseAndResumeEnabled = false,
+                isGpsEnabled = false
+            )
+            exerciseClient.setUpdateCallback(callback)
+            exerciseClient.startExerciseAsync(config).await()
+            Log.d("FitnessTracker", "Workout started: $exerciseType")
+        } catch (e: Exception) {
+            Log.e("FitnessTracker", "Failed to start workout", e)
+        }
+    }
+
+    suspend fun stopWorkout() {
+        try {
+            exerciseClient.endExerciseAsync().await()
+            exerciseClient.clearUpdateCallbackAsync(callback)
+            Log.d("FitnessTracker", "Workout stopped")
+        } catch (e: Exception) {
+            Log.e("FitnessTracker", "Failed to stop workout", e)
+        }
+    }
+
+    suspend fun saveWorkoutToHealthConnect(startTime: Long, endTime: Long) {
+        val permissionGranted = ContextCompat.checkSelfPermission(
+            context,
+            "android.permission.health.WRITE_EXERCISE"
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!permissionGranted) {
+            Log.d("FitnessTracker", "WRITE_EXERCISE permission not granted")
+            return
+        }
+
+        try {
+            val healthConnectClient = HealthConnectClient.getOrCreate(context)
+            val sessionClientId = UUID.randomUUID().toString()
+            val startInstant = Instant.ofEpochMilli(startTime)
+            val endInstant = Instant.ofEpochMilli(endTime)
+            val zoneOffset = ZoneOffset.systemDefault().rules.getOffset(startInstant)
+
+            val session = ExerciseSessionRecord(
+                startTime = startInstant,
+                startZoneOffset = zoneOffset,
+                endTime = endInstant,
+                endZoneOffset = zoneOffset,
+                exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_TENNIS,
+                title = "Padel Match",
+                metadata = Metadata.activelyRecorded(device = Device(type = Device.TYPE_WATCH), clientRecordId = sessionClientId)
+            )
+
+            withContext(Dispatchers.IO) {
+                healthConnectClient.insertRecords(listOf(session))
+            }
+            Log.d("FitnessTracker", "Workout saved to Health Connect")
+        } catch (e: Exception) {
+            Log.e("FitnessTracker", "Failed to save workout to Health Connect", e)
+        }
+    }
+}

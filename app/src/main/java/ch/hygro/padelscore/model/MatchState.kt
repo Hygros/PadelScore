@@ -43,5 +43,6 @@ data class MatchState(
     val pointsInCurrentGame: Int = 0,
 
     val startedAtEpochMillis: Long = 0L,
-    val finishedAtEpochMillis: Long? = null
+    val finishedAtEpochMillis: Long? = null,
+    val averageHeartRate: Int? = null
 )

@@ -19,6 +19,8 @@ import androidx.core.content.edit
 class MatchQuietModeController(private val activity: Activity) {
     private val manager = activity.getSystemService(NotificationManager::class.java)
     private val preferences = activity.getSharedPreferences("match_quiet_mode", 0)
+    private val settings = activity.getSharedPreferences("settings_prefs", 0)
+    private fun enabled() = settings.getBoolean("match_quiet_mode_enabled", true)
     private val conditionId = "condition://${activity.packageName}/active-match".toUri()
     private var matchActive = false
     private var resumed = false
@@ -43,6 +45,15 @@ class MatchQuietModeController(private val activity: Activity) {
 
     fun onResume() {
         resumed = true
+        if (enabled() && !preferences.getBoolean("quiet_onboarding_seen", false)) {
+            preferences.edit { putBoolean("quiet_onboarding_seen", true) }
+            if (!manager.isNotificationPolicyAccessGranted &&
+                !activity.isFinishing && !activity.isDestroyed
+            ) {
+                showPermissionExplanation()
+                return
+            }
+        }
         if (manualDialogPending && matchActive) {
             manualDialogPending = false
             showManualModeDialog()
@@ -61,23 +72,40 @@ class MatchQuietModeController(private val activity: Activity) {
         setRuleActive(false)
     }
 
+    fun requestSetup() {
+        if (!resumed || activity.isFinishing || activity.isDestroyed) return
+        if (manager.isNotificationPolicyAccessGranted) {
+            AlertDialog.Builder(activity)
+                .setTitle("Match quiet mode")
+                .setMessage("Do Not Disturb access is already granted. Quiet mode activates only during matches when enabled.")
+                .setPositiveButton("OK", null)
+                .show()
+        } else {
+            showPermissionExplanation()
+        }
+    }
+
+    fun refreshSettings() {
+        synchronize()
+    }
+
+    private fun showPermissionExplanation() {
+        dialog?.dismiss()
+        dialog = AlertDialog.Builder(activity)
+            .setTitle("Match quiet mode")
+            .setMessage("Allow Do Not Disturb access now so Padel Score can silence interruptions during matches. This is optional and can be changed in Settings.")
+            .setPositiveButton("Open settings") { _, _ -> openSettings() }
+            .setNegativeButton("Not now", null)
+            .show()
+    }
+
     private fun synchronize() {
-        if (!matchActive || !resumed) {
+        if (!matchActive || !resumed || !enabled()) {
             setRuleActive(false)
             return
         }
         if (manager.isNotificationPolicyAccessGranted) {
             setRuleActive(true)
-        } else if (!prompted && !activity.isFinishing &&
-            !preferences.getBoolean("manual_mode_acknowledged", false)
-        ) {
-            prompted = true
-            dialog = AlertDialog.Builder(activity)
-                .setTitle("Match quiet mode")
-                .setMessage("Allow Do Not Disturb access to silence notifications and hide pop-ups while a match is open. Calls and messages will be silenced; alarms remain allowed. You can continue without this permission.")
-                .setPositiveButton("Open settings") { _, _ -> openSettings() }
-                .setNegativeButton("Not now", null)
-                .show()
         }
     }
 

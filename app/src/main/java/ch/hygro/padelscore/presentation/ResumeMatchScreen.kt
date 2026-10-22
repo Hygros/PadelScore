@@ -1,15 +1,12 @@
 package ch.hygro.padelscore.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -105,52 +104,44 @@ fun ResumeMatchScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    ActionButton(
-                        text = stringResource(R.string.resume),
-                        backgroundColor = Color(0xFF195F3B),
-                        isRound = isRound,
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF195F3B),
+                            contentColor = Color.White
+                        ),
                         onClick = onContinueMatch
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.resume),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
 
-                    ActionButton(
-                        text = stringResource(R.string.discard),
-                        backgroundColor = Color(0xFF8B2525),
-                        isRound = isRound,
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF8B2525),
+                            contentColor = Color.White
+                        ),
                         onClick = onDiscardMatch
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.discard),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ActionButton(
-    text: String,
-    backgroundColor: Color,
-    isRound: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
-            .height(35.dp)
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(18.dp)
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 11.sp,
-            lineHeight = 12.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
     }
 }
 

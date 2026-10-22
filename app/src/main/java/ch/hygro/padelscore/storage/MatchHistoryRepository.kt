@@ -1,6 +1,7 @@
 package ch.hygro.padelscore.storage
 
 import android.content.Context
+import ch.hygro.padelscore.health.LocalWorkoutRepository
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.MatchHistoryEntry
@@ -12,8 +13,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import androidx.core.content.edit
 
-class MatchHistoryRepository(context: Context) {
+class MatchHistoryRepository(private val context: Context) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    private val workouts = LocalWorkoutRepository(context)
 
     fun loadEntries(): List<MatchHistoryEntry> {
         val storedJson = preferences.getString(KEY_HISTORY_JSON, null) ?: return emptyList()
@@ -23,13 +25,21 @@ class MatchHistoryRepository(context: Context) {
                 for (index in 0 until array.length()) {
                     runCatching { add(decodeEntry(array.getJSONObject(index))) }
                 }
+            }.map { entry ->
+                entry.copy(
+                    averageHeartRate = workouts.averageHeartRateForMatch(entry.matchId)
+                        ?: entry.averageHeartRate,
+                    maximumHeartRate = workouts.maximumHeartRateForMatch(entry.matchId)
+                        ?: entry.maximumHeartRate,
+                    steps = workouts.stepsForMatch(entry.matchId) ?: entry.steps
+                )
             }.sortedByDescending { it.finishedAtEpochMillis }
         }.getOrDefault(emptyList())
     }
 
-    fun saveCompletedMatch(state: MatchState) {
+    fun saveCompletedMatch(state: MatchState, averageHeartRate: Int? = null) {
         val finishedAt = state.finishedAtEpochMillis ?: return
-        if (state.startedAtEpochMillis <= 0L) return
+        if (state.startedAtEpochMillis <= 0L || workouts.isDeleted(state.startedAtEpochMillis)) return
         val entry = MatchHistoryEntry(
             matchId = state.startedAtEpochMillis,
             startedAtEpochMillis = state.startedAtEpochMillis,
@@ -41,7 +51,10 @@ class MatchHistoryRepository(context: Context) {
             ourMatchTieBreakPoints = state.ourMatchTieBreakPoints,
             configuration = state.configuration,
             totalPointsPlayed = state.totalPointsPlayed,
-            totalGamesPlayed = state.totalGamesPlayed
+            totalGamesPlayed = state.totalGamesPlayed,
+            averageHeartRate = averageHeartRate,
+            maximumHeartRate = workouts.maximumHeartRateForMatch(state.startedAtEpochMillis),
+            steps = workouts.stepsForMatch(state.startedAtEpochMillis)
         )
         val updated = loadEntries()
             .filterNot { it.matchId == entry.matchId }
@@ -51,8 +64,15 @@ class MatchHistoryRepository(context: Context) {
         saveEntries(updated)
     }
 
-    fun removeByMatchId(matchId: Long) {
-        if (matchId > 0L) saveEntries(loadEntries().filterNot { it.matchId == matchId })
+    fun removeByMatchId(matchId: Long, deleteHealthData: Boolean = true) {
+        if (matchId > 0L) {
+            // Persist the deletion before removing the visible history entry.
+            if (deleteHealthData) workouts.removeMatch(matchId, deleteHealthData = true)
+            saveEntries(loadEntries().filterNot { it.matchId == matchId })
+            if (deleteHealthData) {
+                ch.hygro.padelscore.health.WorkoutDataSender(context).scheduleDeletionSync()
+            }
+        }
     }
 
     private fun saveEntries(entries: List<MatchHistoryEntry>) {
@@ -74,6 +94,9 @@ class MatchHistoryRepository(context: Context) {
         .put("configuration", encodeConfiguration(entry.configuration))
         .put("totalPointsPlayed", entry.totalPointsPlayed)
         .put("totalGamesPlayed", entry.totalGamesPlayed)
+        .put("averageHeartRate", entry.averageHeartRate ?: -1)
+        .put("maximumHeartRate", entry.maximumHeartRate ?: -1)
+        .put("steps", entry.steps ?: -1L)
 
     private fun decodeEntry(json: JSONObject): MatchHistoryEntry {
         val setsJson = json.optJSONArray("completedSets") ?: JSONArray()
@@ -82,6 +105,7 @@ class MatchHistoryRepository(context: Context) {
                 runCatching { add(decodeSetResult(setsJson.getJSONObject(index))) }
             }
         }
+        val hr = json.optInt("averageHeartRate", -1)
         return MatchHistoryEntry(
             matchId = json.getLong("matchId"),
             startedAtEpochMillis = json.getLong("startedAtEpochMillis"),
@@ -93,7 +117,10 @@ class MatchHistoryRepository(context: Context) {
             ourMatchTieBreakPoints = json.optInt("ourMatchTieBreakPoints", 0),
             configuration = decodeConfiguration(json.optJSONObject("configuration") ?: JSONObject()),
             totalPointsPlayed = json.optInt("totalPointsPlayed", 0),
-            totalGamesPlayed = json.optInt("totalGamesPlayed", 0)
+            totalGamesPlayed = json.optInt("totalGamesPlayed", 0),
+            averageHeartRate = if (hr > 0) hr else null,
+            maximumHeartRate = json.optInt("maximumHeartRate", -1).takeIf { it > 0 },
+            steps = json.optLong("steps", -1L).takeIf { it >= 0L }
         )
     }
 

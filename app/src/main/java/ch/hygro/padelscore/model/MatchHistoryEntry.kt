@@ -11,7 +11,10 @@ data class MatchHistoryEntry(
     val ourMatchTieBreakPoints: Int,
     val configuration: MatchConfiguration,
     val totalPointsPlayed: Int,
-    val totalGamesPlayed: Int
+    val totalGamesPlayed: Int,
+    val averageHeartRate: Int? = null,
+    val maximumHeartRate: Int? = null,
+    val steps: Long? = null
 ) {
     val weWon: Boolean get() = ourSets > opponentSets
 }

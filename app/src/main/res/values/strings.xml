@@ -5,16 +5,16 @@
     <string name="start">START</string>
     <string name="undo">UNDO</string>
     <string name="reset">RESET</string>
-    <string name="hold_to_reset">HOLD</string>
     <string name="new_match">NEW MATCH</string>
+    <string name="undo_last_point">UNDO POINT</string>
     <string name="scoring_mode">SCORING</string>
     <string name="match_format">MATCH</string>
     <string name="set_format">SET</string>
     <string name="short_set_label">SHORT TO 4</string>
     <string name="normal_set_label">NORMAL TO 6</string>
     <string name="first_serve">FIRST SERVE</string>
-    <string name="bottom">BOTTOM</string>
-    <string name="top">TOP</string>
+    <string name="our_team">US</string>
+    <string name="opponent_team">OPPONENT</string>
     <string name="matches_history">MATCHES</string>
     <string name="supporter_active">SUPPORTER</string>
     <string name="supporter_inactive">SUPPORT</string>
@@ -45,7 +45,7 @@
     <string name="hours_format">%1$d:%2$02d h</string>
     <string name="minutes_format">%d min</string>
     <string name="delete_match_title">DELETE MATCH?</string>
-    <string name="delete_match_message">This match will be permanently removed from your history.</string>
+    <string name="delete_match_message">This match and its local health data will be deleted. Deletion from Health Connect is requested when connected. Copies in Samsung Health may need separate deletion.</string>
     <string name="delete">DELETE</string>
     <string name="cancel">Cancel</string>
     <string name="supporter_thanks_title">THANK YOU FOR YOUR\nSUPPORT!</string>
@@ -65,8 +65,8 @@
     <string name="starting_purchase">STARTING PURCHASE</string>
     <string name="match_tie_break">MATCH-TIE-BREAK</string>
     <string name="tie_break">TIE-BREAK</string>
-    <string name="advantage_top">ADVANTAGE TOP</string>
-    <string name="advantage_bottom">ADVANTAGE BOTTOM</string>
+    <string name="advantage_opponent">ADV OPPONENT</string>
+    <string name="advantage_us">ADV US</string>
     <string name="games_abbr">G %d</string>
     <string name="sets_abbr">S %d</string>
     <string name="advantage_abbr">AD</string>
@@ -90,4 +90,5 @@
     <string name="back_to_home">BACK TO HOME</string>
     <string name="back_to_home_message">Returning home discards the current match.</string>
     <string name="change_sides">CHANGE SIDES</string>
+    <string name="average_heart_rate">Avg. HR: %d bpm</string>
 </resources>

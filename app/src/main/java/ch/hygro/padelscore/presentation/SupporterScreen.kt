@@ -1,12 +1,12 @@
 package ch.hygro.padelscore.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -203,18 +205,29 @@ fun SupporterScreen(
                             .padding(vertical = 3.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        SupporterActionButton(
-                            text = if (state.isRefreshing) {
-                                stringResource(R.string.checking_purchases)
-                            } else {
-                                stringResource(R.string.restore_purchases)
-                            },
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                                .height(48.dp),
                             enabled = !state.isRefreshing &&
-                                    state.purchaseStatus !=
-                                    SupporterPurchaseStatus.PURCHASE_IN_PROGRESS,
-                            backgroundColor = Color(0xFF3A3A3A),
+                                    state.purchaseStatus != SupporterPurchaseStatus.PURCHASE_IN_PROGRESS,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF3A3A3A),
+                                contentColor = Color.White
+                            ),
                             onClick = onRestorePurchases
-                        )
+                        ) {
+                            Text(
+                                text = if (state.isRefreshing) {
+                                    stringResource(R.string.checking_purchases)
+                                } else {
+                                    stringResource(R.string.restore_purchases)
+                                },
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
+                            )
+                        }
                     }
                 }
             }
@@ -228,12 +241,23 @@ fun SupporterScreen(
                         .padding(top = 6.dp, bottom = 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    SupporterActionButton(
-                        text = stringResource(R.string.back),
-                        enabled = true,
-                        backgroundColor = Color(0xFF3A3A3A),
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3A3A3A),
+                            contentColor = Color.White
+                        ),
                         onClick = onBack
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.back),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
@@ -245,20 +269,34 @@ private fun PurchaseAvailabilityContent(
     state: SupporterBillingState,
     onPurchase: () -> Unit
 ) {
+    val isRound = LocalConfiguration.current.isScreenRound
+    
     when (state.availability) {
         SupporterBillingAvailability.AVAILABLE -> {
             val price = state.localizedPrice
 
-            SupporterActionButton(
-                text = if (price != null) {
-                    stringResource(R.string.support_with_price, price)
-                } else {
-                    stringResource(R.string.loading_price)
-                },
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                    .height(48.dp),
                 enabled = state.canStartPurchase,
-                backgroundColor = Color(0xFF195F3B),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF195F3B),
+                    contentColor = Color.White
+                ),
                 onClick = onPurchase
-            )
+            ) {
+                Text(
+                    text = if (price != null) {
+                        stringResource(R.string.support_with_price, price)
+                    } else {
+                        stringResource(R.string.loading_price)
+                    },
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+            }
         }
 
         SupporterBillingAvailability.CONNECTING,
@@ -362,54 +400,6 @@ private fun StatusMessage(
             color = color,
             fontSize = 9.sp,
             lineHeight = 10.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-private fun SupporterActionButton(
-    text: String,
-    enabled: Boolean,
-    backgroundColor: Color,
-    onClick: () -> Unit
-) {
-    val displayedBackgroundColor = if (enabled) {
-        backgroundColor
-    } else {
-        backgroundColor.copy(alpha = 0.45f)
-    }
-
-    val displayedContentColor = if (enabled) {
-        Color.White
-    } else {
-        Color.White.copy(alpha = 0.55f)
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.85f)
-            .heightIn(min = 29.dp)
-            .background(
-                color = displayedBackgroundColor,
-                shape = RoundedCornerShape(17.dp)
-            )
-            .clickable(
-                enabled = enabled,
-                onClick = onClick
-            )
-            .padding(
-                horizontal = 8.dp,
-                vertical = 5.dp
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = displayedContentColor,
-            fontSize = 8.sp,
-            lineHeight = 9.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )

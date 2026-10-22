@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -149,11 +151,23 @@ fun MatchHistoryScreen(
                         .padding(top = 8.dp, bottom = 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    HistoryActionButton(
-                        text = stringResource(R.string.back),
-                        backgroundColor = Color(0xFF3A3A3A),
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3A3A3A),
+                            contentColor = Color.White
+                        ),
                         onClick = onBack
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.back),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
@@ -250,17 +264,41 @@ private fun DeleteMatchConfirmation(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    HistoryActionButton(
-                        text = stringResource(R.string.delete),
-                        backgroundColor = Color(0xFF8B2525),
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF8B2525),
+                            contentColor = Color.White
+                        ),
                         onClick = onConfirm
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.delete),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
 
-                    HistoryActionButton(
-                        text = stringResource(R.string.cancel),
-                        backgroundColor = Color(0xFF3A3A3A),
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3A3A3A),
+                            contentColor = Color.White
+                        ),
                         onClick = onCancel
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
@@ -281,7 +319,7 @@ private fun HistoryEntryCard(
                 onLongClick = onLongClick
             )
             .padding(horizontal = 10.dp, vertical = 7.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -299,64 +337,51 @@ private fun HistoryEntryCard(
                 } else {
                     Color(0xFFFF7B72)
                 },
-                fontSize = 9.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = historyDateText(entry.finishedAtEpochMillis),
                 color = Color.LightGray,
-                fontSize = 7.sp
+                fontSize = 9.sp
             )
         }
 
         Text(
             text = historyResultText(entry),
             color = Color.White,
-            fontSize = 10.sp,
-            lineHeight = 11.sp,
+            fontSize = 14.sp,
+            lineHeight = 15.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 2
         )
 
-        Text(
-            text = stringResource(
-                R.string.history_stats_format,
-                entry.totalGamesPlayed,
-                entry.totalPointsPlayed,
-                historyDurationText(entry)
-            ),
-            color = Color.LightGray,
-            fontSize = 7.sp,
-            lineHeight = 8.sp,
-            maxLines = 1
+        val statsText = stringResource(
+            R.string.history_stats_format,
+            entry.totalGamesPlayed,
+            entry.totalPointsPlayed,
+            historyDurationText(entry)
         )
-    }
-}
+        val hrText = if (entry.averageHeartRate != null && entry.averageHeartRate > 0) {
+            " · ${entry.averageHeartRate} bpm"
+        } else {
+            ""
+        }
 
-@Composable
-private fun HistoryActionButton(
-    text: String,
-    backgroundColor: Color,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.76f)
-            .height(31.dp)
-            .background(backgroundColor, RoundedCornerShape(16.dp))
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = { }
-            ),
-        contentAlignment = Alignment.Center
-    ) {
         Text(
-            text = text,
-            color = Color.White,
+            text = statsText + hrText + (entry.maximumHeartRate?.let { " · Max $it bpm" } ?: ""),
+            color = Color.LightGray,
             fontSize = 9.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            lineHeight = 11.sp,
+            maxLines = 2
+        )
+        Text(
+            text = entry.steps?.let { "Steps: $it" } ?: "Steps unavailable",
+            color = Color.LightGray,
+            fontSize = 9.sp,
+            lineHeight = 11.sp,
+            maxLines = 1
         )
     }
 }
@@ -364,7 +389,7 @@ private fun HistoryActionButton(
 @Composable
 private fun historyResultText(entry: MatchHistoryEntry): String {
     val sets = entry.completedSets.joinToString("  ") {
-        "${it.opponentGames}:${it.ourGames}"
+        "${it.ourGames}:${it.opponentGames}"
     }
     val matchTieBreak = if (
         entry.opponentMatchTieBreakPoints > 0 ||
@@ -372,8 +397,8 @@ private fun historyResultText(entry: MatchHistoryEntry): String {
     ) {
         stringResource(
             R.string.match_tie_break_result,
-            entry.opponentMatchTieBreakPoints,
-            entry.ourMatchTieBreakPoints
+            entry.ourMatchTieBreakPoints,
+            entry.opponentMatchTieBreakPoints
         )
     } else {
         ""
@@ -385,8 +410,8 @@ private fun historyResultText(entry: MatchHistoryEntry): String {
         .ifBlank {
             stringResource(
                 R.string.sets_result,
-                entry.opponentSets,
-                entry.ourSets
+                entry.ourSets,
+                entry.opponentSets
             )
         }
 }

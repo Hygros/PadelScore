@@ -36,8 +36,8 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 30
         targetSdk = 37
-        versionCode = 8
-        versionName = "1.0"
+        versionCode = 9
+        versionName = "1.1"
     }
 
     signingConfigs {
@@ -57,6 +57,7 @@ android {
             optimization {
                 enable = true
             }
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-release.pro")
 
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
@@ -82,6 +83,7 @@ android {
 
 dependencies {
     implementation(libs.wear.ongoing)
+    implementation("androidx.wear:wear-remote-interactions:1.2.0")
     implementation("androidx.core:core:1.19.1")
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)
@@ -94,6 +96,17 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.wear.tooling.preview)
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.health:health-services-client:1.1.0")
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.3.0")
+    implementation("com.google.android.gms:play-services-wearable:20.0.1")
+    
+    // Wear OS Tiles & Complications
+    implementation("androidx.wear.tiles:tiles:1.6.2")
+    implementation("androidx.wear.protolayout:protolayout:1.4.2")
+    implementation("androidx.wear.protolayout:protolayout-material:1.4.2")
+    implementation("androidx.wear.watchface:watchface-complications-data-source:1.3.0")
+    implementation("androidx.wear.tiles:tiles-tooling-preview:1.6.2")
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)

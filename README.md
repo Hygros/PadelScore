@@ -42,31 +42,35 @@
 - 🎾 **Official Padel Rules**: Advantage, Golden Point, and Star Point scoring modes.
 - ⚙️ **Flexible Match Formats**: Single set, Best-of-3, Short sets (to 4 games), Normal sets (to 6 games), set tie-breaks, and match tie-breaks.
 - 🟡 **Serve & Court Tracking**: Visual serve indicators (Deuce/Ad court) with 1-2-2 tie-break rotation and court change notifications.
+- ❤️ **Fitness Tracking**: Native integration with Wear OS Health Services to track heart rate, steps, active calories, and match duration as an official workout.
+- 📱 **Health Connect Sync**: Optional phone companion app to automatically sync your padel workouts and heart rate data from the watch directly to Android Health Connect.
+- ⌚ **Tiles & Complications**: Launch a new match instantly straight from your watch face using the included Complication or Wear OS Tile.
 - 🔕 **Match Quiet Mode**: Optional automatic Do Not Disturb mode during active matches to silence notifications and pop-ups.
 - 🎯 **Court-Optimized UI**: Large touch targets, 300 ms double-tap safety lock, wrist haptics, and Always-On Display (AOD) support.
 - ↺ **Instant Undo & Reset**: Quick point reversal and safety long-press match reset.
 - 📜 **Local Match History**: Save and review past matches on your watch, including scores, durations, and total point breakdowns.
-- 🔒 **100% Standalone & Privacy-First**: No phone app required, no internet permission requested, and zero tracking.
+- 🔒 **100% Standalone & Privacy-First**: No internet permission requested and zero tracking. The watch app operates fully independently.
 
 ---
 
 ## 🚀 Installation
 
-1. Download the latest APK from [GitHub Releases](https://github.com/Hygros/PadelScore/releases).
-2. Install onto your Wear OS watch using **ADB over Wi-Fi** or a phone sideloading app (e.g. Bugjaeger, Easy Fire Tools):
+1. Download the latest release APKs from [GitHub Releases](https://github.com/Hygros/PadelScore/releases).
+2. Install the Wear OS app onto your watch using **ADB over Wi-Fi** or a phone sideloading app (e.g. Bugjaeger, Easy Fire Tools):
    ```bash
    adb connect <WATCH_IP_ADDRESS>:5555
-   adb install -r PadelScore.apk
+   adb install -r PadelScore-wear.apk
    ```
+*(Note: To enable Health Connect sync, install the companion `PadelScore-mobile.apk` on your paired Android phone. The phone app acts purely as a sync bridge.)*
 
 ---
 
 <a id="privacy"></a>
 ## 🔒 Privacy & Permissions
 
-- ❌ **No Internet Access**: `android.permission.INTERNET` is not requested.
+- ❌ **No Internet Access**: `android.permission.INTERNET` is not requested by either the watch or phone app.
 - ❌ **No Tracking**: No telemetry, analytics, or background cloud sync.
-- 💾 **100% Local**: All match state and history remain strictly on your watch.
+- 💾 **100% Local**: All match state and history remain strictly on your watch. If using the companion app, health data is only passed directly from the watch to your phone's secure on-device Health Connect store.
 
 ---
 
@@ -75,11 +79,17 @@
 ```text
 app/src/main/java/ch/hygro/padelscore/
 ├── billing/        # Optional Supporter page Google Play Billing
+├── complications/  # Watch face Complication for quick-start
+├── health/         # Health Services fitness tracking (Heart Rate, Steps)
 ├── logic/          # Core scoring engine & serve calculator
 ├── model/          # Match configuration and scoring data models
 ├── presentation/   # Wear OS Jetpack Compose UI & quiet mode controller
 ├── storage/        # Offline local match storage & persistence
+├── tiles/          # Wear OS quick-start Tile
 └── vibration/      # Wrist haptic feedback engine
+
+mobile/src/main/java/ch/hygro/padelscore/sync/
+└──                 # Optional companion app for Health Connect workout sync
 ```
 
 ---

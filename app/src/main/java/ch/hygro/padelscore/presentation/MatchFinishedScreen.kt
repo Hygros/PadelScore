@@ -1,16 +1,12 @@
 package ch.hygro.padelscore.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -65,9 +63,10 @@ fun MatchFinishedScreen(
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
                     Text(
+                        modifier = Modifier.fillMaxWidth(),
                         text = if (weWon) stringResource(R.string.match_won) else stringResource(R.string.match_lost),
                         color = if (weWon) Color(0xFF66E59A) else Color(0xFFFF7B72),
-                        fontSize = 13.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
@@ -87,13 +86,21 @@ fun MatchFinishedScreen(
                     Text(
                         text = completedSetsText(matchState),
                         color = Color.White,
-                        fontSize = 10.sp,
-                        lineHeight = 11.sp,
+                        fontSize = 20.sp,
+                        lineHeight = 22.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         maxLines = 2
                     )
 
+                    if (matchState.averageHeartRate != null) {
+                        Text(
+                            text = stringResource(R.string.average_heart_rate, matchState.averageHeartRate),
+                            color = Color.LightGray,
+                            fontSize = 13.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -125,14 +132,14 @@ fun MatchFinishedScreen(
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     FinishedActionButton(
-                        text = stringResource(R.string.undo),
+                        text = stringResource(R.string.undo_last_point),
                         backgroundColor = if (canUndo) Color(0xFF3A3A3A) else Color(0xFF1B1B1B),
                         enabled = canUndo,
                         onClick = onUndo
                     )
 
                     FinishedActionButton(
-                        text = stringResource(R.string.new_match),
+                        text = stringResource(R.string.back_to_home),
                         backgroundColor = Color(0xFF195F3B),
                         enabled = true,
                         onClick = onNewMatch
@@ -154,16 +161,16 @@ private fun Statistic(
         Text(
             text = label,
             color = Color.LightGray,
-            fontSize = 6.sp,
-            lineHeight = 7.sp,
+            fontSize = 10.sp,
+            lineHeight = 12.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1
         )
         Text(
             text = value,
             color = Color.White,
-            fontSize = 9.sp,
-            lineHeight = 10.sp,
+            fontSize = 15.sp,
+            lineHeight = 18.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1
         )
@@ -177,25 +184,18 @@ private fun FinishedActionButton(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.78f)
-            .height(31.dp)
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .clickable(
-                enabled = enabled,
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
+    Button(
+        modifier = Modifier.fillMaxWidth(0.9f),
+        onClick = onClick,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = backgroundColor,
+            disabledContainerColor = backgroundColor
+        )
     ) {
         Text(
             text = text,
             color = if (enabled) Color.White else Color.DarkGray,
-            fontSize = 9.sp,
-            lineHeight = 10.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             maxLines = 1
@@ -206,7 +206,7 @@ private fun FinishedActionButton(
 @Composable
 private fun completedSetsText(state: MatchState): String {
     val normalSets = state.completedSets.joinToString(separator = "  ") { result ->
-        "${result.opponentGames}:${result.ourGames}"
+        "${result.ourGames}:${result.opponentGames}"
     }
 
     val matchTieBreak = if (
@@ -215,8 +215,8 @@ private fun completedSetsText(state: MatchState): String {
     ) {
         stringResource(
             R.string.match_tie_break_result,
-            state.opponentMatchTieBreakPoints,
-            state.ourMatchTieBreakPoints
+            state.ourMatchTieBreakPoints,
+            state.opponentMatchTieBreakPoints
         )
     } else {
         ""
@@ -228,8 +228,8 @@ private fun completedSetsText(state: MatchState): String {
         .ifBlank {
             stringResource(
                 R.string.sets_result,
-                state.opponentSets,
-                state.ourSets
+                state.ourSets,
+                state.opponentSets
             )
         }
 }

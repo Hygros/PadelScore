@@ -166,9 +166,9 @@ private fun ambientStatusText(state: MatchState): String {
         state.isTieBreak -> stringResource(R.string.tie_break)
         state.isStarPointActive -> stringResource(R.string.star_point)
         state.isGoldenPointActive -> stringResource(R.string.golden_point)
-        state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_top)
-        state.advantageTeam == Team.US -> stringResource(R.string.advantage_bottom)
-        else -> "${state.opponentGames} : ${state.ourGames}"
+        state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_opponent)
+        state.advantageTeam == Team.US -> stringResource(R.string.advantage_us)
+        else -> "${state.ourGames} : ${state.opponentGames}"
     }
 }
 

@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,10 +25,15 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
@@ -44,25 +51,36 @@ fun StartScreen(
     initialConfiguration: MatchConfiguration,
     isSupporterActive: Boolean,
     onStartMatch: (MatchConfiguration) -> Unit,
+    onConfigurationChanged: (MatchConfiguration) -> Unit,
     onOpenHistory: () -> Unit,
-    onOpenSupporter: () -> Unit
+    onOpenSupporter: () -> Unit,
+    onOpenSettings: () -> Unit
 ) {
-    var scoringMode by remember {
+    var scoringMode by remember(initialConfiguration) {
         mutableStateOf(initialConfiguration.scoringMode)
     }
-    var matchFormat by remember {
+    var matchFormat by remember(initialConfiguration) {
         mutableStateOf(initialConfiguration.matchFormat)
     }
-    var shortSet by remember {
+    var shortSet by remember(initialConfiguration) {
         mutableStateOf(initialConfiguration.gamesRequiredToWinSet == 4)
     }
-    var firstServingTeam by remember {
+    var firstServingTeam by remember(initialConfiguration) {
         mutableStateOf(initialConfiguration.firstServingTeam)
     }
 
+    LaunchedEffect(scoringMode, matchFormat, shortSet, firstServingTeam) {
+        val draft = if (shortSet) {
+            MatchConfiguration.shortSet(scoringMode, matchFormat, firstServingTeam)
+        } else {
+            MatchConfiguration.normalSet(scoringMode, matchFormat, firstServingTeam)
+        }
+        if (draft != initialConfiguration) onConfigurationChanged(draft)
+    }
     val columnState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
     val isRound = LocalConfiguration.current.isScreenRound
+    val haptic = LocalHapticFeedback.current
 
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         TransformingLazyColumn(
@@ -105,8 +123,9 @@ fun StartScreen(
                     ConfigurationField(
                         modifier = Modifier.weight(1f),
                         title = stringResource(R.string.scoring_mode),
-                        value = scoringModeLabel(scoringMode),
+                        value = scoringModeFullName(scoringMode),
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             scoringMode = when (scoringMode) {
                                 ScoringMode.CLASSIC_ADVANTAGE -> ScoringMode.GOLDEN_POINT
                                 ScoringMode.GOLDEN_POINT -> ScoringMode.STAR_POINT
@@ -120,6 +139,7 @@ fun StartScreen(
                         title = stringResource(R.string.match_format),
                         value = matchFormatLabel(matchFormat),
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             matchFormat = when (matchFormat) {
                                 MatchFormat.ONE_SET -> MatchFormat.BEST_OF_THREE
                                 MatchFormat.BEST_OF_THREE -> MatchFormat.TWO_SETS_AND_MATCH_TIE_BREAK
@@ -148,6 +168,7 @@ fun StartScreen(
                             stringResource(R.string.normal_set_label)
                         },
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             shortSet = !shortSet
                         }
                     )
@@ -156,51 +177,14 @@ fun StartScreen(
                         modifier = Modifier.weight(1f),
                         title = stringResource(R.string.first_serve),
                         value = if (firstServingTeam == Team.US) {
-                            stringResource(R.string.bottom)
+                            stringResource(R.string.our_team)
                         } else {
-                            stringResource(R.string.top)
+                            stringResource(R.string.opponent_team)
                         },
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             firstServingTeam = firstServingTeam.other()
                         }
-                    )
-                }
-            }
-
-            item {
-                val itemScope = this
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(if (isRound) 0.90f else 0.92f)
-                        .transformedHeight(itemScope, transformationSpec)
-                        .padding(top = 1.dp, bottom = 1.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    StartActionButton(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(R.string.matches_history),
-                        backgroundColor = Color(0xFF3A3A3A),
-                        onClick = onOpenHistory
-                    )
-
-                    StartActionButton(
-                        modifier = Modifier.weight(1f),
-                        text = if (isSupporterActive) {
-                            stringResource(R.string.supporter_active)
-                        } else {
-                            stringResource(R.string.supporter_inactive)
-                        },
-                        backgroundColor = if (isSupporterActive) {
-                            Color(0xFF163D29)
-                        } else {
-                            Color(0xFF3A3A3A)
-                        },
-                        contentColor = if (isSupporterActive) {
-                            Color(0xFF66E59A)
-                        } else {
-                            Color.White
-                        },
-                        onClick = onOpenSupporter
                     )
                 }
             }
@@ -214,11 +198,14 @@ fun StartScreen(
                         .padding(top = 1.dp, bottom = 1.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    StartActionButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.start),
-                        backgroundColor = Color(0xFF195F3B),
+                    Button(
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF195F3B),
+                            contentColor = Color.White
+                        ),
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             val configuration = if (shortSet) {
                                 MatchConfiguration.shortSet(
                                     scoringMode,
@@ -234,37 +221,111 @@ fun StartScreen(
                             }
                             onStartMatch(configuration)
                         }
-                    )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.start),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            item {
+                val itemScope = this
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 0.92f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(top = 1.dp, bottom = 1.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3A3A3A),
+                            contentColor = Color.White
+                        ),
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpenSettings()
+                        }
+                    ) {
+                        Text(
+                            text = "SETTINGS",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            maxLines = 1,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            item {
+                val itemScope = this
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 0.92f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(top = 1.dp, bottom = 1.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3A3A3A),
+                            contentColor = Color.White
+                        ),
+                        contentPadding = PaddingValues(0.dp),
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpenHistory()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.matches_history),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 9.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Button(
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isSupporterActive) Color(0xFF163D29) else Color(0xFF3A3A3A),
+                            contentColor = if (isSupporterActive) Color(0xFF66E59A) else Color.White
+                        ),
+                        contentPadding = PaddingValues(0.dp),
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onOpenSupporter()
+                        }
+                    ) {
+                        Text(
+                            text = if (isSupporterActive) {
+                                stringResource(R.string.supporter_active)
+                            } else {
+                                stringResource(R.string.supporter_inactive)
+                            },
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 9.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun StartActionButton(
-    modifier: Modifier,
-    text: String,
-    backgroundColor: Color,
-    contentColor: Color = Color.White,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .height(25.dp)
-            .background(backgroundColor, RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = contentColor,
-            fontSize = 8.sp,
-            lineHeight = 9.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
     }
 }
 
@@ -277,13 +338,13 @@ private fun ConfigurationField(
 ) {
     Box(
         modifier = modifier
-            .height(32.dp)
+            .height(48.dp)
             .background(
                 color = Color(0xFF292929),
                 shape = RoundedCornerShape(10.dp)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 2.dp, vertical = 1.dp),
+            .padding(horizontal = 2.dp, vertical = 2.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -293,8 +354,8 @@ private fun ConfigurationField(
             Text(
                 text = title,
                 color = Color.LightGray,
-                fontSize = 6.sp,
-                lineHeight = 6.5.sp,
+                fontSize = 8.sp,
+                lineHeight = 9.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 maxLines = 1
@@ -303,8 +364,8 @@ private fun ConfigurationField(
             Text(
                 text = value,
                 color = Color(0xFFFFD54F),
-                fontSize = 8.sp,
-                lineHeight = 9.sp,
+                fontSize = 11.sp,
+                lineHeight = 12.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 maxLines = 2
@@ -313,22 +374,7 @@ private fun ConfigurationField(
     }
 }
 
-@Composable
-private fun scoringModeLabel(mode: ScoringMode): String {
-    return when (mode) {
-        ScoringMode.CLASSIC_ADVANTAGE -> {
-            stringResource(R.string.advantage)
-        }
 
-        ScoringMode.GOLDEN_POINT -> {
-            stringResource(R.string.golden_point)
-        }
-
-        ScoringMode.STAR_POINT -> {
-            stringResource(R.string.star_point)
-        }
-    }
-}
 
 @Composable
 private fun matchFormatLabel(format: MatchFormat): String {
@@ -355,8 +401,10 @@ private fun StartScreenPreview() {
             initialConfiguration = MatchConfiguration.normalSet(),
             isSupporterActive = false,
             onStartMatch = {},
+            onConfigurationChanged = {},
             onOpenHistory = {},
-            onOpenSupporter = {}
+            onOpenSupporter = {},
+            onOpenSettings = {}
         )
     }
 }

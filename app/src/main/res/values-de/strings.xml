@@ -1,20 +1,20 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Padel Score</string>
     <string name="back">ZURÜCK</string>
     <string name="start">START</string>
     <string name="undo">UNDO</string>
     <string name="reset">RESET</string>
-    <string name="hold_to_reset">HALTEN</string>
     <string name="new_match">NEUES MATCH</string>
+    <string name="undo_last_point">PUNKT KORRIGIEREN</string>
     <string name="scoring_mode">ZÄHLWEISE</string>
     <string name="match_format">MATCH</string>
     <string name="set_format">SATZ</string>
     <string name="short_set_label">KURZ BIS 4</string>
     <string name="normal_set_label">NORMAL BIS 6</string>
     <string name="first_serve">ERSTER AUFSCHLAG</string>
-    <string name="bottom">UNTEN</string>
-    <string name="top">OBEN</string>
+    <string name="our_team">WIR</string>
+    <string name="opponent_team">GEGNER</string>
     <string name="matches_history">SPIELE</string>
     <string name="supporter_active">SUPPORTER</string>
     <string name="supporter_inactive">SUPPORT</string>
@@ -45,7 +45,7 @@
     <string name="hours_format">%1$d:%2$02d h</string>
     <string name="minutes_format">%d min</string>
     <string name="delete_match_title">MATCH LÖSCHEN?</string>
-    <string name="delete_match_message">Dieses Match wird dauerhaft aus dem Verlauf gelöscht.</string>
+    <string name="delete_match_message">Dieses Match und seine lokalen Gesundheitsdaten werden gelöscht. Die Löschung in Health Connect wird bei Verbindung angefordert. Kopien in Samsung Health müssen eventuell separat gelöscht werden.</string>
     <string name="delete">LÖSCHEN</string>
     <string name="cancel">ABBRECHEN</string>
     <string name="supporter_thanks_title">DANKE FÜR DEINE\nUNTERSTÜTZUNG!</string>
@@ -65,8 +65,8 @@
     <string name="starting_purchase">KAUF WIRD GESTARTET</string>
     <string name="match_tie_break">MATCH-TIE-BREAK</string>
     <string name="tie_break">TIE-BREAK</string>
-    <string name="advantage_top">VORTEIL OBEN</string>
-    <string name="advantage_bottom">VORTEIL UNTEN</string>
+    <string name="advantage_opponent">ADV GEGNER</string>
+    <string name="advantage_us">ADV WIR</string>
     <string name="games_abbr">G %d</string>
     <string name="sets_abbr">S %d</string>
     <string name="advantage_abbr">AD</string>
@@ -90,4 +90,5 @@
     <string name="back_to_home">ZURÜCK ZUM START</string>
     <string name="back_to_home_message">Zurückkehren verwirft das laufende Spiel.</string>
     <string name="change_sides">SEITENWECHSEL</string>
+    <string name="average_heart_rate">Ø Puls: %d bpm</string>
 </resources>

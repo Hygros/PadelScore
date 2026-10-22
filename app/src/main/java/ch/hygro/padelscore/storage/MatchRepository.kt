@@ -112,6 +112,7 @@ class MatchRepository(context: Context) {
             .put("totalGamesPlayed", state.totalGamesPlayed)
             .put("startedAtEpochMillis", state.startedAtEpochMillis)
             .put("finishedAtEpochMillis", state.finishedAtEpochMillis)
+            .put("averageHeartRate", state.averageHeartRate)
     }
 
     private fun decodeState(json: JSONObject): MatchState {
@@ -168,7 +169,8 @@ class MatchRepository(context: Context) {
             totalGamesPlayed = json.optInt("totalGamesPlayed", 0),
             startedAtEpochMillis = json.optLong("startedAtEpochMillis", 0L),
             finishedAtEpochMillis = json.optLong("finishedAtEpochMillis", 0L)
-                .takeIf { it != 0L }
+                .takeIf { it != 0L },
+            averageHeartRate = json.optInt("averageHeartRate", 0).takeIf { it > 0 }
         )
     }
 
