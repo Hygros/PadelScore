@@ -24,11 +24,15 @@
 <p align="center">
   <img src="docs/screenshots/01_new_match.png" width="200" alt="New Match Setup" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/02_match_scoring.png" width="200" alt="Match Scoring" />
+  <img src="docs/screenshots/07_match_scoring.png" width="200" alt="Match Scoring" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/03_match_result.png" width="200" alt="Match Result" />
+  <img src="docs/screenshots/08_end_match.png" width="200" alt="Match Result" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/04_match_history.png" width="200" alt="Match History" />
+  <img src="docs/screenshots/09_match_history.png" width="200" alt="Match History" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/10_companion.png" width="200" alt="Companion App" />
+
+
 </p>
 
 <p align="center">
