@@ -1,6 +1,7 @@
 package ch.hygro.padelscore.sync
 
 import android.os.Bundle
+import androidx.concurrent.futures.await
 import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
@@ -22,6 +23,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var status: TextView
     private lateinit var syncButton: Button
     private var syncJob: Job? = null
+    private var watchInstallJob: Job? = null
+    private lateinit var watchInstallButton: Button
+    private lateinit var watchInstallStatus: TextView
+    private var watchSelectionDialog: android.app.AlertDialog? = null
     private val receiptPreferences by lazy {
         getSharedPreferences("health_sync_receipts", MODE_PRIVATE)
     }
@@ -116,8 +121,121 @@ class MainActivity : ComponentActivity() {
                 "Copies in Samsung Health or other apps may need to be deleted there separately. " +
                 "An import already in progress may finish when you switch sync off."
         })
+        val phoneManufacturer = android.os.Build.MANUFACTURER
+            .lowercase(java.util.Locale.ROOT)
+        val phoneBrand = android.os.Build.BRAND
+            .lowercase(java.util.Locale.ROOT)
+        val xiaomiBrands = setOf("xiaomi", "redmi", "poco")
+        if (phoneManufacturer in xiaomiBrands || phoneBrand in xiaomiBrands) {
+            layout.addView(TextView(this).apply {
+                text = "Watch links not opening on this phone?\n\n" +
+                    "Some Xiaomi, Redmi and POCO phones block links opened by the watch plugin. " +
+                    "In phone Settings > Apps, select your watch plugin, then Other permissions. " +
+                    "If available, allow 'Display pop-up windows while running in the background'. " +
+                    "For Samsung watches, select the Galaxy Watch plugin, not PadelScore. " +
+                    "Menu names vary. Only change this setting if watch links do not open. " +
+                    "PadelScore cannot check or grant this setting."
+                setPadding(0, 12, 0, 24)
+            })
+        }
+
+        watchInstallButton = Button(this).apply {
+            text = "Install / update watch app"
+            setOnClickListener { chooseWatchForInstallation() }
+        }
+        layout.addView(watchInstallButton)
+        watchInstallStatus = TextView(this).apply {
+            text = "Opens the Play Store on your connected Wear OS watch. " +
+                "Confirm installation on the watch. Test-track access is still required."
+            setPadding(0, 12, 0, 24)
+        }
+        layout.addView(watchInstallStatus)
         setContentView(android.widget.ScrollView(this).apply { addView(layout) })
         refreshAvailability()
+    }
+
+    private fun chooseWatchForInstallation() {
+        if (watchInstallJob?.isActive == true || watchSelectionDialog?.isShowing == true) return
+        watchInstallButton.isEnabled = false
+        watchInstallStatus.text = "Finding connected watches..."
+        watchInstallJob = scope.launch {
+            try {
+                val nodes = withContext(Dispatchers.IO) {
+                    com.google.android.gms.tasks.Tasks.await(
+                        com.google.android.gms.wearable.Wearable.getNodeClient(applicationContext)
+                            .connectedNodes, 10, java.util.concurrent.TimeUnit.SECONDS
+                    ).sortedByDescending { it.isNearby }
+                }
+                when (nodes.size) {
+                    0 -> watchInstallStatus.text =
+                        "No connected Wear OS watch. Check pairing and Google Play services."
+                    1 -> watchInstallStatus.text = openWatchStore(nodes.single().id)
+                    else -> {
+                        watchInstallStatus.text = "Choose the watch to install or update."
+                        watchSelectionDialog = android.app.AlertDialog.Builder(this@MainActivity)
+                            .setTitle("Choose watch")
+                            .setItems(nodes.map { it.displayName }.toTypedArray()) { _, index ->
+                                installOnSelectedWatch(nodes[index].id)
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .create()
+                        watchSelectionDialog?.show()
+                    }
+                }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                watchInstallStatus.text = "Watch discovery failed (${(e.cause ?: e).javaClass.simpleName}). " +
+                    "Check pairing and Google Play services."
+            } finally {
+                watchInstallButton.isEnabled = true
+            }
+        }
+    }
+
+    private fun installOnSelectedWatch(nodeId: String) {
+        if (watchInstallJob?.isActive == true) return
+        watchInstallButton.isEnabled = false
+        watchInstallStatus.text = "Opening Play Store on the watch..."
+        watchInstallJob = scope.launch {
+            try {
+                watchInstallStatus.text = openWatchStore(nodeId)
+            } finally {
+                watchInstallButton.isEnabled = true
+            }
+        }
+    }
+
+    private suspend fun openWatchStore(nodeId: String): String {
+        val helper = androidx.wear.remote.interactions.RemoteActivityHelper(
+            applicationContext,
+            java.util.concurrent.Executor { command -> command.run() }
+        )
+        val links = listOf(
+            "market://details?id=$packageName",
+            "https://play.google.com/store/apps/details?id=$packageName"
+        )
+        var failure = "Timeout"
+        for (link in links) {
+            try {
+                val sent = kotlinx.coroutines.withTimeoutOrNull(15_000L) {
+                    helper.startRemoteActivity(
+                        android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(link))
+                            .addCategory(android.content.Intent.CATEGORY_BROWSABLE), nodeId
+                    ).await()
+                    true
+                } ?: false
+                if (sent) return "Store request sent. Continue on your watch. " +
+                    "Installation and test-track access are not confirmed by this request."
+                failure = "Timeout"
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                failure = (e.cause ?: e).javaClass.simpleName
+            }
+        }
+        return "Watch store request failed ($failure). Unlock the watch and check its connection. " +
+            "Alternatively, open Play Store on the watch and search for Padel Score."
     }
 
     private fun openExternal(intent: android.content.Intent) {
@@ -187,6 +305,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        watchSelectionDialog?.dismiss()
+        watchSelectionDialog = null
         scope.cancel()
         super.onDestroy()
     }

@@ -49,6 +49,7 @@ fun SettingsScreen(
     val healthSyncEnabled by repository.healthSyncEnabled.collectAsState()
     val syncScope = rememberCoroutineScope()
     var companionStatus by remember { androidx.compose.runtime.mutableStateOf("Phone companion is optional.") }
+    var companionBusy by remember { androidx.compose.runtime.mutableStateOf(false) }
 
     val bodySensorLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -194,20 +195,36 @@ fun SettingsScreen(
             item {
                 androidx.wear.compose.material3.Button(
                     onClick = {
-                        syncScope.launch {
-                            companionStatus = ch.hygro.padelscore.health.CompanionSetup.status(context.applicationContext)
+                        if (!companionBusy) {
+                            companionBusy = true
+                            companionStatus = "Checking phone connection..."
+                            syncScope.launch {
+                                try {
+                                    companionStatus = ch.hygro.padelscore.health.CompanionSetup.status(context.applicationContext)
+                                } finally {
+                                    companionBusy = false
+                                }
+                            }
                         }
-                    }, modifier = Modifier.fillMaxWidth(0.9f)
+                    }, enabled = !companionBusy, modifier = Modifier.fillMaxWidth(0.9f)
                 ) { Text("Check phone setup", fontSize = 12.sp) }
             }
             item { Text(companionStatus, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f)) }
             item {
                 androidx.wear.compose.material3.Button(
                     onClick = {
-                        syncScope.launch {
-                            companionStatus = ch.hygro.padelscore.health.CompanionSetup.openStore(context.applicationContext)
+                        if (!companionBusy) {
+                            companionBusy = true
+                            companionStatus = "Opening store on phone..."
+                            syncScope.launch {
+                                try {
+                                    companionStatus = ch.hygro.padelscore.health.CompanionSetup.openStore(context.applicationContext)
+                                } finally {
+                                    companionBusy = false
+                                }
+                            }
                         }
-                    }, modifier = Modifier.fillMaxWidth(0.9f)
+                    }, enabled = !companionBusy, modifier = Modifier.fillMaxWidth(0.9f)
                 ) { Text("Install phone companion", fontSize = 12.sp) }
             }
             item {

@@ -66,6 +66,8 @@ android {
     }
 }
 dependencies {
+    implementation("androidx.wear:wear-remote-interactions:1.2.0")
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.3.0")
     testImplementation("junit:junit:4.13.2")
     implementation("androidx.activity:activity:1.13.0")
     implementation("androidx.health.connect:connect-client:1.1.0")
