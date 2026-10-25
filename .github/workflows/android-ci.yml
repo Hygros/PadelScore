@@ -296,6 +296,53 @@ jobs:
               print("Access to ch.hygro.padelscore succeeded.")
               print("A temporary empty edit was created.")
 
+              tracks_response = api_request(
+                  "GET",
+                  f"{base_url}/{edit_id}/tracks",
+              )
+
+              tracks = tracks_response.get("tracks", [])
+
+              print("")
+              print("Available Google Play tracks:")
+
+              for track in sorted(
+                  tracks,
+                  key=lambda item: item.get("track", ""),
+              ):
+                  track_id = track.get("track", "<unknown>")
+                  releases = track.get("releases", [])
+
+                  print(f"- Track: {track_id}")
+
+                  if not releases:
+                      print("  Releases: none")
+                      continue
+
+                  for release in releases:
+                      release_name = release.get("name", "<unnamed>")
+                      release_status = release.get(
+                          "status",
+                          "<unknown>",
+                      )
+                      version_codes = release.get(
+                          "versionCodes",
+                          [],
+                      )
+
+                      print(f"  Release: {release_name}")
+                      print(f"  Status: {release_status}")
+                      print(
+                          "  Version codes: "
+                          + (
+                              ", ".join(version_codes)
+                              if version_codes
+                              else "none"
+                          )
+                      )
+
+              print("")
+
               api_request(
                   "POST",
                   f"{base_url}/{edit_id}:validate",
