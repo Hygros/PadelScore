@@ -1,10 +1,10 @@
-name: Create GitHub prerelease only
+name: Create GitHub release only
 
 on:
   workflow_dispatch:
     inputs:
       confirmation:
-        description: Type GITHUB_RELEASE to create a GitHub-only prerelease
+        description: Type GITHUB_RELEASE to create a GitHub-only release
         required: true
         type: string
       release_name:
@@ -376,8 +376,6 @@ jobs:
           
           - Wear OS: `${WEAR_VERSION_CODE}`
           - Android companion: `${MOBILE_VERSION_CODE}`
-          
-          This is a test build for manual installation. No build was uploaded to Google Play, and no Google Play track was changed.
           
           Build label: ${RELEASE_NAME_INPUT}
           EOF
