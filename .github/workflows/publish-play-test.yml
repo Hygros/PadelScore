@@ -14,7 +14,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: padelscore-google-play-publishing
@@ -245,6 +245,8 @@ jobs:
           set -euo pipefail
 
           ./gradlew \
+            :app:assembleRelease \
+            :mobile:assembleRelease \
             :app:bundleRelease \
             :mobile:bundleRelease \
             "-PpadelscoreWearVersionCode=${WEAR_VERSION_CODE}" \
@@ -552,6 +554,136 @@ jobs:
           print("Mobile closed-test release was published.")
           PYTHON
 
+      - name: Create GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
+          MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
+        run: |
+          set -euo pipefail
+
+          wear_apk="app/build/outputs/apk/release/app-release.apk"
+          mobile_apk="mobile/build/outputs/apk/release/mobile-release.apk"
+          wear_aab="app/build/outputs/bundle/release/app-release.aab"
+          mobile_aab="mobile/build/outputs/bundle/release/mobile-release.aab"
+
+          test -s "${wear_apk}"
+          test -s "${mobile_apk}"
+          test -s "${wear_aab}"
+          test -s "${mobile_aab}"
+
+          jarsigner -verify "${wear_apk}"
+          jarsigner -verify "${mobile_apk}"
+          jarsigner -verify "${wear_aab}"
+          jarsigner -verify "${mobile_aab}"
+
+          wear_metadata="app/build/outputs/apk/release/output-metadata.json"
+          mobile_metadata="mobile/build/outputs/apk/release/output-metadata.json"
+
+          test -s "${wear_metadata}"
+          test -s "${mobile_metadata}"
+
+          version_name="$(
+            python3 - "${wear_metadata}" "${mobile_metadata}" <<'PYTHON'
+          import json
+          import pathlib
+          import sys
+
+          wear_path = pathlib.Path(sys.argv[1])
+          mobile_path = pathlib.Path(sys.argv[2])
+
+          wear_data = json.loads(wear_path.read_text(encoding="utf-8"))
+          mobile_data = json.loads(mobile_path.read_text(encoding="utf-8"))
+
+          wear_elements = wear_data.get("elements", [])
+          mobile_elements = mobile_data.get("elements", [])
+
+          if not wear_elements or not mobile_elements:
+              raise RuntimeError("APK output metadata contains no elements.")
+
+          wear_name = str(wear_elements[0]["versionName"])
+          mobile_name = str(mobile_elements[0]["versionName"])
+
+          if wear_name != mobile_name:
+              raise RuntimeError(
+                  "Wear and mobile versionName values do not match: "
+                  f"{wear_name} != {mobile_name}"
+              )
+
+          print(wear_name)
+          PYTHON
+          )"
+
+          if [ -z "${version_name}" ]; then
+            echo "versionName could not be determined."
+            exit 1
+          fi
+
+          tag="v${version_name}-play-${WEAR_VERSION_CODE}-${MOBILE_VERSION_CODE}"
+          title="PadelScore ${version_name} Closed-Test Build"
+
+          release_directory="${RUNNER_TEMP}/padelscore-github-release"
+          mkdir -p "${release_directory}"
+
+          wear_apk_name="PadelScore-Wear-${version_name}-vc${WEAR_VERSION_CODE}.apk"
+          mobile_apk_name="PadelScore-Mobile-${version_name}-vc${MOBILE_VERSION_CODE}.apk"
+          wear_aab_name="PadelScore-Wear-${version_name}-vc${WEAR_VERSION_CODE}.aab"
+          mobile_aab_name="PadelScore-Mobile-${version_name}-vc${MOBILE_VERSION_CODE}.aab"
+
+          cp "${wear_apk}" "${release_directory}/${wear_apk_name}"
+          cp "${mobile_apk}" "${release_directory}/${mobile_apk_name}"
+          cp "${wear_aab}" "${release_directory}/${wear_aab_name}"
+          cp "${mobile_aab}" "${release_directory}/${mobile_aab_name}"
+
+          notes_file="${release_directory}/release-notes.md"
+
+          cat > "${notes_file}" <<EOF
+          ## PadelScore ${version_name} Closed-Test Build
+
+          ### Builds
+
+          - Wear OS: versionCode ${WEAR_VERSION_CODE}
+          - Android companion: versionCode ${MOBILE_VERSION_CODE}
+
+          ### Google Play distribution
+
+          - Wear OS closed-testing track
+          - Android companion closed-testing track
+
+          ### Downloads
+
+          - ${wear_apk_name}
+          - ${mobile_apk_name}
+
+          The attached AAB files are included for release archiving.
+
+          This is a prerelease build for testing.
+          EOF
+
+          if gh release view "${tag}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            echo "A GitHub release already exists for ${tag}."
+            exit 1
+          fi
+
+          gh release create "${tag}" \
+            "${release_directory}/${wear_apk_name}#Wear OS APK" \
+            "${release_directory}/${mobile_apk_name}#Android companion APK" \
+            "${release_directory}/${wear_aab_name}#Wear OS App Bundle" \
+            "${release_directory}/${mobile_aab_name}#Android companion App Bundle" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "${title}" \
+            --notes-file "${notes_file}" \
+            --prerelease \
+            --latest=false
+
+          gh release view "${tag}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --json tagName,name,isPrerelease,isDraft,url
+
+          echo "GitHub prerelease created successfully."
+          echo "Tag: ${tag}"
       - name: Upload published bundles as workflow artifacts
         uses: actions/upload-artifact@v7
         with:
