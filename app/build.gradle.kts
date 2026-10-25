@@ -36,7 +36,7 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 30
         targetSdk = 37
-        versionCode = 12
+        versionCode = providers.gradleProperty("padelscoreWearVersionCode").orNull?.toInt() ?: 12
         versionName = "1.2"
     }
 

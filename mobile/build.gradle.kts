@@ -32,7 +32,7 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 28
         targetSdk = 37
-        versionCode = 13
+        versionCode = providers.gradleProperty("padelscoreMobileVersionCode").orNull?.toInt() ?: 13
         versionName = "1.2"
     }
     signingConfigs {
