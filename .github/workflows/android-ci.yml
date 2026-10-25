@@ -194,3 +194,124 @@ jobs:
         shell: bash
         run: |
           rm -f "${RUNNER_TEMP}/padelscore-upload.jks"
+  play-api-access-check:
+    name: Verify Google Play API access
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Install Google authentication library
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install \
+            --disable-pip-version-check \
+            --quiet \
+            google-auth
+
+      - name: Verify Google Play API access
+        shell: bash
+        env:
+          PACKAGE_NAME: ch.hygro.padelscore
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PYTHON'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          import google.auth
+          from google.auth.transport.requests import Request
+
+          package_name = os.environ["PACKAGE_NAME"]
+          scope = "https://www.googleapis.com/auth/androidpublisher"
+
+          credentials, _ = google.auth.default(scopes=[scope])
+          credentials.refresh(Request())
+
+          access_token = credentials.token
+          base_url = (
+              "https://androidpublisher.googleapis.com/androidpublisher/v3/"
+              f"applications/{package_name}/edits"
+          )
+
+          edit_id = None
+
+          def api_request(method, url, body=None):
+              data = None
+              headers = {
+                  "Authorization": f"Bearer {access_token}",
+                  "Accept": "application/json",
+              }
+
+              if body is not None:
+                  data = json.dumps(body).encode("utf-8")
+                  headers["Content-Type"] = "application/json"
+
+              request = urllib.request.Request(
+                  url=url,
+                  data=data,
+                  headers=headers,
+                  method=method,
+              )
+
+              try:
+                  with urllib.request.urlopen(request, timeout=60) as response:
+                      response_body = response.read().decode("utf-8")
+
+                      if not response_body:
+                          return None
+
+                      return json.loads(response_body)
+              except urllib.error.HTTPError as error:
+                  error_body = error.read().decode("utf-8", errors="replace")
+                  print(
+                      f"Google Play API request failed with HTTP {error.code}.",
+                      file=sys.stderr,
+                  )
+                  print(error_body, file=sys.stderr)
+                  raise
+
+          try:
+              created_edit = api_request("POST", base_url, {})
+              edit_id = created_edit["id"]
+
+              print("Google Play API authentication succeeded.")
+              print("Access to ch.hygro.padelscore succeeded.")
+              print("A temporary empty edit was created.")
+
+              api_request(
+                  "POST",
+                  f"{base_url}/{edit_id}:validate",
+                  {},
+              )
+
+              print("The temporary edit validated successfully.")
+          finally:
+              if edit_id:
+                  api_request(
+                      "DELETE",
+                      f"{base_url}/{edit_id}",
+                  )
+                  print("The temporary edit was deleted.")
+
+          print("No bundle was uploaded.")
+          print("No edit was committed.")
+          print("No release or track was changed.")
+          PYTHON
