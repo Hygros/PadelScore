@@ -365,29 +365,21 @@ jobs:
           notes_file="${RELEASE_DIRECTORY}/release-notes.md"
 
           cat > "${notes_file}" <<EOF
-          ## PadelScore ${VERSION_NAME} GitHub Test Build
-
-          ### Builds
-
-          - Wear OS: versionCode ${WEAR_VERSION_CODE}
-          - Android companion: versionCode ${MOBILE_VERSION_CODE}
-
-          ### Downloads
-
-          - ${WEAR_ASSET}
-          - ${MOBILE_ASSET}
-
-          ### Distribution
-
-          This release was created only on GitHub.
-
-          No bundle was uploaded to Google Play.
-          No Google Play track was changed.
-          No Google Play release was started.
-
-          This is a prerelease build for direct APK testing.
-
-          Label: ${RELEASE_NAME_INPUT}
+          ## PadelScore ${VERSION_NAME} – GitHub Prerelease
+          
+          Signed APKs for direct testing:
+          
+          - **${WEAR_ASSET}** – Wear OS app
+          - **${MOBILE_ASSET}** – Android companion app
+          
+          ### Version codes
+          
+          - Wear OS: `${WEAR_VERSION_CODE}`
+          - Android companion: `${MOBILE_VERSION_CODE}`
+          
+          This is a test build for manual installation. No build was uploaded to Google Play, and no Google Play track was changed.
+          
+          Build label: ${RELEASE_NAME_INPUT}
           EOF
 
           gh release create "${TAG}" \
