@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -50,11 +52,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.AmbientMode
 import androidx.wear.compose.foundation.AmbientTickEffect
+import androidx.wear.compose.foundation.CurvedDirection
+import androidx.wear.compose.foundation.CurvedLayout
+import androidx.wear.compose.foundation.CurvedModifier
 import androidx.wear.compose.foundation.LocalAmbientModeManager
+import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ProgressIndicatorDefaults
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.curvedText
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.billing.SupporterBillingState
 import ch.hygro.padelscore.logic.PadelScoreEngine
@@ -453,6 +460,7 @@ fun PadelScoreContent(
 
         ScoreArea(
             modifier = Modifier.fillMaxWidth().weight(1f),
+            teamName = stringResource(R.string.opponent_team),
             pointText = pointText(matchState, Team.OPPONENT),
             games = matchState.opponentGames,
             sets = matchState.opponentSets,
@@ -485,6 +493,7 @@ fun PadelScoreContent(
 
         ScoreArea(
             modifier = Modifier.fillMaxWidth().weight(1f),
+            teamName = stringResource(R.string.our_team),
             pointText = pointText(matchState, Team.US),
             games = matchState.ourGames,
             sets = matchState.ourSets,
@@ -503,6 +512,7 @@ fun PadelScoreContent(
 @Composable
 fun ScoreArea(
     modifier: Modifier,
+    teamName: String,
     pointText: String,
     games: Int,
     sets: Int,
@@ -521,21 +531,16 @@ fun ScoreArea(
         enabled -> backgroundColor
         else -> backgroundColor.copy(alpha = 0.58f)
     }
-    val shape = if (statsAtTop) {
-        RoundedCornerShape(bottomStart = 22.dp, bottomEnd = 22.dp)
-    } else {
-        RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)
-    }
+    val shape = RectangleShape
     val scoreFontSize = if (ambient) 35.sp else 55.sp
 
     Box(
         modifier = modifier
             .background(color = displayedBackgroundColor, shape = shape)
             .clickable(enabled = enabled && !swipeGesturesEnabled, onClick = onClick)
-            .padding(horizontal = 16.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Top button: statistics above the score.
@@ -586,23 +591,84 @@ fun ScoreArea(
             }
         }
 
-        // Keep the serve indicator independent of the score layout.
+        // Serve indicator: full screen width matching CenterScoreArea horizontal coordinate system, offset by 21dp for ScoreStatistics
         if (isServing) {
-            val alignment = if (isDeuceCourt) {
-                if (statsAtTop) Alignment.BottomEnd else Alignment.TopEnd
-            } else {
-                if (statsAtTop) Alignment.BottomStart else Alignment.TopStart
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = if (statsAtTop) 21.dp else 0.dp,
+                        bottom = if (!statsAtTop) 21.dp else 0.dp
+                    ),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier.width(46.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!isDeuceCourt) {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(
+                                    color = if (ambient) Color.White else ColorServeIndicator,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(82.dp))
+
+                Box(
+                    modifier = Modifier.width(46.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isDeuceCourt) {
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(
+                                    color = if (ambient) Color.White else ColorServeIndicator,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
             }
-            Box(
-                modifier = Modifier.align(alignment)
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .width(12.dp)
-                    .height(12.dp)
-                    .background(
-                        color = if (ambient) Color.White else ColorServeIndicator, 
-                        shape = CircleShape
+        }
+
+        // Team name label horizontally centered with the Reset button
+        if (teamName.isNotEmpty()) {
+            val teamAlignment = if (statsAtTop) Alignment.BottomCenter else Alignment.TopCenter
+            val teamPadding = if (statsAtTop) Modifier.padding(bottom = 0.dp) else Modifier.padding(top = 0.dp)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(teamAlignment)
+                    .then(teamPadding),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.width(46.dp))
+                Spacer(modifier = Modifier.width(82.dp))
+                Box(
+                    modifier = Modifier.width(46.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = teamName,
+                        color = if (ambient) Color.White else Color.White.copy(alpha = 0.55f),
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        softWrap = false
                     )
-            )
+                }
+            }
         }
     }
 }

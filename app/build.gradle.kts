@@ -36,8 +36,8 @@ android {
         applicationId = "ch.hygro.padelscore"
         minSdk = 30
         targetSdk = 37
-        versionCode = 9
-        versionName = "1.1"
+        versionCode = 12
+        versionName = "1.2"
     }
 
     signingConfigs {

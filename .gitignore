@@ -75,3 +75,5 @@ lint-results*.xml
 *.apks
 *.aab
 
+# Local source backups
+*.bak_*

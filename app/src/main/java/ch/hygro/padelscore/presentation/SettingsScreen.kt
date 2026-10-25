@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import ch.hygro.padelscore.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -83,7 +85,7 @@ fun SettingsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "SETTINGS",
+                        text = stringResource(R.string.settings),
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,

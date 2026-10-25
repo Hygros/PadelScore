@@ -254,7 +254,7 @@ fun StartScreen(
                         }
                     ) {
                         Text(
-                            text = "SETTINGS",
+                            text = stringResource(R.string.settings),
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp,
                             maxLines = 1,
