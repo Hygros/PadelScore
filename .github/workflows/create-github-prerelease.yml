@@ -1,0 +1,414 @@
+name: Create GitHub prerelease only
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type GITHUB_RELEASE to create a GitHub-only prerelease
+        required: true
+        type: string
+      release_name:
+        description: Optional title suffix
+        required: false
+        default: GitHub test build
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: padelscore-github-only-release
+  cancel-in-progress: false
+
+jobs:
+  create-github-prerelease:
+    name: Build APKs and create GitHub prerelease
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    env:
+      PACKAGE_NAME: ch.hygro.padelscore
+
+    steps:
+      - name: Require explicit confirmation
+        shell: bash
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+
+          if [ "${CONFIRMATION}" != "GITHUB_RELEASE" ]; then
+            echo "GitHub-only release was not confirmed."
+            echo "Enter exactly GITHUB_RELEASE."
+            exit 1
+          fi
+
+          echo "GitHub-only prerelease was explicitly confirmed."
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run unit tests and release lint
+        run: |
+          ./gradlew \
+            :app:testDebugUnitTest \
+            :mobile:testDebugUnitTest \
+            :app:lintRelease \
+            :mobile:lintRelease \
+            --stacktrace
+
+      - name: Authenticate for read-only Play inspection
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          create_credentials_file: true
+          export_environment_variables: true
+
+      - name: Install Google authentication library
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 -m pip install \
+            --disable-pip-version-check \
+            --quiet \
+            google-auth
+
+      - name: Calculate APK version codes from Google Play
+        id: versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PYTHON'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          import google.auth
+          from google.auth.transport.requests import Request
+
+          package_name = os.environ["PACKAGE_NAME"]
+          github_output = os.environ["GITHUB_OUTPUT"]
+
+          credentials, _ = google.auth.default(
+              scopes=[
+                  "https://www.googleapis.com/auth/androidpublisher"
+              ]
+          )
+          credentials.refresh(Request())
+
+          token = credentials.token
+          base_url = (
+              "https://androidpublisher.googleapis.com/"
+              "androidpublisher/v3/applications/"
+              f"{package_name}/edits"
+          )
+
+          edit_id = None
+
+          def api_request(method, url, body=None):
+              data = None
+              headers = {
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/json",
+              }
+
+              if body is not None:
+                  data = json.dumps(body).encode("utf-8")
+                  headers["Content-Type"] = "application/json"
+
+              request = urllib.request.Request(
+                  url=url,
+                  data=data,
+                  headers=headers,
+                  method=method,
+              )
+
+              try:
+                  with urllib.request.urlopen(
+                      request,
+                      timeout=120,
+                  ) as response:
+                      response_body = response.read().decode("utf-8")
+
+                      if not response_body:
+                          return None
+
+                      return json.loads(response_body)
+              except urllib.error.HTTPError as error:
+                  error_body = error.read().decode(
+                      "utf-8",
+                      errors="replace",
+                  )
+                  print(
+                      f"Google Play API request failed with "
+                      f"HTTP {error.code}.",
+                      file=sys.stderr,
+                  )
+                  print(error_body, file=sys.stderr)
+                  raise
+
+          try:
+              created_edit = api_request("POST", base_url, {})
+              edit_id = created_edit["id"]
+
+              bundles_response = api_request(
+                  "GET",
+                  f"{base_url}/{edit_id}/bundles",
+              )
+
+              bundles = bundles_response.get("bundles", [])
+
+              existing_codes = [
+                  int(bundle["versionCode"])
+                  for bundle in bundles
+                  if "versionCode" in bundle
+              ]
+
+              highest_code = max(existing_codes, default=0)
+              wear_code = highest_code + 1
+              mobile_code = highest_code + 2
+
+              with open(
+                  github_output,
+                  "a",
+                  encoding="utf-8",
+              ) as output:
+                  output.write(
+                      f"highest_existing_code={highest_code}\n"
+                  )
+                  output.write(
+                      f"wear_version_code={wear_code}\n"
+                  )
+                  output.write(
+                      f"mobile_version_code={mobile_code}\n"
+                  )
+
+              print(
+                  "Highest Google Play version code: "
+                  f"{highest_code}"
+              )
+              print(f"GitHub Wear APK version code: {wear_code}")
+              print(f"GitHub mobile APK version code: {mobile_code}")
+          finally:
+              if edit_id:
+                  api_request(
+                      "DELETE",
+                      f"{base_url}/{edit_id}",
+                  )
+                  print("Temporary Google Play edit deleted.")
+
+          print("No bundle was uploaded to Google Play.")
+          print("No Google Play track was changed.")
+          print("No Google Play edit was committed.")
+          PYTHON
+
+      - name: Reconstruct upload keystore
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.PADELSCORE_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${KEYSTORE_BASE64}" ]; then
+            echo "PADELSCORE_UPLOAD_KEYSTORE_BASE64 is missing."
+            exit 1
+          fi
+
+          printf '%s' "${KEYSTORE_BASE64}" \
+            | base64 --decode \
+            > "${RUNNER_TEMP}/padelscore-upload.jks"
+
+          test -s "${RUNNER_TEMP}/padelscore-upload.jks"
+          chmod 600 "${RUNNER_TEMP}/padelscore-upload.jks"
+
+      - name: Build signed APKs
+        env:
+          PADELSCORE_UPLOAD_STORE_FILE: ${{ runner.temp }}/padelscore-upload.jks
+          PADELSCORE_UPLOAD_STORE_PASSWORD: ${{ secrets.PADELSCORE_UPLOAD_STORE_PASSWORD }}
+          PADELSCORE_UPLOAD_KEY_ALIAS: ${{ secrets.PADELSCORE_UPLOAD_KEY_ALIAS }}
+          PADELSCORE_UPLOAD_KEY_PASSWORD: ${{ secrets.PADELSCORE_UPLOAD_KEY_PASSWORD }}
+          WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
+          MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ./gradlew \
+            :app:assembleRelease \
+            :mobile:assembleRelease \
+            "-PpadelscoreWearVersionCode=${WEAR_VERSION_CODE}" \
+            "-PpadelscoreMobileVersionCode=${MOBILE_VERSION_CODE}" \
+            --stacktrace
+
+      - name: Verify and prepare release assets
+        id: release
+        shell: bash
+        env:
+          WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
+          MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
+        run: |
+          set -euo pipefail
+
+          wear_apk="app/build/outputs/apk/release/app-release.apk"
+          mobile_apk="mobile/build/outputs/apk/release/mobile-release.apk"
+
+          wear_metadata="app/build/outputs/apk/release/output-metadata.json"
+          mobile_metadata="mobile/build/outputs/apk/release/output-metadata.json"
+
+          test -s "${wear_apk}"
+          test -s "${mobile_apk}"
+          test -s "${wear_metadata}"
+          test -s "${mobile_metadata}"
+
+          jarsigner -verify "${wear_apk}"
+          jarsigner -verify "${mobile_apk}"
+
+          version_name="$(
+            python3 - "${wear_metadata}" "${mobile_metadata}" <<'PYTHON'
+          import json
+          import pathlib
+          import sys
+
+          wear_data = json.loads(
+              pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+          )
+          mobile_data = json.loads(
+              pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")
+          )
+
+          wear_elements = wear_data.get("elements", [])
+          mobile_elements = mobile_data.get("elements", [])
+
+          if not wear_elements or not mobile_elements:
+              raise RuntimeError("APK metadata contains no elements.")
+
+          wear_name = str(wear_elements[0]["versionName"])
+          mobile_name = str(mobile_elements[0]["versionName"])
+
+          if wear_name != mobile_name:
+              raise RuntimeError(
+                  f"versionName mismatch: {wear_name} != {mobile_name}"
+              )
+
+          print(wear_name)
+          PYTHON
+          )"
+
+          if [ -z "${version_name}" ]; then
+            echo "versionName could not be determined."
+            exit 1
+          fi
+
+          tag="v${version_name}-github-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+
+          release_directory="${RUNNER_TEMP}/padelscore-github-only-release"
+          mkdir -p "${release_directory}"
+
+          wear_name="PadelScore-Wear-${version_name}-vc${WEAR_VERSION_CODE}.apk"
+          mobile_name="PadelScore-Mobile-${version_name}-vc${MOBILE_VERSION_CODE}.apk"
+
+          cp "${wear_apk}" "${release_directory}/${wear_name}"
+          cp "${mobile_apk}" "${release_directory}/${mobile_name}"
+
+          {
+            echo "version_name=${version_name}"
+            echo "tag=${tag}"
+            echo "release_directory=${release_directory}"
+            echo "wear_asset=${wear_name}"
+            echo "mobile_asset=${mobile_name}"
+          } >> "${GITHUB_OUTPUT}"
+
+          sha256sum \
+            "${release_directory}/${wear_name}" \
+            "${release_directory}/${mobile_name}"
+
+      - name: Create GitHub-only prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION_NAME: ${{ steps.release.outputs.version_name }}
+          TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_DIRECTORY: ${{ steps.release.outputs.release_directory }}
+          WEAR_ASSET: ${{ steps.release.outputs.wear_asset }}
+          MOBILE_ASSET: ${{ steps.release.outputs.mobile_asset }}
+          WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
+          MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
+          RELEASE_NAME_INPUT: ${{ inputs.release_name }}
+        run: |
+          set -euo pipefail
+
+          if gh release view \
+            "${TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            >/dev/null 2>&1
+          then
+            echo "A release already exists for ${TAG}."
+            exit 1
+          fi
+
+          notes_file="${RELEASE_DIRECTORY}/release-notes.md"
+
+          cat > "${notes_file}" <<EOF
+          ## PadelScore ${VERSION_NAME} GitHub Test Build
+
+          ### Builds
+
+          - Wear OS: versionCode ${WEAR_VERSION_CODE}
+          - Android companion: versionCode ${MOBILE_VERSION_CODE}
+
+          ### Downloads
+
+          - ${WEAR_ASSET}
+          - ${MOBILE_ASSET}
+
+          ### Distribution
+
+          This release was created only on GitHub.
+
+          No bundle was uploaded to Google Play.
+          No Google Play track was changed.
+          No Google Play release was started.
+
+          This is a prerelease build for direct APK testing.
+
+          Label: ${RELEASE_NAME_INPUT}
+          EOF
+
+          gh release create "${TAG}" \
+            "${RELEASE_DIRECTORY}/${WEAR_ASSET}#Wear OS APK" \
+            "${RELEASE_DIRECTORY}/${MOBILE_ASSET}#Android companion APK" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "PadelScore ${VERSION_NAME} GitHub Test Build" \
+            --notes-file "${notes_file}" \
+            --prerelease \
+            --latest=false
+
+          gh release view "${TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --json tagName,name,isPrerelease,isDraft,url
+
+          echo "GitHub-only prerelease created successfully."
+          echo "No Google Play release was created."
+
+      - name: Remove temporary keystore
+        if: always()
+        shell: bash
+        run: |
+          rm -f "${RUNNER_TEMP}/padelscore-upload.jks"
