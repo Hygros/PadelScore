@@ -88,6 +88,7 @@ Padel Score is currently available through a **Closed Test**:
 3. Install **Padel Score** from Google Play on your Wear OS watch.
 
 Once installed through Google Play, future updates will be delivered through the Play Store automatically according to your Play Store update settings.
+
 ---
 
 <a id="privacy"></a>
