@@ -77,6 +77,17 @@ Contributions, bug reports, and feature suggestions are equally appreciated.
    ```
 *(Note: To enable Health Connect sync, install the companion `PadelScore-mobile.apk` on your paired Android phone. The phone app acts purely as a sync bridge.)*
 
+## 🔄 Automatic Updates via Google Play
+
+Want to receive **automatic app updates through Google Play** instead of manually installing new APKs?
+
+Padel Score is currently available through a **Closed Test**:
+
+1. Join the tester group: [Padel Score Testers](https://groups.google.com/g/padel-score-testers)
+2. Become a tester: [Join the Google Play test](https://play.google.com/apps/testing/ch.hygro.padelscore)
+3. Install **Padel Score** from Google Play on your Wear OS watch.
+
+Once installed through Google Play, future updates will be delivered through the Play Store automatically according to your Play Store update settings.
 ---
 
 <a id="privacy"></a>
