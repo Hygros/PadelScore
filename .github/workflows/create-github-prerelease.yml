@@ -7,11 +7,6 @@ on:
         description: Type GITHUB_RELEASE to create a GitHub-only release
         required: true
         type: string
-      release_name:
-        description: Optional build label
-        required: false
-        default: GitHub release build
-        type: string
 
 permissions:
   contents: write
@@ -349,7 +344,6 @@ jobs:
           MOBILE_ASSET: ${{ steps.release.outputs.mobile_asset }}
           WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
-          RELEASE_NAME_INPUT: ${{ inputs.release_name }}
         run: |
           set -euo pipefail
 
@@ -374,11 +368,9 @@ jobs:
           
           ### Build information
           
-          - Wear OS: `${WEAR_VERSION_CODE}`
-          - Android companion: `${MOBILE_VERSION_CODE}`
+          - Wear OS: \`${WEAR_VERSION_CODE}\`
+          - Android companion: \`${MOBILE_VERSION_CODE}\`
           
-          **Build:** ${RELEASE_NAME_INPUT}
-
           This GitHub release is independent of Google Play and does not publish or modify a Play Store release.
           EOF
 
