@@ -8,9 +8,9 @@ on:
         required: true
         type: string
       release_name:
-        description: Optional title suffix
+        description: Optional build label
         required: false
-        default: GitHub test build
+        default: GitHub release build
         type: string
 
 permissions:
@@ -21,8 +21,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  create-github-prerelease:
-    name: Build APKs and create GitHub prerelease
+  create-github-release:
+    name: Build APKs and create GitHub release
     runs-on: ubuntu-latest
     timeout-minutes: 35
 
@@ -43,7 +43,7 @@ jobs:
             exit 1
           fi
 
-          echo "GitHub-only prerelease was explicitly confirmed."
+          echo "GitHub-only release was explicitly confirmed."
 
       - name: Check out repository
         uses: actions/checkout@v6
@@ -338,7 +338,7 @@ jobs:
             "${release_directory}/${wear_name}" \
             "${release_directory}/${mobile_name}"
 
-      - name: Create GitHub-only prerelease
+      - name: Create GitHub-only release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
@@ -365,19 +365,21 @@ jobs:
           notes_file="${RELEASE_DIRECTORY}/release-notes.md"
 
           cat > "${notes_file}" <<EOF
-          ## PadelScore ${VERSION_NAME} – GitHub Prerelease
+          ## PadelScore ${VERSION_NAME}
           
-          Signed APKs for direct testing:
+          Install the latest PadelScore apps directly from the APK files below:
           
-          - **${WEAR_ASSET}** – Wear OS app
-          - **${MOBILE_ASSET}** – Android companion app
+          - **${WEAR_ASSET}** – install on a Wear OS watch
+          - **${MOBILE_ASSET}** – install on the paired Android phone
           
-          ### Version codes
+          ### Build information
           
           - Wear OS: `${WEAR_VERSION_CODE}`
           - Android companion: `${MOBILE_VERSION_CODE}`
           
-          Build label: ${RELEASE_NAME_INPUT}
+          **Build:** ${RELEASE_NAME_INPUT}
+
+          This GitHub release is independent of Google Play and does not publish or modify a Play Store release.
           EOF
 
           gh release create "${TAG}" \
@@ -385,16 +387,14 @@ jobs:
             "${RELEASE_DIRECTORY}/${MOBILE_ASSET}#Android companion APK" \
             --repo "${GITHUB_REPOSITORY}" \
             --target "${GITHUB_SHA}" \
-            --title "PadelScore ${VERSION_NAME} GitHub Test Build" \
-            --notes-file "${notes_file}" \
-            --prerelease \
-            --latest=false
+            --title "PadelScore ${VERSION_NAME}" \
+            --notes-file "${notes_file}"
 
           gh release view "${TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
             --json tagName,name,isPrerelease,isDraft,url
 
-          echo "GitHub-only prerelease created successfully."
+          echo "GitHub-only release created successfully."
           echo "No Google Play release was created."
 
       - name: Remove temporary keystore
