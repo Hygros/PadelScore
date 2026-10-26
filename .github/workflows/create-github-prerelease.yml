@@ -7,6 +7,10 @@ on:
         description: Type GITHUB_RELEASE to create a GitHub-only release
         required: true
         type: string
+      release_notes:
+        description: What is new in this release? Use short bullet points.
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -344,6 +348,7 @@ jobs:
           MOBILE_ASSET: ${{ steps.release.outputs.mobile_asset }}
           WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
+          RELEASE_NOTES_INPUT: ${{ inputs.release_notes }}
         run: |
           set -euo pipefail
 
@@ -366,12 +371,14 @@ jobs:
           - **${WEAR_ASSET}** – install on a Wear OS watch
           - **${MOBILE_ASSET}** – install on the paired Android phone
           
+          ### What's new
+
+          ${RELEASE_NOTES_INPUT}
+
           ### Build information
           
           - Wear OS: \`${WEAR_VERSION_CODE}\`
           - Android companion: \`${MOBILE_VERSION_CODE}\`
-          
-          This GitHub release is independent of Google Play and does not publish or modify a Play Store release.
           EOF
 
           gh release create "${TAG}" \
