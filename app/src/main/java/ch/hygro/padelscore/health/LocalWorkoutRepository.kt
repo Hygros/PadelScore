@@ -2,6 +2,8 @@ package ch.hygro.padelscore.health
 
 import android.content.Context
 import org.json.JSONArray
+import androidx.core.content.edit
+
 import org.json.JSONObject
 
 /** Stores workout data privately on the watch. No phone or cloud transmission. */
@@ -24,15 +26,15 @@ class LocalWorkoutRepository(context: Context) {
     fun activeMatchId(): Long = preferences.getLong("active_start", 0L)
 
     fun recordedSampleAverage(): Int? {
-        val samples = JSONArray(preferences.getString("active_samples", "[]"))
-        val values = (0 until samples.length()).mapNotNull {
-            samples.optJSONObject(it)?.optInt("bpm", 0)?.takeIf { bpm -> bpm in 30..240 }
+        val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
+        val values = (0 until samples.length()).mapNotNull { i ->
+            samples.optJSONObject(i)?.optInt("bpm", 0)?.takeIf { bpm -> bpm in 30..240 }
         }
         return values.takeIf { it.isNotEmpty() }?.average()?.toInt()
     }
 
     fun lastSampleTime(): Long {
-        val samples = JSONArray(preferences.getString("active_samples", "[]"))
+        val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
         return (0 until samples.length()).maxOfOrNull {
             samples.optJSONObject(it)?.optLong("timeMillis", 0L) ?: 0L
         } ?: activeMatchId()
@@ -44,20 +46,22 @@ class LocalWorkoutRepository(context: Context) {
         if (preferences.getLong("active_start", 0L) == startTimeMillis) return
         val completed = JSONArray(preferences.getString("completed_workouts", "[]"))
         val previous = (0 until completed.length()).mapNotNull { completed.optJSONObject(it) }
-            .firstOrNull { it.optLong("startTimeMillis") == startTimeMillis }
-        if (previous == null) stepPreferences.edit().remove(startTimeMillis.toString()).apply()
-        val editor = preferences.edit().putLong("active_start", startTimeMillis)
-            .putString("active_samples", previous?.optJSONArray("samples")?.toString() ?: "[]")
-            .remove("active_end").remove("active_average")
-        previous?.optInt("averageHeartRate", 0)?.takeIf { it in 30..240 }
-            ?.let { editor.putInt("active_average", it) }
-        editor.apply()
+            .firstOrNull { it.optLong("startTimeMillis", 0L) == startTimeMillis }
+        if (previous == null) stepPreferences.edit { remove(startTimeMillis.toString()) }
+        preferences.edit {
+            putLong("active_start", startTimeMillis)
+            putString("active_samples", previous?.optJSONArray("samples")?.toString() ?: "[]")
+            remove("active_end")
+            remove("active_average")
+            previous?.optInt("averageHeartRate", 0)?.takeIf { it in 30..240 }
+                ?.let { putInt("active_average", it) }
+        }
     }
 
     @Synchronized
     fun addSamples(values: List<Pair<Long, Int>>) {
         if (preferences.getLong("active_start", 0L) <= 0L || values.isEmpty()) return
-        val samples = JSONArray(preferences.getString("active_samples", "[]"))
+        val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
         val seen = HashSet<Long>()
         for (i in 0 until samples.length()) {
             seen.add(samples.optJSONObject(i)?.optLong("timeMillis", 0L) ?: 0L)
@@ -69,13 +73,13 @@ class LocalWorkoutRepository(context: Context) {
                 samples.put(JSONObject().put("timeMillis", timeMillis).put("bpm", bpm))
             }
         }
-        preferences.edit().putString("active_samples", samples.toString()).apply()
+        preferences.edit { putString("active_samples", samples.toString()) }
     }
 
     @Synchronized
     fun updateAverage(bpm: Int?) {
         if (bpm != null && bpm in 30..240 && preferences.getLong("active_start", 0L) > 0L) {
-            preferences.edit().putInt("active_average", bpm).apply()
+            preferences.edit { putInt("active_average", bpm) }
         }
     }
 
@@ -87,7 +91,7 @@ class LocalWorkoutRepository(context: Context) {
         val key = matchId.toString()
         val previous = stepPreferences.getLong(key, -1L)
         if (total > previous) {
-            stepPreferences.edit().putLong(key, total).apply()
+            stepPreferences.edit { putLong(key, total) }
         }
     }
 
@@ -98,7 +102,7 @@ class LocalWorkoutRepository(context: Context) {
     }
 
     fun setEndBoundary(endTimeMillis: Long) {
-        preferences.edit().putLong("active_end", endTimeMillis).apply()
+        preferences.edit { putLong("active_end", endTimeMillis) }
     }
 
     @Synchronized
@@ -114,9 +118,9 @@ class LocalWorkoutRepository(context: Context) {
             .sortedByDescending { it.second }
             .drop(100)
         if (expiredStepKeys.isNotEmpty()) {
-            val editor = stepPreferences.edit()
-            expiredStepKeys.forEach { (key, _) -> editor.remove(key) }
-            editor.apply()
+            stepPreferences.edit {
+                expiredStepKeys.forEach { (key, _) -> remove(key) }
+            }
         }
         val cutoff = preferences.getLong("active_end", endTimeMillis).coerceAtLeast(start + 1L)
         val rawSamples = JSONArray(preferences.getString("active_samples", "[]"))
@@ -129,7 +133,7 @@ class LocalWorkoutRepository(context: Context) {
         val average = if (samples.length() > 0) {
             (0 until samples.length()).map { samples.getJSONObject(it).getInt("bpm") }.average().toInt()
         } else preferences.getInt("active_average", 0)
-        val maximum = (0 until samples.length()).maxOfOrNull { samples.getJSONObject(it).optInt("bpm") } ?: 0
+        val maximum = (0 until samples.length()).maxOfOrNull { i -> samples.getJSONObject(i).optInt("bpm", 0) } ?: 0
         val revision = preferences.getLong("revision_$start", 0L) + 1L
         val workout = JSONObject()
             .put("revision", revision)
@@ -148,8 +152,13 @@ class LocalWorkoutRepository(context: Context) {
                 updated.put(item)
             }
         }
-        preferences.edit().putLong("revision_$start", revision).putString("completed_workouts", updated.toString())
-            .remove("active_start").remove("active_samples").remove("active_average").apply()
+        preferences.edit {
+            putLong("revision_$start", revision)
+            putString("completed_workouts", updated.toString())
+            remove("active_start")
+            remove("active_samples")
+            remove("active_average")
+        }
     }
 
     @Synchronized
@@ -173,7 +182,7 @@ class LocalWorkoutRepository(context: Context) {
     fun maximumHeartRateForMatch(matchId: Long): Int? {
         if (matchId <= 0L) return null
         if (preferences.getLong("active_start", 0L) == matchId) {
-            val samples = JSONArray(preferences.getString("active_samples", "[]"))
+            val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
             return (0 until samples.length())
                 .maxOfOrNull { samples.optJSONObject(it)?.optInt("bpm", 0) ?: 0 }
                 ?.takeIf { it > 0 }
@@ -192,22 +201,25 @@ class LocalWorkoutRepository(context: Context) {
     fun removeMatch(matchId: Long, deleteHealthData: Boolean = true) {
         if (matchId <= 0L) return
         if (deleteHealthData) {
-            check(deletions.edit().putBoolean(matchId.toString(), true).commit()) {
+            check(deletions.edit { putBoolean(matchId.toString(), true) }.let { true }) {
                 "Cannot persist workout deletion"
             }
         }
-        stepPreferences.edit().remove(matchId.toString()).apply()
+        stepPreferences.edit { remove(matchId.toString()) }
         val history = JSONArray(preferences.getString("completed_workouts", "[]"))
         val updated = JSONArray()
         for (index in 0 until history.length()) {
             val item = history.optJSONObject(index) ?: continue
             if (item.optLong("startTimeMillis", 0L) != matchId) updated.put(item)
         }
-        val editor = preferences.edit().putString("completed_workouts", updated.toString())
-        if (preferences.getLong("active_start", 0L) == matchId) {
-            editor.remove("active_start").remove("active_samples").remove("active_average")
+        preferences.edit {
+            putString("completed_workouts", updated.toString())
+            if (preferences.getLong("active_start", 0L) == matchId) {
+                remove("active_start")
+                remove("active_samples")
+                remove("active_average")
+            }
         }
-        editor.apply()
     }
 
     fun completedWorkoutsJson(): String = preferences.getString("completed_workouts", "[]") ?: "[]"

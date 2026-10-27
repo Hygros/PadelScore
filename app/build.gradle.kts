@@ -37,7 +37,7 @@ android {
         minSdk = 30
         targetSdk = 37
         versionCode = providers.gradleProperty("padelscoreWearVersionCode").orNull?.toInt() ?: 12
-        versionName = "1.2"
+        versionName = "1.3"
     }
 
     signingConfigs {
@@ -83,8 +83,8 @@ android {
 
 dependencies {
     implementation(libs.wear.ongoing)
-    implementation("androidx.wear:wear-remote-interactions:1.2.0")
-    implementation("androidx.core:core:1.19.1")
+    implementation(libs.wear.remote.interactions)
+    implementation(libs.core)
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)
     implementation(libs.compose.foundation)
@@ -96,28 +96,28 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.wear.tooling.preview)
-    implementation("androidx.compose.material:material-icons-core")
-    implementation("androidx.health:health-services-client:1.1.0")
-    implementation("androidx.concurrent:concurrent-futures-ktx:1.3.0")
-    implementation("com.google.android.gms:play-services-wearable:20.0.1")
+    implementation(libs.material.icons.core)
+    implementation(libs.health.services.client)
+    implementation(libs.concurrent.futures.ktx)
+    implementation(libs.play.services.wearable)
     
     // Wear OS Tiles & Complications
-    implementation("androidx.wear.tiles:tiles:1.6.2")
-    implementation("androidx.wear.protolayout:protolayout:1.4.2")
-    implementation("androidx.wear.protolayout:protolayout-material:1.4.2")
-    implementation("androidx.wear.watchface:watchface-complications-data-source:1.3.0")
-    implementation("androidx.wear.tiles:tiles-tooling-preview:1.6.2")
+    implementation(libs.wear.tiles)
+    implementation(libs.wear.protolayout)
+    implementation(libs.wear.protolayout.material)
+    implementation(libs.wear.watchface.complications.data.source)
+    implementation(libs.wear.tiles.tooling.preview)
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.ui.tooling)
 
     constraints {
-        implementation("androidx.fragment:fragment:1.9.1") {
+        implementation(libs.fragment) {
             because("Update outdated transitive Fragment dependency")
         }
     }

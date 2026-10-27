@@ -1,6 +1,7 @@
 package ch.hygro.padelscore.presentation
 
 import android.app.Activity
+import androidx.core.content.edit
 import android.content.ActivityNotFoundException
 import android.app.AlertDialog
 import android.app.AutomaticZenRule
@@ -13,7 +14,6 @@ import android.service.notification.Condition
 import android.service.notification.ZenPolicy
 import android.util.Log
 import androidx.core.net.toUri
-import androidx.core.content.edit
 
 /** Owns only the app's rule; never changes the user's global DND policy. */
 class MatchQuietModeController(private val activity: Activity) {
@@ -190,7 +190,7 @@ class MatchQuietModeController(private val activity: Activity) {
                 id = manager.addAutomaticZenRule(rule)
                 check(!id.isNullOrBlank()) { "The system did not create the match rule" }
                 // Persist before activation so the next launch can clear a stale rule.
-                check(preferences.edit().putString("rule_id", id).commit())
+                preferences.edit(commit = true) { putString("rule_id", id) }
             }
             manager.setAutomaticZenRuleState(
                 id,

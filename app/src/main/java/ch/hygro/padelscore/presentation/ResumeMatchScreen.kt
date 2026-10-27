@@ -32,6 +32,8 @@ import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.presentation.theme.ColorDestructive
+import ch.hygro.padelscore.presentation.theme.ColorPrimary
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
@@ -109,7 +111,7 @@ fun ResumeMatchScreen(
                             .fillMaxWidth(if (isRound) 0.82f else 0.88f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF195F3B),
+                            containerColor = ColorPrimary,
                             contentColor = Color.White
                         ),
                         onClick = onContinueMatch
@@ -127,7 +129,7 @@ fun ResumeMatchScreen(
                             .fillMaxWidth(if (isRound) 0.82f else 0.88f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF8B2525),
+                            containerColor = ColorDestructive,
                             contentColor = Color.White
                         ),
                         onClick = onDiscardMatch

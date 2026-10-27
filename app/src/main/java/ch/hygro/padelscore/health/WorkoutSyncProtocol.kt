@@ -12,7 +12,6 @@ internal object WorkoutSyncProtocol {
     // Within the existing manifest path filters; no new exported component.
     const val DELETE_RPC = CHUNK + "delete/"
     const val DELETE_DATA = "/padelscore/workout/deleted/"
-    const val SENDER = "padelscore_sync_sender"
     const val RECEIVER = "padelscore_sync_receiver"
     const val CHUNK_BYTES = 48 * 1024
     const val MAX_BYTES = 2 * 1024 * 1024

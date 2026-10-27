@@ -13,7 +13,7 @@ import androidx.concurrent.futures.CallbackToFutureAdapter
 import com.google.common.util.concurrent.ListenableFuture
 
 class PadelScoreTileService : TileService() {
-    private val RESOURCES_VERSION = "1"
+    private val resourcesVersion = "1"
 
     override fun onTileRequest(
         requestParams: RequestBuilders.TileRequest
@@ -56,7 +56,7 @@ class PadelScoreTileService : TileService() {
             .build()
 
         val tile = TileBuilders.Tile.Builder()
-            .setResourcesVersion(RESOURCES_VERSION)
+            .setResourcesVersion(resourcesVersion)
             .setTileTimeline(
                 TimelineBuilders.Timeline.Builder()
                     .addTimelineEntry(
@@ -83,7 +83,7 @@ class PadelScoreTileService : TileService() {
         return CallbackToFutureAdapter.getFuture { completer ->
             completer.set(
                 ResourceBuilders.Resources.Builder()
-                    .setVersion(RESOURCES_VERSION)
+                    .setVersion(resourcesVersion)
                     .build()
             )
             "TileResourcesRequest"

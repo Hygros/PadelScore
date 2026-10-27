@@ -27,11 +27,11 @@ internal class MatchStepSensor(private val context: Context) : SensorEventListen
         val sensor = manager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) ?: return
         accumulator = StepDeltaAccumulator(repository.stepsForMatch(matchId) ?: 0L)
         startedNanos = SystemClock.elapsedRealtimeNanos()
-        registered = manager?.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL) == true
+        registered = manager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL) == true
     }
 
     fun stop() {
-        if (registered) manager?.unregisterListener(this)
+        if (registered) manager.unregisterListener(this)
         registered = false
     }
 

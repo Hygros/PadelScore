@@ -22,21 +22,35 @@
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/01_new_match.png" width="200" alt="New Match Setup" />
+  <img src="docs/screenshots/01_new_match.png" width="180" alt="New Match Setup" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/07_match_scoring.png" width="200" alt="Match Scoring" />
+  <img src="docs/screenshots/07_match_scoring.png" width="180" alt="Match Scoring" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/08_end_match.png" width="200" alt="Match Result" />
+  <img src="docs/screenshots/08_end_match.png" width="180" alt="Match Result" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/09_match_history.png" width="200" alt="Match History" />
+  <img src="docs/screenshots/09_match_history.png" width="180" alt="Match History" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/10_companion.png" width="200" alt="Companion App" />
-
-
+  <img src="docs/screenshots/10_companion.png" width="180" alt="Companion App" />
 </p>
 
 <p align="center">
   <sub><b>Match Setup</b> &nbsp;•&nbsp; <b>Live Scoring</b> &nbsp;•&nbsp; <b>Match Summary</b> &nbsp;•&nbsp; <b>Local History</b> &nbsp;•&nbsp; <b>Companion</b></sub>
+</p>
+
+### 📊 Detailed Match Statistics & Point History
+
+<p align="center">
+  <img src="docs/screenshots/stats-01.png" width="180" alt="Match Statistics" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/stats-02.png" width="180" alt="Point Sequence" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/stats-03.png" width="180" alt="Game Score Chart" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/stats-04.png" width="180" alt="Game Point Breakdown" />
+</p>
+
+<p align="center">
+  <sub><b>Match Breakdown</b> &nbsp;•&nbsp; <b>Point Sequence</b> &nbsp;•&nbsp; <b>Game Chart</b> &nbsp;•&nbsp; <b>Point-by-Point</b></sub>
 </p>
 
 ---
@@ -57,12 +71,13 @@ Contributions, bug reports, and feature suggestions are equally appreciated.
 - ⚙️ **Flexible Match Formats**: Single set, Best-of-3, Short sets (to 4 games), Normal sets (to 6 games), set tie-breaks, and match tie-breaks.
 - 🟡 **Serve & Court Tracking**: Visual serve indicators (Deuce/Ad court) with 1-2-2 tie-break rotation and court change notifications.
 - ❤️ **Fitness Tracking**: Native integration with Wear OS Health Services to track heart rate, steps, active calories, and match duration as an official workout.
-- 📱 **Health Connect Sync**: Optional phone companion app to automatically sync your padel workouts and heart rate data from the watch directly to Android Health Connect.
+- 📊 **Detailed Match Statistics & Point History**: Full point-by-point tracking, interactive game progression charts, point sequence strips, and set/game breakdowns right on your watch.
+- 📱 **Companion App (`PadelScore Sync`)**: Sync watch workouts and heart rate directly to Android Health Connect, sync match deletions, manage permissions, and remotely trigger watch app installation from your phone.
 - ⌚ **Tiles & Complications**: Launch a new match instantly straight from your watch face using the included Complication or Wear OS Tile.
 - 🔕 **Match Quiet Mode**: Optional automatic Do Not Disturb mode during active matches to silence notifications and pop-ups.
 - 🎯 **Court-Optimized UI**: Large touch targets, 300 ms double-tap safety lock, wrist haptics, and Always-On Display (AOD) support.
 - ↺ **Instant Undo & Reset**: Quick point reversal and safety long-press match reset.
-- 📜 **Local Match History**: Save and review past matches on your watch, including scores, durations, and total point breakdowns.
+- 📜 **Local Match Storage**: Save and review past matches offline on your watch with full privacy.
 - 🔒 **100% Standalone & Privacy-First**: No internet permission requested and zero tracking. The watch app operates fully independently.
 
 ---
@@ -75,7 +90,7 @@ Contributions, bug reports, and feature suggestions are equally appreciated.
    adb connect <WATCH_IP_ADDRESS>:5555
    adb install -r PadelScore-wear.apk
    ```
-*(Note: To enable Health Connect sync, install the companion `PadelScore-mobile.apk` on your paired Android phone. The phone app acts purely as a sync bridge.)*
+*(Note: To enable Health Connect sync, install the companion `PadelScore-mobile.apk` on your paired Android phone. The phone app acts purely as a sync bridge and can also open the Play Store on your paired watch directly to install or update the watch app.)*
 
 ## 🔄 Automatic Updates via Google Play
 
@@ -108,14 +123,14 @@ app/src/main/java/ch/hygro/padelscore/
 ├── complications/  # Watch face Complication for quick-start
 ├── health/         # Health Services fitness tracking (Heart Rate, Steps)
 ├── logic/          # Core scoring engine & serve calculator
-├── model/          # Match configuration and scoring data models
-├── presentation/   # Wear OS Jetpack Compose UI & quiet mode controller
-├── storage/        # Offline local match storage & persistence
+├── model/          # Match configuration, scoring & point history data models
+├── presentation/   # Wear OS Jetpack Compose UI, match stats & quiet mode controller
+├── storage/        # Offline local match storage & point history codec
 ├── tiles/          # Wear OS quick-start Tile
 └── vibration/      # Wrist haptic feedback engine
 
 mobile/src/main/java/ch/hygro/padelscore/sync/
-└──                 # Optional companion app for Health Connect workout sync
+└──                 # Companion app for Health Connect workout sync & watch app launcher
 ```
 
 ---

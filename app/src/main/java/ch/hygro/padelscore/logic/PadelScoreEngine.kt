@@ -11,6 +11,54 @@ object PadelScoreEngine {
 
     fun awardPoint(state: MatchState, team: Team): MatchState {
         if (isMatchFinished(state)) return state
+        val next = awardPointInternal(state, team)
+        val setNumber = state.completedSets.size + 1
+        val gameNumber = state.totalGamesPlayed + 1
+        val last = state.pointHistory.lastOrNull()?.takeIf {
+            it.setNumber == setNumber && it.gameNumber == gameNumber
+        }
+        val gameEnded = next.totalGamesPlayed > state.totalGamesPlayed ||
+            next.completedSets.size > state.completedSets.size ||
+            (!isMatchFinished(state) && isMatchFinished(next))
+        val numeric = state.isTieBreak || state.phase == MatchPhase.MATCH_TIE_BREAK
+        fun score(forTeam: Team): String {
+            if (state.phase == MatchPhase.MATCH_TIE_BREAK) {
+                val before = if (forTeam == Team.US) state.ourMatchTieBreakPoints
+                    else state.opponentMatchTieBreakPoints
+                return (before + if (team == forTeam) 1 else 0).toString()
+            }
+            if (state.isTieBreak) {
+                val before = if (forTeam == Team.US) state.ourTieBreakPoints
+                    else state.opponentTieBreakPoints
+                return (before + if (team == forTeam) 1 else 0).toString()
+            }
+            if (gameEnded) return if (team == forTeam) "GAME" else "-"
+            if (next.advantageTeam == forTeam) return "AD"
+            return when (if (forTeam == Team.US) next.ourPoints else next.opponentPoints) {
+                0 -> "0"
+                1 -> "15"
+                2 -> "30"
+                else -> "40"
+            }
+        }
+        val point = ch.hygro.padelscore.model.GamePoint(
+            number = next.totalPointsPlayed,
+            setNumber = setNumber,
+            gameNumber = gameNumber,
+            scoringTeam = team,
+            ourScore = score(Team.US),
+            opponentScore = score(Team.OPPONENT),
+            ourRallies = (last?.ourRallies ?: 0) + if (team == Team.US) 1 else 0,
+            opponentRallies = (last?.opponentRallies ?: 0) + if (team == Team.OPPONENT) 1 else 0,
+            numeric = numeric,
+            matchTieBreak = state.phase == MatchPhase.MATCH_TIE_BREAK,
+            gameEnded = gameEnded
+        )
+        return next.copy(pointHistory = state.pointHistory + point)
+    }
+
+    private fun awardPointInternal(state: MatchState, team: Team): MatchState {
+        if (isMatchFinished(state)) return state
 
         if (state.phase == MatchPhase.MATCH_TIE_BREAK) {
             return awardMatchTieBreakPoint(state, team)

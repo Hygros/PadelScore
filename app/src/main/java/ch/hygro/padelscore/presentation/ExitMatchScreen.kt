@@ -29,12 +29,16 @@ import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import ch.hygro.padelscore.R
+import ch.hygro.padelscore.presentation.theme.ColorDestructive
+import ch.hygro.padelscore.presentation.theme.ColorPrimary
+import ch.hygro.padelscore.presentation.theme.ColorSecondary
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
 fun ExitMatchScreen(
     onContinueMatch: () -> Unit,
-    onBackToHome: () -> Unit
+    onBackToHome: () -> Unit,
+    onEndAndSave: (() -> Unit)? = null
 ) {
     val columnState = rememberTransformingLazyColumnState()
     val transformationSpec = rememberTransformationSpec()
@@ -104,7 +108,7 @@ fun ExitMatchScreen(
                             .fillMaxWidth(if (isRound) 0.82f else 0.88f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF195F3B),
+                            containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = onContinueMatch
@@ -117,12 +121,32 @@ fun ExitMatchScreen(
                         )
                     }
 
+                    if (onEndAndSave != null) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                                .height(48.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = ColorPrimary,
+                                contentColor = Color.White
+                            ),
+                            onClick = onEndAndSave
+                        ) {
+                            Text(
+                                text = stringResource(R.string.end_and_save),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
+                            )
+                        }
+                    }
+
                     Button(
                         modifier = Modifier
                             .fillMaxWidth(if (isRound) 0.82f else 0.88f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3A3A3A),
+                            containerColor = ColorDestructive,
                             contentColor = Color.White
                         ),
                         onClick = onBackToHome

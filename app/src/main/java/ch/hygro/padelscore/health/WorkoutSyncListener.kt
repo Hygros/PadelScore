@@ -30,7 +30,7 @@ class WorkoutSyncListener : WearableListenerService() {
             val reply = JSONObject().put("id", id).put("sha256", hash)
                 .put("deleted", deleted).put("allowed", enabled && !deleted && exists && repository.activeMatchId() != id)
             com.google.android.gms.tasks.Tasks.forResult(reply.toString().toByteArray(Charsets.UTF_8))
-        } catch (e: Exception) { com.google.android.gms.tasks.Tasks.forException<ByteArray>(e) }
+        } catch (e: Exception) { com.google.android.gms.tasks.Tasks.forException(e) }
     }
 
     override fun onMessageReceived(event: MessageEvent) {

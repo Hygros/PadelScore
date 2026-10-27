@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -52,16 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.AmbientMode
 import androidx.wear.compose.foundation.AmbientTickEffect
-import androidx.wear.compose.foundation.CurvedDirection
-import androidx.wear.compose.foundation.CurvedLayout
-import androidx.wear.compose.foundation.CurvedModifier
 import androidx.wear.compose.foundation.LocalAmbientModeManager
-import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ProgressIndicatorDefaults
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.curvedText
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.billing.SupporterBillingState
 import ch.hygro.padelscore.logic.PadelScoreEngine
@@ -75,14 +69,6 @@ import ch.hygro.padelscore.vibration.HapticFeedbackManager
 import ch.hygro.padelscore.presentation.theme.*
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import android.content.pm.PackageManager
-import androidx.compose.runtime.collectAsState
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
 
 @Composable
 fun PadelScoreContent(
@@ -137,8 +123,6 @@ fun PadelScoreContent(
     var showSupporter by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var draftConfiguration by remember { mutableStateOf(initialState.configuration) }
-
-    val scope = rememberCoroutineScope()
     val bodySensorPermissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions ->
@@ -211,6 +195,45 @@ fun PadelScoreContent(
             updateMatch(history.removeAt(history.lastIndex))
             hapticFeedbackManager.undo()
         }
+    }
+
+    val saveMatchFailedMessage = stringResource(R.string.save_match_failed)
+
+    fun endAndSaveMatch() {
+        if (PadelScoreEngine.isMatchFinished(matchState) ||
+            matchState.startedAtEpochMillis <= 0L
+        ) return
+
+        val stoppedState = matchState.copy(
+            finishedAtEpochMillis = System.currentTimeMillis(),
+            averageHeartRate =
+                ch.hygro.padelscore.health.FitnessTrackingService.averageHeartRate
+        )
+
+        try {
+            matchHistoryRepository.saveCompletedMatch(
+                state = stoppedState,
+                averageHeartRate = stoppedState.averageHeartRate,
+                endedEarly = true
+            )
+        } catch (exception: Exception) {
+            Log.e("PadelScore", "Could not save ended match", exception)
+            android.widget.Toast.makeText(
+                context,
+                saveMatchFailedMessage,
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        ch.hygro.padelscore.health.FitnessTrackingService.stop(context)
+        history.clear()
+        lastAcceptedPointAtMillis = 0L
+        showCourtChange = false
+        updateMatch(MatchState(configuration = stoppedState.configuration))
+        showExitConfirmation = false
+        showResumePrompt = false
+        showConfiguration = true
     }
 
     fun resetMatch() {
@@ -401,7 +424,14 @@ fun PadelScoreContent(
     if (showExitConfirmation) {
         ExitMatchScreen(
             onContinueMatch = { showExitConfirmation = false },
-            onBackToHome = { resetMatch() }
+            onBackToHome = { resetMatch() },
+            onEndAndSave = if (
+                !matchFinished && matchState.startedAtEpochMillis > 0L
+            ) {
+                { endAndSaveMatch() }
+            } else {
+                null
+            }
         )
         return
     }
@@ -730,7 +760,7 @@ fun CenterScoreArea(
                 delay(16.milliseconds) // ~60fps update rate
                 holdDuration = SystemClock.elapsedRealtime() - startTime
             }
-            if (isResetHolding && holdDuration >= RESET_HOLD_DURATION_MILLIS) {
+            if (isResetHolding) {
                 resetPerformed = true
                 onReset()
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)

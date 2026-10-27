@@ -1,6 +1,7 @@
 package ch.hygro.padelscore.storage
 
 import android.content.Context
+import androidx.core.content.edit
 import android.content.SharedPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,12 +27,12 @@ class SettingsRepository(context: Context) {
     val matchQuietModeEnabled: StateFlow<Boolean> = _matchQuietModeEnabled.asStateFlow()
 
     fun setMatchQuietModeEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_MATCH_QUIET_MODE, enabled).apply()
+        prefs.edit { putBoolean(KEY_MATCH_QUIET_MODE, enabled) }
         _matchQuietModeEnabled.value = enabled
     }
 
     fun setSwipeGesturesEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_SWIPE_GESTURES, enabled).apply()
+        prefs.edit { putBoolean(KEY_SWIPE_GESTURES, enabled) }
         _swipeGesturesEnabled.value = enabled
     }
 
@@ -41,12 +42,12 @@ class SettingsRepository(context: Context) {
     val healthSyncEnabled: StateFlow<Boolean> = _healthSyncEnabled.asStateFlow()
 
     fun setHealthSyncEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_HEALTH_SYNC, enabled).apply()
+        prefs.edit { putBoolean(KEY_HEALTH_SYNC, enabled) }
         _healthSyncEnabled.value = enabled
     }
 
     fun setHealthTrackingEnabled(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_HEALTH_TRACKING, enabled).apply()
+        prefs.edit { putBoolean(KEY_HEALTH_TRACKING, enabled) }
         _healthTrackingEnabled.value = enabled
     }
 

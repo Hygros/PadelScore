@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -35,6 +33,8 @@ import ch.hygro.padelscore.R
 import ch.hygro.padelscore.billing.SupporterBillingAvailability
 import ch.hygro.padelscore.billing.SupporterBillingState
 import ch.hygro.padelscore.billing.SupporterPurchaseStatus
+import ch.hygro.padelscore.presentation.theme.ColorPrimary
+import ch.hygro.padelscore.presentation.theme.ColorSecondary
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
@@ -212,7 +212,7 @@ fun SupporterScreen(
                             enabled = !state.isRefreshing &&
                                     state.purchaseStatus != SupporterPurchaseStatus.PURCHASE_IN_PROGRESS,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF3A3A3A),
+                                containerColor = ColorSecondary,
                                 contentColor = Color.White
                             ),
                             onClick = onRestorePurchases
@@ -246,7 +246,7 @@ fun SupporterScreen(
                             .fillMaxWidth(if (isRound) 0.82f else 0.88f)
                             .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3A3A3A),
+                            containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = onBack
@@ -281,7 +281,7 @@ private fun PurchaseAvailabilityContent(
                     .height(48.dp),
                 enabled = state.canStartPurchase,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF195F3B),
+                    containerColor = ColorPrimary,
                     contentColor = Color.White
                 ),
                 onClick = onPurchase

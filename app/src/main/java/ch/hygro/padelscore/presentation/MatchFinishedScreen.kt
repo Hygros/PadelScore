@@ -31,6 +31,7 @@ import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.presentation.theme.ColorTeamUs
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
@@ -140,7 +141,7 @@ fun MatchFinishedScreen(
 
                     FinishedActionButton(
                         text = stringResource(R.string.back_to_home),
-                        backgroundColor = Color(0xFF195F3B),
+                        backgroundColor = ColorTeamUs,
                         enabled = true,
                         onClick = onNewMatch
                     )

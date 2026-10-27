@@ -37,6 +37,7 @@ import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
+import ch.hygro.padelscore.presentation.theme.ColorSecondary
 import ch.hygro.padelscore.storage.SettingsRepository
 
 @Composable
@@ -50,7 +51,10 @@ fun SettingsScreen(
     val matchQuietModeEnabled by repository.matchQuietModeEnabled.collectAsState()
     val healthSyncEnabled by repository.healthSyncEnabled.collectAsState()
     val syncScope = rememberCoroutineScope()
-    var companionStatus by remember { androidx.compose.runtime.mutableStateOf("Phone companion is optional.") }
+    val defaultCompanionStatus = stringResource(R.string.companion_status_optional)
+    val checkingStatus = stringResource(R.string.companion_status_checking)
+    val openingStoreStatus = stringResource(R.string.companion_status_opening_store)
+    var companionStatus by remember(defaultCompanionStatus) { androidx.compose.runtime.mutableStateOf(defaultCompanionStatus) }
     var companionBusy by remember { androidx.compose.runtime.mutableStateOf(false) }
 
     val bodySensorLauncher = rememberLauncherForActivityResult(
@@ -105,8 +109,8 @@ fun SettingsScreen(
                     SwitchButton(
                         checked = swipeGesturesEnabled,
                         onCheckedChange = { repository.setSwipeGesturesEnabled(it) },
-                        label = { Text("Swipe Gestures", fontSize = 12.sp) },
-                        secondaryLabel = { Text("Swipe up/down to score", fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { Text(stringResource(R.string.swipe_gestures), fontSize = 12.sp) },
+                        secondaryLabel = { Text(stringResource(R.string.swipe_gestures_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -142,8 +146,8 @@ fun SettingsScreen(
                                 }
                             }
                         },
-                        label = { Text("Health Tracking", fontSize = 12.sp) },
-                        secondaryLabel = { Text("Record match heart rate and steps locally", fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { Text(stringResource(R.string.health_tracking), fontSize = 12.sp) },
+                        secondaryLabel = { Text(stringResource(R.string.health_tracking_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -169,8 +173,8 @@ fun SettingsScreen(
                                 }
                             }
                         },
-                        label = { Text("Health Sync", fontSize = 12.sp) },
-                        secondaryLabel = { Text("Send workouts to Health Connect via phone", fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { Text(stringResource(R.string.health_sync), fontSize = 12.sp) },
+                        secondaryLabel = { Text(stringResource(R.string.health_sync_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -188,8 +192,8 @@ fun SettingsScreen(
                             repository.setMatchQuietModeEnabled(enabled)
                             (context as? MainActivity)?.refreshMatchQuietModeSettings()
                         },
-                        label = { Text("Match Quiet Mode", fontSize = 12.sp) },
-                        secondaryLabel = { Text("Silence notifications during matches", fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { Text(stringResource(R.string.match_quiet_mode), fontSize = 12.sp) },
+                        secondaryLabel = { Text(stringResource(R.string.match_quiet_mode_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -199,7 +203,7 @@ fun SettingsScreen(
                     onClick = {
                         if (!companionBusy) {
                             companionBusy = true
-                            companionStatus = "Checking phone connection..."
+                            companionStatus = checkingStatus
                             syncScope.launch {
                                 try {
                                     companionStatus = ch.hygro.padelscore.health.CompanionSetup.status(context.applicationContext)
@@ -209,7 +213,7 @@ fun SettingsScreen(
                             }
                         }
                     }, enabled = !companionBusy, modifier = Modifier.fillMaxWidth(0.9f)
-                ) { Text("Check phone setup", fontSize = 12.sp) }
+                ) { Text(stringResource(R.string.check_phone_setup), fontSize = 12.sp) }
             }
             item { Text(companionStatus, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f)) }
             item {
@@ -217,7 +221,7 @@ fun SettingsScreen(
                     onClick = {
                         if (!companionBusy) {
                             companionBusy = true
-                            companionStatus = "Opening store on phone..."
+                            companionStatus = openingStoreStatus
                             syncScope.launch {
                                 try {
                                     companionStatus = ch.hygro.padelscore.health.CompanionSetup.openStore(context.applicationContext)
@@ -227,11 +231,10 @@ fun SettingsScreen(
                             }
                         }
                     }, enabled = !companionBusy, modifier = Modifier.fillMaxWidth(0.9f)
-                ) { Text("Install phone companion", fontSize = 12.sp) }
+                ) { Text(stringResource(R.string.install_phone_companion), fontSize = 12.sp) }
             }
             item {
-                Text("Sync requires consent on both devices. Steps stay on the watch. " +
-                    "Explicit deletions are sent even with sync OFF; Samsung Health copies may need separate deletion.",
+                Text(stringResource(R.string.companion_sync_info),
                     fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f))
             }
             item {
@@ -245,7 +248,7 @@ fun SettingsScreen(
                         onClick = { (context as? MainActivity)?.configureMatchQuietMode() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Configure Quiet Mode", fontSize = 12.sp)
+                        Text(stringResource(R.string.configure_quiet_mode), fontSize = 12.sp)
                     }
                 }
             }
@@ -264,13 +267,13 @@ fun SettingsScreen(
                             .fillMaxWidth(if (androidx.compose.ui.platform.LocalConfiguration.current.isScreenRound) 0.82f else 0.88f)
                             .height(48.dp),
                         colors = androidx.wear.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3A3A3A),
+                            containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = onBack
                     ) {
                         Text(
-                            text = androidx.compose.ui.res.stringResource(ch.hygro.padelscore.R.string.back),
+                            text = stringResource(R.string.back),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1

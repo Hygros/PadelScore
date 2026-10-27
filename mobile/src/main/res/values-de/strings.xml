@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore Sync</string>
+    <string name="app_subtitle">Verbinde deine Uhr-Workouts mit Health Connect</string>
+    <string name="current_status">AKTUELLER STATUS</string>
+    <string name="checking_health_connect">Health Connect wird überprüft…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">Berechtigungen, Workout-Importe und manuelle Synchronisierung</string>
+    <string name="allow_workout_imports">Workout-Importe auf diesem Telefon zulassen</string>
+    <string name="connect_health_connect">Mit Health Connect verbinden</string>
+    <string name="sync_watch_workouts_now">Workouts der Uhr jetzt synchronisieren</string>
+    <string name="manage_health_connect_access">Health Connect-Zugriff verwalten</string>
+    <string name="install_or_update_health_connect">Health Connect installieren oder aktualisieren</string>
+    <string name="health_sync_explanation">Health Sync muss auch auf deiner Uhr aktiviert sein. Deine Uhr bleibt auch ohne diese Begleit-App nutzbar.</string>
+
+    <string name="watch_app">Uhr-App</string>
+    <string name="watch_app_summary">PadelScore auf einer verbundenen Uhr installieren oder aktualisieren</string>
+    <string name="install_or_update_on_watch">Uhr-App installieren / aktualisieren</string>
+    <string name="watch_install_explanation">Öffnet den Play Store auf deiner verbundenen Wear OS-Uhr. Bestätige die Installation auf der Uhr. Der Zugriff auf den Test-Track ist weiterhin erforderlich.</string>
+
+    <string name="privacy_and_help">Datenschutz &amp; Hilfe</string>
+    <string name="privacy_summary">Datenverarbeitung, Löschung und Verbindungshilfe</string>
+    <string name="privacy_and_deletion_info">Datenschutz- und Löschinformationen</string>
+    <string name="privacy_explanation">Match-Schritte verbleiben auf der Uhr und werden nicht exportiert. Das Löschen eines Matches fordert das Löschen der zugehörigen PadelScore-Einträge aus Health Connect an. Kopien in anderen Gesundheits-Apps müssen möglicherweise separat gelöscht werden.</string>
+    <string name="xiaomi_workaround">Uhr-Links öffnen sich nicht? Einige Xiaomi-, Redmi- und POCO-Telefone können Links blockieren, die durch das Uhren-Plugin geöffnet werden. Gehe zu den Telefon-Einstellungen > Apps, wähle dein Uhren-Plugin aus, öffne "Andere Berechtigungen" und erlaube "Hintergrund-Pop-up-Fenster", falls diese Option existiert.</string>
+
+    <string name="debug_info">Debug-Info</string>
+    <string name="debug_summary">Verarbeitete und ausstehende Operationen anzeigen</string>
+    <string name="show_local_data">Lokale Daten anzeigen</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">ausgeklappt</string>
+    <string name="collapsed">eingeklappt</string>
+    <string name="choose_watch_title">Uhr auswählen</string>
+    <string name="cancel">Abbrechen</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Berechtigung erteilt. Bereit zum Synchronisieren aufgezeichneter Workouts.</string>
+    <string name="status_permission_denied">Erforderliche Berechtigungen wurden nicht erteilt. Überprüfe die Health Connect-Berechtigungen.</string>
+    <string name="status_sync_off">Health Sync ist AUS. Match-Löschungen bleiben aktiviert.</string>
+    <string name="status_finding_watches">Suche nach verbundenen Uhren…</string>
+    <string name="status_no_watch">Keine verbundene Wear OS-Uhr gefunden. Überprüfe die Kopplung und die Google Play-Dienste.</string>
+    <string name="status_choose_watch">Wähle die Uhr zum Installieren oder Aktualisieren aus.</string>
+    <string name="status_watch_discovery_failed">Uhrsuche fehlgeschlagen (%s). Überprüfe die Kopplung und die Google Play-Dienste.</string>
+    <string name="status_opening_play_store">Play Store wird auf der Uhr geöffnet…</string>
+    <string name="status_store_request_sent">Store-Anfrage gesendet. Fahre auf deiner Uhr fort. Installation und Test-Track-Zugriff werden durch diese Anfrage nicht bestätigt.</string>
+    <string name="status_store_request_failed">Store-Anfrage der Uhr fehlgeschlagen (%s). Entsperre die Uhr und überprüfe die Verbindung. Öffne alternativ den Play Store auf der Uhr und suche nach Padel Score.</string>
+    <string name="status_no_app_for_action">Keine App kann diese Aktion öffnen. Öffne Health Connect über die Telefoneinstellungen.</string>
+    <string name="status_hc_unavailable">Health Connect ist nicht verfügbar oder muss installiert/aktualisiert werden (Status %s).</string>
+    <string name="status_connected_ready">Verbunden. Bereit zum Synchronisieren von Workouts.</string>
+    <string name="status_hc_available_connect">Health Connect verfügbar. Tippe auf Verbinden, um Schreibzugriff für Training und Herzfrequenz zu gewähren.</string>
+    <string name="status_connection_failed">Verbindung fehlgeschlagen: %1$s: %2$s</string>
+    <string name="status_syncing">Wird synchronisiert…</string>
+    <string name="status_sync_failed">Synchronisierung fehlgeschlagen: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Aus Health Connect gelöscht: %s. Bitte Samsung Health separat überprüfen.</string>
+    <string name="status_hc_import_confirmed">Health Connect-Import bestätigt: %1$s; Herzfrequenz-Messungen: %2$d</string>
+    <string name="status_sync_off_phone">Health Sync ist auf diesem Telefon AUS. Explizite Match-Löschungen werden weiterhin verarbeitet.</string>
+    <string name="status_hc_unavailable_permissions">Health Connect ist nicht verfügbar oder die Schreibberechtigung für Training / Herzfrequenz fehlt.</string>
+    <string name="status_sync_progress">Bestätigte Importe: %1$d\nImportiert/wiederholt: %2$d\nIn Warteschlange: %3$d\nHealth Sync der Uhr muss AN sein.\nAusstehende Löschungen: %4$d\nEine ausstehende Anfrage ist keine Importbestätigung.</string>
+    <string name="status_deletion_pending_permission">Löschen des Workouts ausstehend: Health Connect Berechtigung oder Verfügbarkeit erforderlich.</string>
+    <string name="status_deletion_pending_no_record_id">Löschen ausstehend für %s: alter Import hat keine gespeicherte Health Connect-Datensatz-ID. Lösche dieses ältere Workout manuell in Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Löschen ausstehend für %s: alter Herzfrequenzdatensatz hat keine gespeicherte UID. Lösche ihn manuell in Health Connect.</string>
+    <string name="status_deletion_pending_error">Health Connect-Löschung ausstehend für %1$s: %2$s</string>
+    <string name="status_import_paused_consent">Import pausiert: Zustimmung der Uhr nicht verfügbar. Verbinde die aktualisierte Uhr und aktiviere Health Sync.</string>
+
+    <string name="listener_hc_unavailable">Health Connect nicht verfügbar. Öffne die Begleit-App auf dem Telefon.</string>
+    <string name="listener_hc_permissions_missing">Health Connect-Berechtigungen fehlen. Öffne die Begleit-App auf dem Telefon.</string>
+    <string name="listener_sync_off">Telefon-Synchronisierung ist AUS. Aktiviere sie in der Begleit-App.</string>
+    <string name="listener_phone_ready">Telefon bereit. Samsung Health-Import ist nicht bestätigt.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Manuelle oder automatische Synchronisierung angefordert</string>
+    <string name="log_sync_failed">Synchronisierung fehlgeschlagen</string>
+    <string name="log_data_items_visible">DataItems auf Telefon sichtbar=%d</string>
+    <string name="log_data_item_scan_unavailable">DataItem-Scan nicht verfügbar; fordere direkte Übertragung an</string>
+    <string name="log_workout_request_queue_failed">Workout-Anfrage konnte nicht in Warteschlange gestellt werden</string>
+    <string name="log_hr_write_completed">Schreiben der Herzfrequenz abgeschlossen workout=%1$s Datensätze=%2$d</string>
+    <string name="log_exercise_session_write_completed">Schreiben der Trainingssitzung abgeschlossen</string>
+    <string name="log_import_confirmed">Health Connect-Import bestätigt workout=%1$s HF-Messungen=%2$d</string>
+    <string name="log_already_imported">Workout bereits importiert workout=%s; Wiederholung ohne Duplikat bestätigt</string>
+    <string name="log_import_succeeded_ack_deferred">Import erfolgreich; Bestätigung (ACK) bis zur Wiederholung verzögert</string>
+    <string name="log_import_deferred">Import verzögert; Quell-Workouts beibehalten</string>
+
+    <string name="permissions_rationale">PadelScore Sync bittet nur dann um die Berechtigung, Trainingseinheiten in Health Connect zu schreiben, wenn du dich für eine Verbindung entscheidest. Wenn die Synchronisierung auf der Uhr aktiviert ist, kann die App auch aufgezeichnete Herzfrequenzmessungen schreiben. Du kannst den Zugriff jederzeit in den Health Connect-Einstellungen widerrufen.\n\nDie Uhr zeichnet Herzfrequenzdaten und Match-Schritte nur lokal auf, wenn das Health Tracking aktiviert ist. Schritte werden nicht exportiert. Trainingseinheiten und Herzfrequenzdaten werden über die Datenschicht des gekoppelten Geräts nur übertragen, wenn Health Sync auf der Uhr aktiviert ist. Neue Importe erfordern außerdem den Synchronisierungsschalter des Telefons, Health Connect-Schreibberechtigungen und eine Live-Zustimmungsprüfung mit der Quelluhr. Es wird kein Konto oder vom Entwickler betriebener Server verwendet.\n\nDas Löschen eines Matches sendet eine dauerhafte Löschanfrage für die PadelScore-Einträge dieses Matches. Explizite Löschanfragen werden auch bei ausgeschalteter Synchronisierung verarbeitet. Bereits importierte Kopien in Samsung Health oder anderen Apps erfordern möglicherweise eine separate Löschung. Das Ausschalten der Synchronisierung löscht keine vorhandenen Daten. Die Deinstallation der Uhr-App vor der Übermittlung ausstehender Löschungen kann zum Verlust dieser Löschanfragen führen. Unvollständige Übertragungen verbleiben im privaten Telefonspeicher für einen erneuten Versuch. Dies ist eine Fitness-Funktion, kein medizinisches Gerät.</string>
+</resources>

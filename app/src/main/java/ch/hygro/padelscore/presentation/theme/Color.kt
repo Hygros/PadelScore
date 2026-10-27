@@ -2,8 +2,14 @@ package ch.hygro.padelscore.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val ColorTeamUs = Color(0xFF195F3B)
+val ColorPrimary = Color(0xFF012853)
+val ColorSecondary = Color(0xFF3A3A3A)
+val ColorDestructive = Color(0xFF8B2525)
+val ColorTeamUs = Color(0xFF012853)
 val ColorTeamOpponent = Color(0xFF8B2525)
+
+val ColorTeamUsText = Color(0xFF82B8FF)
+val ColorTeamOpponentText = Color(0xFFFF7B72)
 
 val ColorMatchWon = Color(0xFF66E59A)
 val ColorMatchLost = Color(0xFFFF7B72)

@@ -33,13 +33,13 @@ class WorkoutDataListener : WearableListenerService() {
                         .permissionController.getGrantedPermissions().containsAll(WorkoutHealthImporter.permissions)
                 }
                 val status = when {
-                    !available -> "Health Connect unavailable. Open the phone companion."
-                    !granted -> "Health Connect permissions missing. Open the phone companion."
-                    !prefs.getBoolean("sync_enabled", false) -> "Phone sync is OFF. Enable it in the companion."
-                    else -> "Phone ready. Samsung Health import is not confirmed."
+                    !available -> getString(R.string.listener_hc_unavailable)
+                    !granted -> getString(R.string.listener_hc_permissions_missing)
+                    !prefs.getBoolean("sync_enabled", false) -> getString(R.string.listener_sync_off)
+                    else -> getString(R.string.listener_phone_ready)
                 }
                 Tasks.forResult(status.toByteArray(Charsets.UTF_8))
-            } catch (e: Exception) { Tasks.forException<ByteArray>(e) }
+            } catch (e: Exception) { Tasks.forException(e) }
         }
         if (path.startsWith(WorkoutSyncProtocol.DELETE_RPC)) {
             return try {
@@ -48,7 +48,7 @@ class WorkoutDataListener : WearableListenerService() {
                 val done = runBlocking { WorkoutHealthImporter(applicationContext).deleteWorkout(id) }
                 Tasks.forResult((if (done) "DELETED:$id" else "DELETE_PENDING:$id")
                     .toByteArray(Charsets.UTF_8))
-            } catch (e: Exception) { Tasks.forException<ByteArray>(e) }
+            } catch (e: Exception) { Tasks.forException(e) }
         }
         if (!path.startsWith(WorkoutSyncProtocol.CHUNK)) return null
         return try {
@@ -74,12 +74,12 @@ class WorkoutDataListener : WearableListenerService() {
             }
             Tasks.forResult(response.toByteArray(Charsets.UTF_8))
         } catch (e: Exception) {
-            WorkoutHealthImporter(applicationContext).report("Transfer/import deferred: ${e.message}")
-            Tasks.forException<ByteArray>(e)
+            WorkoutHealthImporter(applicationContext).report("${applicationContext.getString(R.string.log_import_deferred)}: ${e.message}")
+            Tasks.forException(e)
         }
     }
 
     private fun importPending(requestWatch: Boolean = true) {
-        try { runBlocking { WorkoutHealthImporter(applicationContext).importPending(requestWatch) } } catch (e: Exception) { Log.w("WorkoutDataListener", "Import deferred; source workouts retained", e) }
+        try { runBlocking { WorkoutHealthImporter(applicationContext).importPending(requestWatch) } } catch (e: Exception) { Log.w("WorkoutDataListener", applicationContext.getString(R.string.log_import_deferred), e) }
     }
 }

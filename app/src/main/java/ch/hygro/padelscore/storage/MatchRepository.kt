@@ -75,7 +75,7 @@ class MatchRepository(context: Context) {
         )
     }
 
-    private fun encodeState(state: MatchState): JSONObject {
+    internal fun encodeState(state: MatchState): JSONObject {
         return JSONObject()
             .put("opponentPoints", state.opponentPoints)
             .put("ourPoints", state.ourPoints)
@@ -108,14 +108,16 @@ class MatchRepository(context: Context) {
                     state.completedSets.forEach { put(encodeSetResult(it)) }
                 }
             )
+            .put("pointsInCurrentGame", state.pointsInCurrentGame)
             .put("totalPointsPlayed", state.totalPointsPlayed)
             .put("totalGamesPlayed", state.totalGamesPlayed)
             .put("startedAtEpochMillis", state.startedAtEpochMillis)
             .put("finishedAtEpochMillis", state.finishedAtEpochMillis)
             .put("averageHeartRate", state.averageHeartRate)
+            .put("pointHistory", PointHistoryCodec.encode(state.pointHistory))
     }
 
-    private fun decodeState(json: JSONObject): MatchState {
+    internal fun decodeState(json: JSONObject): MatchState {
         val configuration = decodeConfiguration(
             json.optJSONObject("configuration") ?: JSONObject()
         )
@@ -165,12 +167,14 @@ class MatchRepository(context: Context) {
                 json.optString("tieBreakFirstServingTeam")
             ),
             completedSets = completedSets,
+            pointsInCurrentGame = json.optInt("pointsInCurrentGame", 0),
             totalPointsPlayed = json.optInt("totalPointsPlayed", 0),
             totalGamesPlayed = json.optInt("totalGamesPlayed", 0),
             startedAtEpochMillis = json.optLong("startedAtEpochMillis", 0L),
             finishedAtEpochMillis = json.optLong("finishedAtEpochMillis", 0L)
                 .takeIf { it != 0L },
-            averageHeartRate = json.optInt("averageHeartRate", 0).takeIf { it > 0 }
+            averageHeartRate = json.optInt("averageHeartRate", 0).takeIf { it > 0 },
+            pointHistory = PointHistoryCodec.decode(json.optJSONArray("pointHistory"))
         )
     }
 

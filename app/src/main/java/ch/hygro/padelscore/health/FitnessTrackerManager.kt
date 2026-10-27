@@ -13,6 +13,7 @@ import androidx.health.services.client.data.ExerciseLapSummary
 import androidx.health.services.client.data.ExerciseType
 import androidx.health.services.client.data.ExerciseUpdate
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
@@ -20,6 +21,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
 class FitnessTrackerManager(private val context: Context) {
     private val healthClient = HealthServices.getClient(context)
@@ -101,9 +103,11 @@ class FitnessTrackerManager(private val context: Context) {
             // Let the public startExerciseAsync API decide whether a new exercise can start.
             resumedSegment = workoutRepository.recordedSampleAverage() != null
             healthStepsOffset = workoutRepository.stepsForMatch(workoutRepository.activeMatchId()) ?: 0L
-            recoveryState.edit().putLong("match_id", workoutRepository.activeMatchId())
-                .putLong("steps_offset", healthStepsOffset).apply()
-            val capabilities = withTimeoutOrNull(10_000L) { exerciseClient.getCapabilitiesAsync().await() }
+            recoveryState.edit {
+                putLong("match_id", workoutRepository.activeMatchId())
+                putLong("steps_offset", healthStepsOffset)
+            }
+            val capabilities = withTimeoutOrNull(10_000L.milliseconds) { exerciseClient.getCapabilitiesAsync().await() }
                 ?: error("Health Services capabilities unavailable")
             val supportedTypes = capabilities.supportedExerciseTypes
             
@@ -126,7 +130,7 @@ class FitnessTrackerManager(private val context: Context) {
             )
             acceptUpdates = true
             exerciseClient.setUpdateCallback(ContextCompat.getMainExecutor(context), callback)
-            withTimeoutOrNull(10_000L) { exerciseClient.startExerciseAsync(config).await(); true }
+            withTimeoutOrNull(10_000L.milliseconds) { exerciseClient.startExerciseAsync(config).await(); true }
                 ?: error("Health Services start timed out")
             tracking = true
             stepSensor.start()
@@ -155,11 +159,11 @@ class FitnessTrackerManager(private val context: Context) {
         val completion = finalUpdate
         try {
             if (!completion.isCompleted) {
-                withTimeoutOrNull(10_000L) { exerciseClient.endExerciseAsync().await(); true }
+                withTimeoutOrNull(10_000L.milliseconds) { exerciseClient.endExerciseAsync().await(); true }
                     ?: Log.w("FitnessTracker", "End request timed out; keeping last measurements")
             }
             // Device/API fault fallback, not a fixed sleep: return immediately on ENDED.
-            val received = withTimeoutOrNull(5_000L) {
+            val received = withTimeoutOrNull(5_000L.milliseconds) {
                 completion.await()
                 true
             } ?: false
@@ -177,7 +181,7 @@ class FitnessTrackerManager(private val context: Context) {
             acceptUpdates = false
             stepSensor.stop()
             withContext(NonCancellable) {
-                runCatching { kotlinx.coroutines.withTimeout(5_000L) { exerciseClient.clearUpdateCallbackAsync(callback).await() } }
+                runCatching { kotlinx.coroutines.withTimeout(5_000L.milliseconds) { exerciseClient.clearUpdateCallbackAsync(callback).await() } }
                     .onFailure { Log.w("FitnessTracker", "Callback cleanup failed", it) }
             }
         }

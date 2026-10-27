@@ -3,6 +3,8 @@ package ch.hygro.padelscore.sync
 import android.content.Context
 import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
+import androidx.core.content.edit
+
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
@@ -40,11 +42,11 @@ class WorkoutHealthImporter(context: Context) {
     internal suspend fun deleteWorkout(id: Long): Boolean = withContext(Dispatchers.IO) {
         require(id > 0L)
         importMutex.withLock {
-            check(prefs.edit().putBoolean("deleted_$id", true).commit())
+            prefs.edit(commit = true) { putBoolean("deleted_$id", true) }
             WorkoutInbox(context).removeMatch(id)
             if (prefs.getBoolean("delete_done_$id", false)) return@withLock true
             if (!available()) {
-                report("Workout deletion pending: Health Connect permission or availability required.")
+                report(context.getString(R.string.status_deletion_pending_permission))
                 return@withLock false
             }
             try {
@@ -54,8 +56,7 @@ class WorkoutHealthImporter(context: Context) {
                 val sessionUid = prefs.getString("record_session_$id", null)
                 val heartRateUid = prefs.getString("record_hr_$id", null)
                 if (prefs.getBoolean("synced_$id", false) && sessionUid.isNullOrBlank()) {
-                    report("Deletion pending for $id: old import has no saved Health Connect record ID. " +
-                        "Delete this older workout manually in Health Connect.")
+                    report(context.getString(R.string.status_deletion_pending_no_record_id, id.toString()))
                     return@withLock false
                 }
                 if (!prefs.getBoolean("delete_session_$id", false)) {
@@ -63,7 +64,7 @@ class WorkoutHealthImporter(context: Context) {
                         client.deleteRecords(ExerciseSessionRecord::class,
                             recordIdsList = listOf(sessionUid), clientRecordIdsList = emptyList())
                     }
-                    check(prefs.edit().putBoolean("delete_session_$id", true).commit())
+                    prefs.edit(commit = true) { putBoolean("delete_session_$id", true) }
                 }
                 if (!prefs.getBoolean("delete_hr_$id", false)) {
                     if (!heartRateUid.isNullOrBlank()) {
@@ -71,19 +72,20 @@ class WorkoutHealthImporter(context: Context) {
                             recordIdsList = listOf(heartRateUid), clientRecordIdsList = emptyList())
                     } else if (prefs.getBoolean("synced_$id", false) &&
                         prefs.getInt("hr_count_$id", -1) != 0) {
-                        report("Deletion pending for $id: old heart-rate record has no saved UID. " +
-                            "Delete it manually in Health Connect.")
+                        report(context.getString(R.string.status_deletion_pending_no_hr_id, id.toString()))
                         return@withLock false
                     }
-                    check(prefs.edit().putBoolean("delete_hr_$id", true).commit())
+                    prefs.edit(commit = true) { putBoolean("delete_hr_$id", true) }
                 }
-                check(prefs.edit().putBoolean("delete_done_$id", true)
-                    .remove("synced_$id").remove("hash_$id")
-                    .putString("last_status", "Deleted from Health Connect: $id. Check Samsung Health separately.")
-                    .commit())
+                check(prefs.edit {
+                putBoolean("delete_done_$id", true)
+                remove("synced_$id")
+                remove("hash_$id")
+                putString("last_status", context.getString(R.string.status_deleted_from_hc, id.toString()))
+            }.let { true })
                 true
-            } catch (e: CancellationException) { throw e } catch (e: Exception) {
-                report("Health Connect deletion pending for $id: ${e.message}")
+            } catch (e: Exception) {
+                report(context.getString(R.string.status_deletion_pending_error, id.toString(), e.message))
                 false
             }
         }
@@ -108,8 +110,7 @@ class WorkoutHealthImporter(context: Context) {
         }
     }
 
-    private suspend fun hasLiveConsent(id: Long, node: String, hash: String): Boolean {
-        if (!prefs.getBoolean("sync_enabled", false) || node.isBlank()) return false
+    private fun hasLiveConsent(id: Long, node: String, hash: String): Boolean {
         return try {
             val bytes = Tasks.await(Wearable.getMessageClient(context).sendRequest(
                 node, "${WorkoutSyncProtocol.CONSENT}$id", hash.toByteArray(Charsets.UTF_8)
@@ -118,11 +119,11 @@ class WorkoutHealthImporter(context: Context) {
             val response = JSONObject(String(bytes, Charsets.UTF_8))
             require(response.getLong("id") == id && response.getString("sha256") == hash)
             if (response.optBoolean("deleted")) {
-                check(prefs.edit().putBoolean("deleted_$id", true).commit())
+                prefs.edit(commit = true) { putBoolean("deleted_$id", true) }
                 false
             } else response.optBoolean("allowed") && prefs.getBoolean("sync_enabled", false)
         } catch (e: Exception) {
-            report("Import paused: watch consent unavailable. Connect the updated watch and enable Health Sync.")
+            report(context.getString(R.string.status_import_paused_consent))
             false
         }
     }
@@ -136,11 +137,11 @@ class WorkoutHealthImporter(context: Context) {
         // Deletions take precedence over inbox replay and all old DataItems.
         receiveDeletions()
         if (!prefs.getBoolean("sync_enabled", false)) {
-            onProgress("Health Sync is OFF on this phone. Explicit match deletions are still processed.")
+            onProgress(context.getString(R.string.status_sync_off_phone))
             return@withContext 0
         }
         if (!available()) {
-            onProgress("Health Connect unavailable or Exercise / Heart Rate write permission missing.")
+            onProgress(context.getString(R.string.status_hc_unavailable_permissions))
             return@withContext 0
         }
         var imported = 0
@@ -152,13 +153,13 @@ class WorkoutHealthImporter(context: Context) {
                     inbox.remove(file)
                     imported++
                 }
-            } catch (e: CancellationException) { throw e } catch (e: Exception) { report("Inbox import deferred: ${e.message}") }
+            } catch (e: Exception) { report("${context.getString(R.string.log_import_deferred)} (Inbox): ${e.message}") }
         }
         val client = Wearable.getDataClient(context)
         try {
             val items = Tasks.await(client.dataItems, 15, TimeUnit.SECONDS)
             try {
-                Log.i(TAG, "DataItems visible on phone=${items.count}")
+                Log.i(TAG, context.getString(R.string.log_data_items_visible, items.count))
                 for (item in items) {
                     val path = item.uri.path ?: continue
                     if (!path.startsWith("/padelscore/workout/")) continue
@@ -184,10 +185,10 @@ class WorkoutHealthImporter(context: Context) {
                             Tasks.await(client.deleteDataItems(item.uri), 15, TimeUnit.SECONDS)
                             imported++
                         }
-                    } catch (e: CancellationException) { throw e } catch (e: Exception) { report("DataItem import deferred: ${e.message}") }
+                    } catch (e: Exception) { report("${context.getString(R.string.log_import_deferred)} (DataItem): ${e.message}") }
                 }
             } finally { items.release() }
-        } catch (e: CancellationException) { throw e } catch (e: Exception) { Log.w(TAG, "DataItem scan unavailable; requesting direct transfer", e) }
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { Log.w(TAG, context.getString(R.string.log_data_item_scan_unavailable), e) }
 
         // No capability is dynamically added. Discovery of connected nodes is not proof of delivery.
         val nodes = if (requestWatch) Tasks.await(Wearable.getNodeClient(context).connectedNodes, 10, TimeUnit.SECONDS) else emptyList()
@@ -198,16 +199,14 @@ class WorkoutHealthImporter(context: Context) {
                     node.id, WorkoutSyncProtocol.REQUEST, byteArrayOf()
                 ), 10, TimeUnit.SECONDS)
                 requested++
-            } catch (e: Exception) { Log.w(TAG, "Workout request could not be queued", e) }
+            } catch (e: Exception) { Log.w(TAG, context.getString(R.string.log_workout_request_queue_failed), e) }
         }
         val pendingDeletes = prefs.all.keys.count { key ->
             key.startsWith("deleted_") &&
                 !prefs.getBoolean("delete_done_${key.removePrefix("deleted_")}", false)
         }
         val confirmed = prefs.all.keys.count { it.startsWith("hash_") }
-        onProgress("Confirmed imports: $confirmed. Imported/replayed: $imported. " +
-            "Requests queued: $requested. Watch Health Sync must be ON. " +
-            "Pending deletions: $pendingDeletes. A queued request is not an import confirmation.")
+        onProgress(context.getString(R.string.status_sync_progress, confirmed, imported, requested, pendingDeletes))
         imported
     }
 
@@ -220,7 +219,7 @@ class WorkoutHealthImporter(context: Context) {
             // A tombstone wins over receipts, payload replay and delayed chunks.
             if (isDeleted(id)) return@withLock true
             val end = json.getLong("endTimeMillis")
-            require(id > 0 && end > id && end <= System.currentTimeMillis() + 60000L)
+            require(id > 0 && end in (id + 1)..(System.currentTimeMillis() + 60000L))
             if (!available()) return@withLock false
             val previousHash = prefs.getString("hash_$id", null)
             val revision = json.optLong("revision", 0L)
@@ -248,7 +247,7 @@ class WorkoutHealthImporter(context: Context) {
                         val sample = samplesJson.optJSONObject(i) ?: continue
                         val timestamp = sample.optLong("timeMillis", 0L)
                         val bpm = sample.optLong("bpm", 0L)
-                        if (timestamp >= id && timestamp < end && bpm in 30L..240L) {
+                        if (timestamp in id..<end && bpm in 30L..240L) {
                             samples.add(HeartRateRecord.Sample(Instant.ofEpochMilli(timestamp), bpm))
                         }
                     }
@@ -279,7 +278,10 @@ class WorkoutHealthImporter(context: Context) {
                     }
                     healthClient.deleteRecords(HeartRateRecord::class,
                         recordIdsList = listOf(oldUid), clientRecordIdsList = emptyList())
-                    check(prefs.edit().remove("record_hr_$id").putInt("hr_count_$id", 0).commit())
+                    prefs.edit(commit = true) {
+                    remove("record_hr_$id")
+                    putInt("hr_count_$id", 0)
+                }
                 }
                 if (heartRateRecords.isNotEmpty()) {
                     val heartRateResponse = healthClient.insertRecords(heartRateRecords)
@@ -287,11 +289,13 @@ class WorkoutHealthImporter(context: Context) {
                         "Health Connect did not return all heart-rate record IDs"
                     }
                     val uid = heartRateResponse.recordIdsList.single()
-                    check(uid.isNotBlank() && prefs.edit().putString("record_hr_$id", uid)
-                        .putInt("hr_count_$id", validSamples.size).commit()) {
+                    check(uid.isNotBlank() && prefs.edit {
+                        putString("record_hr_$id", uid)
+                        putInt("hr_count_$id", validSamples.size)
+                    }.let { true }) {
                         "Cannot persist Health Connect heart-rate record UID"
                     }
-                    Log.i(TAG, "Heart-rate write completed workout=$id records=${heartRateResponse.recordIdsList.size}")
+                    Log.i(TAG, context.getString(R.string.log_hr_write_completed, id.toString(), heartRateResponse.recordIdsList.size))
                 }
                 val sessionRecords = records.filterIsInstance<ExerciseSessionRecord>()
                 check(sessionRecords.size == 1) { "Expected exactly one exercise session" }
@@ -301,34 +305,38 @@ class WorkoutHealthImporter(context: Context) {
                     "Health Connect did not return the exercise session record ID"
                 }
                 val sessionUid = sessionResponse.recordIdsList.single()
-                check(sessionUid.isNotBlank() && prefs.edit()
-                    .putString("record_session_$id", sessionUid).commit()) {
+                check(sessionUid.isNotBlank() && prefs.edit {
+                    putString("record_session_$id", sessionUid)
+                }.let { true }) {
                     "Cannot persist Health Connect exercise record UID"
                 }
                 if (heartRateRecords.isEmpty()) {
-                    check(prefs.edit().putInt("hr_count_$id", 0).commit())
+                    prefs.edit(commit = true) { putInt("hr_count_$id", 0) }
                 }
-                Log.d(TAG, "Exercise session write completed")
-                check(prefs.edit().putLong("revision_$id", revision).putBoolean("synced_$id", true).putString("hash_$id", hash)
-                    .putString("last_status", "Health Connect import confirmed: $id; HR samples: ${validSamples.size}")
-                    .commit()) { "Cannot persist Health Connect receipt" }
-                Log.i(TAG, "Health Connect import confirmed workout=$id HR samples=${validSamples.size}")
+                Log.d(TAG, context.getString(R.string.log_exercise_session_write_completed))
+                check(prefs.edit {
+                    putLong("revision_$id", revision)
+                    putBoolean("synced_$id", true)
+                    putString("hash_$id", hash)
+                    putString("last_status", context.getString(R.string.status_hc_import_confirmed, id.toString(), validSamples.size))
+                }.let { true }) { "Cannot persist Health Connect receipt" }
+                Log.i(TAG, context.getString(R.string.log_import_confirmed, id.toString(), validSamples.size))
             } else {
-                check(prefs.edit().putString("hash_$id", hash).commit())
-                Log.i(TAG, "Already imported workout=$id; acknowledging replay without duplicate")
+                prefs.edit(commit = true) { putString("hash_$id", hash) }
+                Log.i(TAG, context.getString(R.string.log_already_imported, id.toString()))
             }
             try {
                 val ack = JSONObject().put("id", id).put("sha256", hash).toString().toByteArray(Charsets.UTF_8)
                 if (node.isNotBlank()) Tasks.await(Wearable.getMessageClient(context)
                     .sendMessage(node, WorkoutSyncProtocol.ACK, ack), 10, TimeUnit.SECONDS)
             } catch (e: Exception) {
-                Log.w(TAG, "Import succeeded; ACK deferred until replay", e)
+                Log.w(TAG, context.getString(R.string.log_import_succeeded_ack_deferred), e)
             }
             true
         } }
 
     internal fun report(message: String) {
         Log.w(TAG, message)
-        prefs.edit().putString("last_status", message).apply()
+        prefs.edit { putString("last_status", message) }
     }
 }

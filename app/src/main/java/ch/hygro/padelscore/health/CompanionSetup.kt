@@ -2,10 +2,11 @@ package ch.hygro.padelscore.health
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.concurrent.futures.await
 import androidx.core.content.ContextCompat
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import ch.hygro.padelscore.R
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Node
@@ -17,6 +18,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 
 internal object CompanionSetup {
     suspend fun status(context: Context): String = withContext(Dispatchers.IO) {
@@ -41,7 +43,7 @@ internal object CompanionSetup {
                 .distinctBy { it.id }
                 .sortedByDescending { it.isNearby }
             if (targets.isEmpty()) {
-                return@withContext "No reachable device. Check phone/watch pairing and Google Play services."
+                return@withContext context.getString(R.string.companion_status_no_reachable_device)
             }
             val failures = mutableListOf<String>()
             for (node in targets) {
@@ -56,7 +58,7 @@ internal object CompanionSetup {
                     val reply = String(bytes, Charsets.UTF_8)
                     val capabilityMissing = advertised.none { it.id == node.id }
                     return@withContext if (capabilityMissing) {
-                        "$reply\nCompanion replied, but capability discovery is missing. Update both apps."
+                        context.getString(R.string.companion_status_capability_missing, reply)
                     } else reply
                 } catch (e: CancellationException) {
                     throw e
@@ -65,16 +67,16 @@ internal object CompanionSetup {
                     failures.add(cause.javaClass.simpleName)
                 }
             }
-            val discovery = if (discoveryFailed) "Capability lookup failed. " else ""
-            discovery + "Device reachable, but no companion status reply. " +
-                "Open the updated phone app. Check that both apps use the same signing certificate " +
-                "and installation source. Errors: ${failures.distinct().joinToString()}."
+            val discovery = if (discoveryFailed) context.getString(R.string.companion_status_capability_lookup_failed) else ""
+            discovery + context.getString(
+                R.string.companion_status_no_reply_with_errors,
+                failures.distinct().joinToString()
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val cause = e.cause ?: e
-            "Phone connection check failed (${cause.javaClass.simpleName}). " +
-                "Check pairing and Google Play services."
+            context.getString(R.string.companion_status_check_failed, cause.javaClass.simpleName)
         }
     }
 
@@ -84,32 +86,27 @@ internal object CompanionSetup {
             "market://details?id=${context.packageName}",
             "https://play.google.com/store/apps/details?id=${context.packageName}"
         )
-        var failure = "Timeout"
+        var failure = context.getString(R.string.companion_status_timeout)
         for (link in links) {
             try {
-                val sent = withTimeoutOrNull(15_000L) {
+                val sent = withTimeoutOrNull(15_000L.milliseconds) {
                     helper.startRemoteActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                        Intent(Intent.ACTION_VIEW, link.toUri())
                             .addCategory(Intent.CATEGORY_BROWSABLE), null
                     ).await()
                     true
                 } ?: false
                 if (sent) {
-                    return "Store request sent. Unlock your phone and confirm installation there. " +
-                        "This does not confirm installation or test-track access. " +
-                        "Nothing opens on a Xiaomi, Redmi or POCO phone? " +
-                        "In phone Settings, open your watch plugin's app permissions and, if available, " +
-                        "allow background pop-up windows. For Samsung watches, change the watch plugin, " +
-                        "not PadelScore. Menu names vary."
+                    return context.getString(R.string.companion_store_request_sent)
                 }
-                failure = "Timeout"
+                failure = context.getString(R.string.companion_status_timeout)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 failure = (e.cause ?: e).javaClass.simpleName
             }
         }
-        return "Phone store request failed ($failure). Unlock your phone and check the watch connection. " +
-            "Alternatively, open Play Store on the phone and search for Padel Score."
+        return context.getString(R.string.companion_store_request_failed, failure)
     }
 }
+

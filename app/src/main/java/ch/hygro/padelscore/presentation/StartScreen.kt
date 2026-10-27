@@ -44,6 +44,8 @@ import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.ScoringMode
 import ch.hygro.padelscore.model.Team
+import ch.hygro.padelscore.presentation.theme.ColorPrimary
+import ch.hygro.padelscore.presentation.theme.ColorSecondary
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
 @Composable
@@ -201,7 +203,7 @@ fun StartScreen(
                     Button(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF195F3B),
+                            containerColor = ColorPrimary,
                             contentColor = Color.White
                         ),
                         onClick = {
@@ -245,7 +247,7 @@ fun StartScreen(
                     Button(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3A3A3A),
+                            containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = {
@@ -277,7 +279,7 @@ fun StartScreen(
                     Button(
                         modifier = Modifier.weight(1f).height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3A3A3A),
+                            containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         contentPadding = PaddingValues(0.dp),
@@ -300,7 +302,7 @@ fun StartScreen(
                     Button(
                         modifier = Modifier.weight(1f).height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isSupporterActive) Color(0xFF163D29) else Color(0xFF3A3A3A),
+                            containerColor = if (isSupporterActive) ColorPrimary else ColorSecondary,
                             contentColor = if (isSupporterActive) Color(0xFF66E59A) else Color.White
                         ),
                         contentPadding = PaddingValues(0.dp),

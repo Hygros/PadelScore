@@ -33,7 +33,7 @@ android {
         minSdk = 28
         targetSdk = 37
         versionCode = providers.gradleProperty("padelscoreMobileVersionCode").orNull?.toInt() ?: 13
-        versionName = "1.2"
+        versionName = "1.3"
     }
     signingConfigs {
         if (hasUploadSigningConfiguration) {
@@ -66,14 +66,14 @@ android {
     }
 }
 dependencies {
-    implementation("androidx.wear:wear-remote-interactions:1.2.0")
-    implementation("androidx.concurrent:concurrent-futures-ktx:1.3.0")
-    testImplementation("junit:junit:4.13.2")
-    implementation("androidx.activity:activity:1.13.0")
-    implementation("androidx.health.connect:connect-client:1.1.0")
-    implementation("com.google.android.gms:play-services-wearable:20.0.1")
+    implementation(libs.wear.remote.interactions)
+    implementation(libs.concurrent.futures.ktx)
+    testImplementation(libs.junit)
+    implementation(libs.activity)
+    implementation(libs.health.connect.client)
+    implementation(libs.play.services.wearable)
     constraints {
-        implementation("androidx.fragment:fragment:1.9.1") {
+        implementation(libs.fragment) {
             because("Activity Result APIs require Fragment 1.3.0 or newer; align with the wear app")
         }
     }

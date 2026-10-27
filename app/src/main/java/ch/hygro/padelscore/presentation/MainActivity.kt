@@ -112,21 +112,18 @@ class MainActivity : ComponentActivity() {
         
         matchQuietMode = MatchQuietModeController(this)
         ongoingMatch = OngoingMatchController(this)
-        wristDisplayController = WristDisplayController(this) { lowered ->
-            wristLowered.value = lowered
-        }
+        wristDisplayController = WristDisplayController(this, wristLowered::value::set)
         resumeFromOngoing.value = intent.getBooleanExtra(
             OngoingMatchController.EXTRA_RESUME_MATCH, false
         )
 
         supporterBillingManager = SupporterBillingManager(
-            context = applicationContext,
-            onStateChanged = { updatedState ->
-                runOnUiThread {
-                    supporterBillingState.value = updatedState
-                }
+            context = applicationContext
+        ) { updatedState ->
+            runOnUiThread {
+                supporterBillingState.value = updatedState
             }
-        )
+        }
 
         setContent {
             PadelScoreTheme {
@@ -136,11 +133,10 @@ class MainActivity : ComponentActivity() {
                     onResumeFromOngoingHandled = { resumeFromOngoing.value = false },
                     onRefreshSupporterPurchases = {
                         supporterBillingManager.refresh()
-                    },
-                    onLaunchSupporterPurchase = { activity ->
-                        supporterBillingManager.launchPurchase(activity)
                     }
-                )
+                ) { activity ->
+                    supporterBillingManager.launchPurchase(activity)
+                }
             }
         }
     }

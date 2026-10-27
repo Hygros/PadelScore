@@ -34,7 +34,7 @@ jobs:
         env:
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           if [ "${CONFIRMATION}" != "GITHUB_RELEASE" ]; then
             echo "GitHub-only release was not confirmed."
@@ -50,7 +50,7 @@ jobs:
       - name: Set up Java 25
         uses: actions/setup-java@v6
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: "25"
 
       - name: Validate Gradle Wrapper
@@ -78,7 +78,7 @@ jobs:
       - name: Install Google authentication library
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           python3 -m pip install \
             --disable-pip-version-check \
@@ -89,7 +89,7 @@ jobs:
         id: versions
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           python3 - <<'PYTHON'
           import json
@@ -222,7 +222,7 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.PADELSCORE_UPLOAD_KEYSTORE_BASE64 }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           if [ -z "${KEYSTORE_BASE64}" ]; then
             echo "PADELSCORE_UPLOAD_KEYSTORE_BASE64 is missing."
@@ -246,7 +246,7 @@ jobs:
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           ./gradlew \
             :app:assembleRelease \
@@ -262,7 +262,7 @@ jobs:
           WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           wear_apk="app/build/outputs/apk/release/app-release.apk"
           mobile_apk="mobile/build/outputs/apk/release/mobile-release.apk"
@@ -350,7 +350,7 @@ jobs:
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
           RELEASE_NOTES_INPUT: ${{ inputs.release_notes }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           if gh release view \
             "${TAG}" \

@@ -1,6 +1,8 @@
 package ch.hygro.padelscore.health
 
 import android.content.Context
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.Asset
@@ -47,7 +49,7 @@ class WorkoutDataSender(context: Context) {
                     dataMap.putLong("id", id)
                 }.asPutDataRequest().setUrgent()
                 Tasks.await(dataClient.putDataItem(request), 15, TimeUnit.SECONDS)
-                val uri = android.net.Uri.parse("wear://*/padelscore/workout/$id")
+                val uri = "wear://*/padelscore/workout/$id".toUri()
                 Tasks.await(dataClient.deleteDataItems(uri), 15, TimeUnit.SECONDS)
             } catch (e: Exception) { Log.w(TAG, "Deletion DataItem deferred workout=$id", e) }
             for (node in targets) {
@@ -151,7 +153,7 @@ class WorkoutDataSender(context: Context) {
                 WorkoutSyncProtocol.digest(workout.toString().toByteArray(Charsets.UTF_8)) == hash
         }
         if (!matches) return
-        check(receipts.edit().putString("hash_$id", hash).commit()) { "Cannot persist import receipt" }
+        receipts.edit(commit = true) { putString("hash_$id", hash) }
         Log.i(TAG, "Health Connect import confirmed workout=$id sha256=$hash; local workout retained")
     }
 

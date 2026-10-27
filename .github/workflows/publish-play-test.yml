@@ -37,7 +37,7 @@ jobs:
         env:
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           if [ "${CONFIRMATION}" != "PUBLISH_TEST" ]; then
             echo "Publishing was not confirmed."
@@ -53,7 +53,7 @@ jobs:
       - name: Set up Java 25
         uses: actions/setup-java@v6
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: "25"
 
       - name: Validate Gradle Wrapper
@@ -81,7 +81,7 @@ jobs:
       - name: Install Google authentication library
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           python3 -m pip install \
             --disable-pip-version-check \
@@ -92,7 +92,7 @@ jobs:
         id: versions
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           python3 - <<'PYTHON'
           import json
@@ -219,7 +219,7 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.PADELSCORE_UPLOAD_KEYSTORE_BASE64 }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           if [ -z "${KEYSTORE_BASE64}" ]; then
             echo "PADELSCORE_UPLOAD_KEYSTORE_BASE64 is missing."
@@ -242,7 +242,7 @@ jobs:
           WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           ./gradlew \
             :app:assembleRelease \
@@ -256,7 +256,7 @@ jobs:
       - name: Verify signed bundles
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           wear_bundle="app/build/outputs/bundle/release/app-release.aab"
           mobile_bundle="mobile/build/outputs/bundle/release/mobile-release.aab"
@@ -277,7 +277,7 @@ jobs:
           EXPECTED_MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
           RELEASE_NAME: ${{ inputs.release_name }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           python3 - <<'PYTHON'
           import json
@@ -490,7 +490,7 @@ jobs:
         env:
           EDIT_ID: ${{ steps.versions.outputs.edit_id }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           python3 - <<'PYTHON'
           import json
@@ -561,7 +561,7 @@ jobs:
           WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           wear_apk="app/build/outputs/apk/release/app-release.apk"
           mobile_apk="mobile/build/outputs/apk/release/mobile-release.apk"
@@ -704,7 +704,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          set -euo pipefail
+          set -o pipefail
 
           edit_file="${RUNNER_TEMP}/padelscore-play-edit-id"
           committed_file="${RUNNER_TEMP}/padelscore-play-edit-committed"

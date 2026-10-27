@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore Sync</string>
+    <string name="app_subtitle">Connect your watch workouts with Health Connect</string>
+    <string name="current_status">CURRENT STATUS</string>
+    <string name="checking_health_connect">Checking Health Connect…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">Permissions, workout imports and manual sync</string>
+    <string name="allow_workout_imports">Allow workout imports on this phone</string>
+    <string name="connect_health_connect">Connect Health Connect</string>
+    <string name="sync_watch_workouts_now">Sync watch workouts now</string>
+    <string name="manage_health_connect_access">Manage Health Connect access</string>
+    <string name="install_or_update_health_connect">Install or update Health Connect</string>
+    <string name="health_sync_explanation">Health Sync must also be enabled on your watch. Your watch remains usable without this companion app.</string>
+
+    <string name="watch_app">Watch app</string>
+    <string name="watch_app_summary">Install or update PadelScore on a connected watch</string>
+    <string name="install_or_update_on_watch">Install / update watch app</string>
+    <string name="watch_install_explanation">Opens the Play Store on your connected Wear OS watch. Confirm installation on the watch. Test-track access is still required.</string>
+
+    <string name="privacy_and_help">Privacy &amp; help</string>
+    <string name="privacy_summary">Data handling, deletion and connection help</string>
+    <string name="privacy_and_deletion_info">Privacy and deletion information</string>
+    <string name="privacy_explanation">Match steps stay on the watch and are not exported. Deleting a match requests deletion of its PadelScore records from Health Connect. Copies in other health apps may need to be deleted separately.</string>
+    <string name="xiaomi_workaround">Watch links not opening? Some Xiaomi, Redmi and POCO phones can block links opened by the watch plugin. In phone Settings > Apps, select your watch plugin, open Other permissions and allow background pop-up windows if that option exists.</string>
+
+    <string name="debug_info">Debug info</string>
+    <string name="debug_summary">View processed and pending operations</string>
+    <string name="show_local_data">Show local data</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">expanded</string>
+    <string name="collapsed">collapsed</string>
+    <string name="choose_watch_title">Choose watch</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Permission granted. Ready to sync recorded workouts.</string>
+    <string name="status_permission_denied">Required permissions were not granted. Check Health Connect permissions.</string>
+    <string name="status_sync_off">Health Sync is OFF. Match deletions remain enabled.</string>
+    <string name="status_finding_watches">Finding connected watches…</string>
+    <string name="status_no_watch">No connected Wear OS watch. Check pairing and Google Play services.</string>
+    <string name="status_choose_watch">Choose the watch to install or update.</string>
+    <string name="status_watch_discovery_failed">Watch discovery failed (%s). Check pairing and Google Play services.</string>
+    <string name="status_opening_play_store">Opening Play Store on the watch…</string>
+    <string name="status_store_request_sent">Store request sent. Continue on your watch. Installation and test-track access are not confirmed by this request.</string>
+    <string name="status_store_request_failed">Watch store request failed (%s). Unlock the watch and check its connection. Alternatively, open Play Store on the watch and search for Padel Score.</string>
+    <string name="status_no_app_for_action">No app can open this action. Open Health Connect from phone Settings.</string>
+    <string name="status_hc_unavailable">Health Connect unavailable or needs installation/update (status %s).</string>
+    <string name="status_connected_ready">Connected. Ready to sync workouts.</string>
+    <string name="status_hc_available_connect">Health Connect available. Tap Connect to grant workout and heart-rate write access.</string>
+    <string name="status_connection_failed">Connection failed: %1$s: %2$s</string>
+    <string name="status_syncing">Syncing…</string>
+    <string name="status_sync_failed">Sync failed: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Deleted from Health Connect: %s. Check Samsung Health separately.</string>
+    <string name="status_hc_import_confirmed">Health Connect import confirmed: %1$s; HR samples: %2$d</string>
+    <string name="status_sync_off_phone">Health Sync is OFF on this phone. Explicit match deletions are still processed.</string>
+    <string name="status_hc_unavailable_permissions">Health Connect unavailable or Exercise / Heart Rate write permission missing.</string>
+    <string name="status_sync_progress">Confirmed imports: %1$d\nImported/replayed: %2$d\nRequests queued: %3$d\nWatch Health Sync must be ON.\nPending deletions: %4$d\nA queued request is not an import confirmation.</string>
+    <string name="status_deletion_pending_permission">Workout deletion pending: Health Connect permission or availability required.</string>
+    <string name="status_deletion_pending_no_record_id">Deletion pending for %s: old import has no saved Health Connect record ID. Delete this older workout manually in Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Deletion pending for %s: old heart-rate record has no saved UID. Delete it manually in Health Connect.</string>
+    <string name="status_deletion_pending_error">Health Connect deletion pending for %1$s: %2$s</string>
+    <string name="status_import_paused_consent">Import paused: watch consent unavailable. Connect the updated watch and enable Health Sync.</string>
+
+    <string name="listener_hc_unavailable">Health Connect unavailable. Open the phone companion.</string>
+    <string name="listener_hc_permissions_missing">Health Connect permissions missing. Open the phone companion.</string>
+    <string name="listener_sync_off">Phone sync is OFF. Enable it in the companion.</string>
+    <string name="listener_phone_ready">Phone ready. Samsung Health import is not confirmed.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Manual or automatic sync requested</string>
+    <string name="log_sync_failed">Sync failed</string>
+    <string name="log_data_items_visible">DataItems visible on phone=%d</string>
+    <string name="log_data_item_scan_unavailable">DataItem scan unavailable; requesting direct transfer</string>
+    <string name="log_workout_request_queue_failed">Workout request could not be queued</string>
+    <string name="log_hr_write_completed">Heart-rate write completed workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">Exercise session write completed</string>
+    <string name="log_import_confirmed">Health Connect import confirmed workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">Already imported workout=%s; acknowledging replay without duplicate</string>
+    <string name="log_import_succeeded_ack_deferred">Import succeeded; ACK deferred until replay</string>
+    <string name="log_import_deferred">Import deferred; source workouts retained</string>
+
+    <string name="permissions_rationale">PadelScore Sync requests permission to write exercise sessions to Health Connect only after you choose to connect. When sync is enabled on the watch, the app can also write recorded heart-rate measurements. You can revoke access at any time in Health Connect settings.\n\nThe watch records heart-rate samples and match steps locally only when Health Tracking is enabled. Steps are not exported. Workout sessions and heart-rate samples are transferred through the paired-device data layer only with Health Sync enabled on the watch. New imports also require the phone sync switch, Health Connect write permissions, and a live consent check with the source watch. No account or developer-operated server is used.\n\nDeleting a match sends a durable deletion request for that match\'s PadelScore records. Explicit deletion requests are processed even when sync is off. Already imported copies in Samsung Health or other apps may require separate deletion. Turning sync off does not delete existing data. Uninstalling the watch app before pending deletions have been delivered can lose those deletion requests. Incomplete transfers remain in private phone storage for retry. This is a fitness feature, not a medical device.</string>
+</resources>
