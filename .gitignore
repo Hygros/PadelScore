@@ -76,4 +76,5 @@ lint-results*.xml
 *.aab
 
 # Local source backups
+*.bak
 *.bak_*

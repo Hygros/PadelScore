@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,6 +70,7 @@ import ch.hygro.padelscore.vibration.HapticFeedbackManager
 import ch.hygro.padelscore.presentation.theme.*
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun PadelScoreContent(
@@ -123,9 +125,9 @@ fun PadelScoreContent(
     var showSupporter by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var draftConfiguration by remember { mutableStateOf(initialState.configuration) }
-    val bodySensorPermissionsLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
+    val bodySensorPermissionsLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions: Map<String, Boolean> ->
             val allGranted = permissions.entries.all { it.value }
             if (allGranted) {
                 ch.hygro.padelscore.health.FitnessTrackingService.start(context, matchState.startedAtEpochMillis)
@@ -291,7 +293,7 @@ fun PadelScoreContent(
                 android.Manifest.permission.ACTIVITY_RECOGNITION
             )
             val missingPermissions = requiredPermissions.filter {
-                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+                androidx.core.content.ContextCompat.checkSelfPermission(context, it) != android.content.pm.PackageManager.PERMISSION_GRANTED
             }
             if (missingPermissions.isEmpty()) {
                 ch.hygro.padelscore.health.FitnessTrackingService.start(context, matchState.startedAtEpochMillis)

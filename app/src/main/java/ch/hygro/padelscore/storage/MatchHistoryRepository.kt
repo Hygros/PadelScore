@@ -82,11 +82,8 @@ class MatchHistoryRepository(private val context: Context) {
 
     private fun saveEntries(entries: List<MatchHistoryEntry>) {
         val array = JSONArray().apply { entries.forEach { put(encodeEntry(it)) } }
-        check(
-            preferences.edit {
-                putString(KEY_HISTORY_JSON, array.toString())
-            }
-        ) { "Could not persist match history" }
+        val result = preferences.edit().putString(KEY_HISTORY_JSON, array.toString()).commit()
+        check(result) { "Could not persist match history" }
     }
 
     private fun encodeEntry(entry: MatchHistoryEntry) = JSONObject()
