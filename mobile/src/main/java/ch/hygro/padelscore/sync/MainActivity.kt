@@ -176,16 +176,6 @@ class MainActivity : ComponentActivity() {
             }
         }, spacedParams(dp(14)))
 
-        page.addView(accordionSection(
-            title = getString(R.string.debug_info),
-            summary = getString(R.string.debug_summary),
-            initiallyExpanded = false
-        ) { content ->
-            content.addView(secondaryButton(getString(R.string.show_local_data)) {
-                requestSync()
-            })
-        }, spacedParams(dp(14)))
-
         setContentView(android.widget.ScrollView(this).apply {
             isFillViewport = true
             addView(page)

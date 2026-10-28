@@ -78,3 +78,9 @@ lint-results*.xml
 # Local source backups
 *.bak
 *.bak_*
+
+# Local scripts
+*.ps1
+
+# Local files in main folder
+/*.kt

@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +29,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -56,7 +59,8 @@ fun StartScreen(
     onConfigurationChanged: (MatchConfiguration) -> Unit,
     onOpenHistory: () -> Unit,
     onOpenSupporter: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onOpenPadelPong: () -> Unit = {}
 ) {
     var scoringMode by remember(initialConfiguration) {
         mutableStateOf(initialConfiguration.scoringMode)
@@ -83,6 +87,8 @@ fun StartScreen(
     val transformationSpec = rememberTransformationSpec()
     val isRound = LocalConfiguration.current.isScreenRound
     val haptic = LocalHapticFeedback.current
+    var secretTapCount by remember { mutableIntStateOf(0) }
+    var lastSecretTapMillis by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
 
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         TransformingLazyColumn(
@@ -94,12 +100,38 @@ fun StartScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                val itemScope = this
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .transformedHeight(itemScope, transformationSpec)
-                        .padding(top = 1.dp, bottom = 1.dp),
+                        .height(20.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    val now = android.os.SystemClock.elapsedRealtime()
+
+                                    // Easter-Egg-Einstellungen
+                                    val requiredTaps = 7
+                                    val maxTapInterval = 300L
+
+                                    // Aufeinanderfolgende Tipps zählen
+                                    secretTapCount = if (
+                                        now - lastSecretTapMillis <= maxTapInterval
+                                    ) {
+                                        secretTapCount + 1
+                                    } else {
+                                        1
+                                    }
+
+                                    lastSecretTapMillis = now
+
+                                    // Minispiel nach sieben Tipps öffnen
+                                    if (secretTapCount >= requiredTaps) {
+                                        secretTapCount = 0
+                                        onOpenPadelPong()
+                                    }
+                                }
+                            )
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

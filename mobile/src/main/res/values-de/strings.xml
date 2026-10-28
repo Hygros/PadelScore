@@ -24,10 +24,6 @@
     <string name="privacy_explanation">Match-Schritte verbleiben auf der Uhr und werden nicht exportiert. Das Löschen eines Matches fordert das Löschen der zugehörigen PadelScore-Einträge aus Health Connect an. Kopien in anderen Gesundheits-Apps müssen möglicherweise separat gelöscht werden.</string>
     <string name="xiaomi_workaround">Uhr-Links öffnen sich nicht? Einige Xiaomi-, Redmi- und POCO-Telefone können Links blockieren, die durch das Uhren-Plugin geöffnet werden. Gehe zu den Telefon-Einstellungen > Apps, wähle dein Uhren-Plugin aus, öffne "Andere Berechtigungen" und erlaube "Hintergrund-Pop-up-Fenster", falls diese Option existiert.</string>
 
-    <string name="debug_info">Debug-Info</string>
-    <string name="debug_summary">Verarbeitete und ausstehende Operationen anzeigen</string>
-    <string name="show_local_data">Lokale Daten anzeigen</string>
-
     <!-- UI State & Accessibility -->
     <string name="expanded">ausgeklappt</string>
     <string name="collapsed">eingeklappt</string>

@@ -124,6 +124,7 @@ fun PadelScoreContent(
     }
     var showSupporter by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+    var showPadelPong by remember { mutableStateOf(false) }
     var draftConfiguration by remember { mutableStateOf(initialState.configuration) }
     val bodySensorPermissionsLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
         contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
@@ -251,7 +252,7 @@ fun PadelScoreContent(
     }
 
     val isActiveMatch = !showConfiguration && !showResumePrompt &&
-            !showMatchHistory && !showSupporter && !showSettings && !matchFinished
+            !showMatchHistory && !showSupporter && !showSettings && !showPadelPong && !matchFinished
     val isReducedDisplay = isAmbientMode ||
             (isActiveMatch && (activity as? MainActivity)?.wristLowered?.value == true)
     
@@ -383,6 +384,11 @@ fun PadelScoreContent(
         return
     }
 
+    if (showPadelPong && showConfiguration) {
+        BackHandler { showPadelPong = false }
+        ch.hygro.padelscore.minigame.PadelPongScreen(onExit = { showPadelPong = false })
+        return
+    }
     if (showConfiguration) {
         StartScreen(
             initialConfiguration = draftConfiguration,
@@ -411,6 +417,9 @@ fun PadelScoreContent(
             },
             onOpenSettings = {
                 showSettings = true
+            },
+            onOpenPadelPong = {
+                if (!hasRunningSavedMatch(matchState)) showPadelPong = true
             }
         )
         return

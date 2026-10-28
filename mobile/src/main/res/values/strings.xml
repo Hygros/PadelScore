@@ -24,10 +24,6 @@
     <string name="privacy_explanation">Match steps stay on the watch and are not exported. Deleting a match requests deletion of its PadelScore records from Health Connect. Copies in other health apps may need to be deleted separately.</string>
     <string name="xiaomi_workaround">Watch links not opening? Some Xiaomi, Redmi and POCO phones can block links opened by the watch plugin. In phone Settings > Apps, select your watch plugin, open Other permissions and allow background pop-up windows if that option exists.</string>
 
-    <string name="debug_info">Debug info</string>
-    <string name="debug_summary">View processed and pending operations</string>
-    <string name="show_local_data">Show local data</string>
-
     <!-- UI State & Accessibility -->
     <string name="expanded">expanded</string>
     <string name="collapsed">collapsed</string>
