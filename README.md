@@ -3,18 +3,18 @@
 <!--suppress ALL -->
 
 <p align="center">
-  <img src="app/src/main/ic_launcher-playstore.png" width="128" height="128" alt="Padel Score App Icon" />
+  <img src="app/src/main/ic_launcher-playstore.png" width="128" height="128" alt="Padel Score app icon" />
 </p>
 
 <p align="center">
-  <strong>A standalone, privacy-first Wear OS smartwatch app for keeping score during padel matches — 100% offline, fast, and effortless.</strong>
+  <strong>A privacy-focused Wear OS padel scorekeeper with offline scoring, local match history and optional fitness tracking.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Hygros/PadelScore/releases"><img src="https://img.shields.io/github/v/release/Hygros/PadelScore?color=2e7d32&label=Latest%20Release&style=flat-square" alt="Latest Release" /></a>
-  <a href="https://developer.android.com/wear"><img src="https://img.shields.io/badge/Platform-Wear%20OS%203%2B-00C853?style=flat-square&logo=wearos&logoColor=white" alt="Wear OS 3+" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square" alt="License" /></a>
-  <a href="#privacy"><img src="https://img.shields.io/badge/Privacy-100%25%20Offline-brightgreen?style=flat-square" alt="Offline Scoring" /></a>
+  <a href="https://github.com/Hygros/PadelScore/releases"><img src="https://img.shields.io/github/v/release/Hygros/PadelScore?color=2e7d32&label=Latest%20Release&style=flat-square" alt="Latest release" /></a>
+  <a href="https://developer.android.com/wear"><img src="https://img.shields.io/badge/Platform-Wear%20OS%203%2B-00C853?style=flat-square&logo=wearos&logoColor=white" alt="Wear OS 3 or newer" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square" alt="Apache License 2.0" /></a>
+  <a href="#privacy"><img src="https://img.shields.io/badge/Privacy-No%20tracking-brightgreen?style=flat-square" alt="No advertising, analytics or developer-operated tracking" /></a>
 </p>
 
 ---
@@ -22,35 +22,35 @@
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="docs/screenshots/01_new_match.png" width="180" alt="New Match Setup" />
+  <img src="docs/screenshots/01_new_match.png" width="180" alt="New match setup" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/07_match_scoring.png" width="180" alt="Match Scoring" />
+  <img src="docs/screenshots/07_match_scoring.png" width="180" alt="Live match scoring" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/08_end_match.png" width="180" alt="Match Result" />
+  <img src="docs/screenshots/08_end_match.png" width="180" alt="Completed match result" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/09_match_history.png" width="180" alt="Match History" />
+  <img src="docs/screenshots/09_match_history.png" width="180" alt="Local match history" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/10_companion.png" width="180" alt="Companion App" />
+  <img src="docs/screenshots/10_companion.png" width="180" alt="Optional Android companion app" />
 </p>
 
 <p align="center">
-  <sub><b>Match Setup</b> &nbsp;•&nbsp; <b>Live Scoring</b> &nbsp;•&nbsp; <b>Match Summary</b> &nbsp;•&nbsp; <b>Local History</b> &nbsp;•&nbsp; <b>Companion</b></sub>
+  <sub><b>Match setup</b> &nbsp;•&nbsp; <b>Live scoring</b> &nbsp;•&nbsp; <b>Match summary</b> &nbsp;•&nbsp; <b>Local history</b> &nbsp;•&nbsp; <b>Optional companion</b></sub>
 </p>
 
-### 📊 Detailed Match Statistics & Point History
+### 📊 Match statistics and point history
 
 <p align="center">
-  <img src="docs/screenshots/stats-01.png" width="180" alt="Match Statistics" />
+  <img src="docs/screenshots/stats-01.png" width="180" alt="Match statistics" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/stats-02.png" width="180" alt="Point Sequence" />
+  <img src="docs/screenshots/stats-02.png" width="180" alt="Point sequence" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/stats-03.png" width="180" alt="Game Score Chart" />
+  <img src="docs/screenshots/stats-03.png" width="180" alt="Game score chart" />
   &nbsp;&nbsp;
-  <img src="docs/screenshots/stats-04.png" width="180" alt="Game Point Breakdown" />
+  <img src="docs/screenshots/stats-04.png" width="180" alt="Game point breakdown" />
 </p>
 
 <p align="center">
-  <sub><b>Match Breakdown</b> &nbsp;•&nbsp; <b>Point Sequence</b> &nbsp;•&nbsp; <b>Game Chart</b> &nbsp;•&nbsp; <b>Point-by-Point</b></sub>
+  <sub><b>Match breakdown</b> &nbsp;•&nbsp; <b>Point sequence</b> &nbsp;•&nbsp; <b>Game chart</b> &nbsp;•&nbsp; <b>Point-by-point history</b></sub>
 </p>
 
 ---
@@ -67,74 +67,270 @@ Contributions, bug reports, and feature suggestions are equally appreciated.
 
 ## ✨ Features
 
-- 🎾 **Official Padel Rules**: Advantage, Golden Point, and Star Point scoring modes.
-- ⚙️ **Flexible Match Formats**: Single set, Best-of-3, Short sets (to 4 games), Normal sets (to 6 games), set tie-breaks, and match tie-breaks.
-- 🟡 **Serve & Court Tracking**: Visual serve indicators (Deuce/Ad court) with 1-2-2 tie-break rotation and court change notifications.
-- ❤️ **Fitness Tracking**: Native integration with Wear OS Health Services to track heart rate, steps, active calories, and match duration as an official workout.
-- 📊 **Detailed Match Statistics & Point History**: Full point-by-point tracking, interactive game progression charts, point sequence strips, and set/game breakdowns right on your watch.
-- 📱 **Companion App (`PadelScore Sync`)**: Sync watch workouts and heart rate directly to Android Health Connect, sync match deletions, manage permissions, and remotely trigger watch app installation from your phone.
-- ⌚ **Tiles & Complications**: Launch a new match instantly straight from your watch face using the included Complication or Wear OS Tile.
-- 🔕 **Match Quiet Mode**: Optional automatic Do Not Disturb mode during active matches to silence notifications and pop-ups.
-- 🎯 **Court-Optimized UI**: Large touch targets, 300 ms double-tap safety lock, wrist haptics, and Always-On Display (AOD) support.
-- ↺ **Instant Undo & Reset**: Quick point reversal and safety long-press match reset.
-- 📜 **Local Match Storage**: Save and review past matches offline on your watch with full privacy.
-- 🔒 **100% Standalone & Privacy-First**: No internet permission requested and zero tracking. The watch app operates fully independently.
+### Scoring
+
+- 🎾 **Padel scoring modes:** Classic Advantage, Golden Point and Star Point.
+- ⚙️ **Flexible match formats:** One set, best of three, short sets, normal sets, set tie-breaks and match tie-breaks.
+- 🟡 **Serve and court tracking:** Deuce and Advantage court indicators, service rotation and the 1-2-2 tie-break service sequence.
+- ↩️ **Undo and reset:** Point reversal and protected long-press match reset.
+- 💾 **Persistent matches:** Resume an in-progress match after leaving or restarting the app.
+- 📜 **Local match history:** Review completed matches directly on the watch.
+- 📊 **Detailed statistics:** Point history, match totals, game progression and set breakdowns.
+
+### Wear OS experience
+
+- ⌚ **Tiles and complications:** Start Padel Score from a Wear OS Tile or supported watch-face complication.
+- 🔕 **Match Quiet Mode:** Optional integration with Android's notification-policy controls during an active match.
+- 🎯 **Watch-oriented controls:** Large touch targets, haptic feedback and a short point-input lock to reduce accidental double taps.
+- 🌙 **Always-on display support:** An ambient match display when Always-on Display is enabled on the watch.
+
+### Optional fitness tracking
+
+Fitness tracking is optional and requires the applicable Android and Wear OS permissions.
+
+When enabled and supported by the watch, Padel Score can record:
+
+- heart-rate samples;
+- average heart rate;
+- steps;
+- active calories when provided by the device; and
+- workout and match duration.
+
+Fitness tracking uses AndroidX Health Services. Availability and measurements depend on the watch hardware, Wear OS version, permissions and other active workout applications.
+
+Core scoring remains available when fitness tracking is disabled.
+
+### Optional Android companion
+
+The optional `PadelScore Sync` Android application can:
+
+- receive completed workouts from the paired watch;
+- write exercise sessions and heart-rate records to Android Health Connect;
+- synchronise supported workout deletions;
+- display synchronisation and permission status; and
+- open the app's Play Store page on the paired watch.
+
+Watch-to-phone transfer uses the Google Play services Wearable Data Layer. The companion app is not required for scoring or local match history.
+
+### Optional supporter purchase
+
+The Wear OS app may offer an optional one-time supporter purchase through Google Play Billing.
+
+The purchase is optional and does not unlock or restrict the core scoring functions.
 
 ---
 
 ## 🚀 Installation
 
-1. Download the latest release APKs from [GitHub Releases](https://github.com/Hygros/PadelScore/releases).
-2. Install the Wear OS app onto your watch using **ADB over Wi-Fi** or a phone sideloading app (e.g. Bugjaeger, Easy Fire Tools):
-   ```bash
-   adb connect <WATCH_IP_ADDRESS>:5555
-   adb install -r PadelScore-wear.apk
-   ```
-*(Note: To enable Health Connect sync, install the companion `PadelScore-mobile.apk` on your paired Android phone. The phone app acts purely as a sync bridge and can also open the Play Store on your paired watch directly to install or update the watch app.)*
+### GitHub APKs
 
-## 🔄 Automatic Updates via Google Play
+1. Download the current APK files from [GitHub Releases](https://github.com/Hygros/PadelScore/releases).
+2. Install the Wear OS APK on a compatible watch.
+3. Optionally install the mobile companion APK on the paired Android phone if Health Connect synchronisation is required.
 
-Want to receive **automatic app updates through Google Play** instead of manually installing new APKs?
+For development devices, installation can be performed with Android Debug Bridge:
 
-Padel Score is currently available through a **Closed Test**:
+```bash
+adb devices
+adb -s <WATCH_SERIAL> install -r PadelScore-Wear.apk
+```
 
-1. Join the tester group: [Padel Score Testers](https://groups.google.com/g/padel-score-testers)
-2. Become a tester: [Join the Google Play test](https://play.google.com/apps/testing/ch.hygro.padelscore)
-3. Install **Padel Score** from Google Play on your Wear OS watch.
+Do not publish device serial numbers, local IP addresses or wireless-debugging credentials.
 
-Once installed through Google Play, future updates will be delivered through the Play Store automatically according to your Play Store update settings.
+The exact release asset names may include the application version and Android `versionCode`.
+
+### Google Play closed test
+
+Padel Score may also be available through a Google Play closed test:
+
+1. Join the [Padel Score Testers group](https://groups.google.com/g/padel-score-testers).
+2. Open the [Google Play testing invitation](https://play.google.com/apps/testing/ch.hygro.padelscore).
+3. Install Padel Score through Google Play on a compatible Wear OS watch.
+
+Access and availability are controlled by Google Play and may depend on the tester account, country, device compatibility and active testing track.
 
 ---
 
 <a id="privacy"></a>
-## 🔒 Privacy & Permissions
 
-- ❌ **No Internet Access**: `android.permission.INTERNET` is not requested by either the watch or phone app.
-- ❌ **No Tracking**: No telemetry, analytics, or background cloud sync.
-- 💾 **100% Local**: All match state and history remain strictly on your watch. If using the companion app, health data is only passed directly from the watch to your phone's secure on-device Health Connect store.
+## 🔒 Privacy
+
+Padel Score does not include:
+
+- advertising;
+- analytics;
+- developer-operated telemetry;
+- third-party crash reporting;
+- user accounts; or
+- developer-operated cloud storage.
+
+Neither the Wear OS app nor the Android companion app requests the Android Internet permission.
+
+### Local match data
+
+Match state, point history, statistics and completed-match history are stored in the Wear OS app's private local storage.
+
+### Optional health data
+
+If fitness tracking is enabled, the Wear OS app processes health and fitness information locally. If Health Connect synchronisation is also enabled, completed workout information is transferred directly between the paired watch and phone and may be written to Health Connect.
+
+No match or health information is uploaded to a server operated by the developer.
+
+### Google platform services
+
+Some optional functions depend on Google platform components:
+
+- Google Play Billing for the supporter purchase;
+- Google Play services Wearable APIs for watch-to-phone transfer;
+- Google Play for installation and updates; and
+- Health Connect for on-device health-record storage.
+
+Those components may process information under Google's own terms and privacy policies.
+
+See the full docs/privacy-policy.md for details about permissions, local storage, Health Connect, Billing, deletion and retention.
 
 ---
 
-## 📂 Project Structure
+## 🧩 Project structure
 
 ```text
-app/src/main/java/ch/hygro/padelscore/
-├── billing/        # Optional Supporter page Google Play Billing
-├── complications/  # Watch face Complication for quick-start
-├── health/         # Health Services fitness tracking (Heart Rate, Steps)
-├── logic/          # Core scoring engine & serve calculator
-├── model/          # Match configuration, scoring & point history data models
-├── presentation/   # Wear OS Jetpack Compose UI, match stats & quiet mode controller
-├── storage/        # Offline local match storage & point history codec
-├── tiles/          # Wear OS quick-start Tile
-└── vibration/      # Wrist haptic feedback engine
+app/
+└── src/main/
+    ├── java/ch/hygro/padelscore/
+    │   ├── billing/        # Optional Google Play supporter purchase
+    │   ├── complications/  # Watch-face complication data source
+    │   ├── health/         # Health Services recording and phone sync
+    │   ├── logic/          # Scoring engine and serve calculator
+    │   ├── minigame/       # Local Padel Pong minigame
+    │   ├── model/          # Match configuration and state models
+    │   ├── presentation/   # Wear OS Compose user interface
+    │   ├── storage/        # Local match and workout storage
+    │   ├── tiles/          # Wear OS Tile
+    │   └── vibration/      # Haptic feedback
+    └── res/
 
-mobile/src/main/java/ch/hygro/padelscore/sync/
-└──                 # Companion app for Health Connect workout sync & watch app launcher
+mobile/
+└── src/main/
+    ├── java/ch/hygro/padelscore/sync/
+    │   └──               # Wearable transfer and Health Connect import
+    └── res/
 ```
 
 ---
 
-## 📄 License
+## 🛠️ Build requirements
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+The project currently uses:
+
+- Android Gradle Plugin 9.4.1;
+- Gradle 9.8.2 through the included Gradle Wrapper;
+- Java 25 for the configured Gradle daemon toolchain;
+- compile SDK 37;
+- target SDK 37;
+- minimum SDK 30 for the Wear OS module; and
+- minimum SDK 28 for the Android companion module.
+
+The source code targets Java 11 bytecode. The Java version used to run Gradle is a separate build-tool setting.
+
+### Windows
+
+```powershell
+.\gradlew.bat `
+    :app:testDebugUnitTest `
+    :mobile:testDebugUnitTest `
+    :app:lintRelease `
+    :mobile:lintRelease `
+    :app:assembleRelease `
+    :mobile:assembleRelease `
+    --stacktrace
+```
+
+### Linux or macOS
+
+```bash
+./gradlew \
+  :app:testDebugUnitTest \
+  :mobile:testDebugUnitTest \
+  :app:lintRelease \
+  :mobile:lintRelease \
+  :app:assembleRelease \
+  :mobile:assembleRelease \
+  --stacktrace
+```
+
+Unsigned release APKs are expected under:
+
+```text
+app/build/outputs/apk/release/
+mobile/build/outputs/apk/release/
+```
+
+Signing is configured only when all required `PADELSCORE_UPLOAD_*` environment variables are available. Keystores, passwords and tokens must never be committed.
+
+---
+
+## 🧪 Verification
+
+Before publishing a release, verify:
+
+```text
+Wear unit tests
+Mobile unit tests
+Wear release lint
+Mobile release lint
+Wear release APK or bundle
+Mobile release APK or bundle
+R8 output
+Merged manifests
+APK permissions
+Version name and version codes
+Signing configuration
+```
+
+The project currently has separate default version codes for its two modules:
+
+```text
+Wear OS app: 12
+Mobile app:  13
+Version name: 1.3
+```
+
+Release workflows may override the version codes through Gradle properties.
+
+---
+
+## 📦 Distribution notes
+
+The current Play-oriented build contains:
+
+- Google Play Billing; and
+- Google Play services Wearable APIs.
+
+These dependencies are used only for the optional supporter purchase and watch-to-phone communication. Core scoring and local match history do not depend on a phone companion.
+
+A future F-Droid build must exclude proprietary Google Play dependencies from the generated F-Droid APK. The current default release build should not be described as F-Droid-compatible until that separate build variant has been implemented and verified.
+
+---
+
+## 🤝 Contributing
+
+Bug reports, feature proposals and code contributions are welcome.
+
+See CONTRIBUTING.md before preparing a contribution.
+
+When reporting a problem:
+
+- do not publish health records;
+- do not publish purchase tokens;
+- do not publish device serial numbers;
+- do not publish local IP addresses;
+- do not publish signing information; and
+- do not place credentials or private vulnerability details in a public issue.
+
+Security issues should be handled according to SECURITY.md.
+
+---
+
+## 📄 Licence
+
+Padel Score is licensed under the [Apache License 2.0](LICENSE).

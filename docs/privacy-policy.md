@@ -4,103 +4,256 @@ title: Privacy Policy for Padel Score
 
 # Privacy Policy for Padel Score
 
-**Effective date: September 24, 2026**
+**Last updated: 2 November 2026**
 
-Padel Score is a standalone Wear OS application for keeping score during padel matches.
+Padel Score is a Wear OS application for keeping score during padel matches. It can optionally record workout information on the watch and transfer completed workouts to the PadelScore Sync companion app on a paired Android phone.
 
-## Data collection by Padel Score
+This policy explains what information the apps process, where that information is stored, and which optional platform services are involved.
 
-Padel Score does not require a user account and does not collect, sell, or share personal or sensitive user data with the developer.
+## Summary
 
-The app does not use:
+Padel Score:
 
-- advertising;
-- analytics;
-- crash reporting;
-- cloud synchronization;
-- location information;
-- health or fitness information;
-- device sensors;
-- contact information;
-- advertising identifiers; or
-- a phone companion application.
+- does not require a user account;
+- does not include advertising;
+- does not include analytics or developer-operated telemetry;
+- does not include crash-reporting services;
+- does not upload match or health information to a server operated by the developer;
+- does not request the Android Internet permission;
+- stores match information locally on the Wear OS device;
+- can optionally record health and fitness information on the watch;
+- can optionally transfer completed workout information directly to a paired Android phone;
+- can optionally write transferred workouts to Android Health Connect; and
+- can optionally use Google Play Billing for a one-time supporter purchase.
 
-## Local app data
+The scoring functions can be used without enabling fitness tracking, installing the companion app, enabling Health Connect synchronisation, or making a supporter purchase.
 
-Padel Score stores the following information locally in the app's private storage on the Wear OS device:
+## Information stored on the Wear OS device
+
+Padel Score stores information required for scoring and match history in the app's private local storage.
+
+This may include:
 
 - the current match state;
 - match configuration;
-- undo history;
+- point and undo history;
 - completed-set results;
+- match start and end times;
 - match duration;
-- the number of played points and games;
+- numbers of points and games;
 - completed-match history; and
-- timestamps for completed matches.
+- timestamps associated with matches.
 
-This information is used only to provide the app's scoring, resume, undo, and match-history functions.
+This information is used to provide scoring, match resumption, undo, statistics and match-history functions.
 
-The locally stored match information is not transmitted to the developer.
+It is not transmitted to the developer.
+
+## Optional fitness tracking
+
+Fitness tracking is optional and must be enabled by the user.
+
+When enabled and when the required Android permissions have been granted, the Wear OS app may process:
+
+- heart-rate measurements;
+- average heart rate;
+- step counts;
+- active-calorie information when supported by the device;
+- workout start and end times; and
+- match duration.
+
+Padel Score uses the AndroidX Health Services APIs and available device sensors to record this information during a match.
+
+Availability and accuracy depend on the watch, Wear OS version, sensor hardware, permissions and other workout applications running on the device.
+
+Fitness information is stored locally in the Wear OS app's private storage. It is not sent to the developer.
+
+## Required and optional permissions
+
+Depending on the Android and Wear OS version and the features selected by the user, Padel Score may request the following permissions:
+
+- body sensor or heart-rate access for optional heart-rate recording;
+- activity recognition for optional workout and step tracking;
+- foreground-service health access so workout recording can continue while the match screen is not in the foreground;
+- notification access for the ongoing workout notification;
+- notification-policy access for the optional Match Quiet Mode; and
+- Health Connect write permissions in the companion app.
+
+A permission can be declined. Features that require the declined permission may then be unavailable, while the core scoring functions remain usable.
+
+## Foreground workout service
+
+While fitness tracking is active, the Wear OS app uses a foreground service and displays an ongoing system notification.
+
+The foreground service allows workout recording to continue during an active match when the app is not continuously visible on screen.
+
+The service stops when the workout is ended or discarded, subject to Android and Wear OS lifecycle behaviour.
+
+## Optional companion app and watch-to-phone transfer
+
+PadelScore Sync is an optional Android companion app.
+
+When health synchronisation is enabled, completed workout information may be transferred directly between the watch and the paired phone using the Google Play services Wearable Data Layer.
+
+Transferred information may include:
+
+- workout start and end times;
+- heart-rate samples;
+- match duration;
+- revision and synchronisation information; and
+- identifiers and hashes used to prevent duplicate or stale imports.
+
+The transfer occurs between the user's paired devices. Padel Score does not send this information to a developer-operated server.
+
+The apps may temporarily retain pending transfer data and synchronisation receipts so that interrupted transfers can be retried and duplicate imports can be avoided.
+
+Users can disable health synchronisation. Disabling synchronisation prevents new workout transfers, although deletion instructions for previously transferred workouts may still be exchanged where necessary to honour an explicit deletion request.
+
+## Health Connect
+
+The optional PadelScore Sync companion app can write completed workouts to Android Health Connect after the user:
+
+1. installs the companion app;
+2. enables synchronisation; and
+3. grants the requested Health Connect permissions.
+
+The companion app may write:
+
+- exercise-session records; and
+- heart-rate records.
+
+Health Connect stores and manages these records on the Android device under the user's Health Connect settings.
+
+Padel Score does not operate Health Connect and does not receive Health Connect data on a developer-controlled server.
+
+Users can inspect or revoke the companion app's Health Connect permissions through Android settings. Revoking permissions prevents further Health Connect writes but may not automatically delete records already stored in Health Connect.
+
+## Workout deletion
+
+When a locally stored workout is deleted on the watch, Padel Score may retain a local deletion marker. This marker prevents an older queued copy of the workout from being imported again.
+
+If the companion app is installed and reachable, the deletion request may be transmitted to the paired phone so that corresponding Health Connect records can be deleted.
+
+Deletion may remain pending if:
+
+- the phone is not reachable;
+- the companion app is unavailable;
+- Health Connect is unavailable;
+- the required Health Connect permissions are missing; or
+- the record identifier required for deletion is unavailable.
+
+Users can also manage Health Connect records directly through Android's Health Connect settings.
 
 ## Optional supporter purchase
 
-Padel Score may offer an optional one-time supporter purchase through Google Play Billing.
+The Wear OS app may offer an optional one-time supporter purchase through Google Play Billing.
 
-Google Play processes the purchase and payment information under Google's own terms and privacy policies. Payment information is not provided to the developer.
+Google Play processes the purchase and payment information according to Google's own terms and privacy policies. Payment-card information is not provided to the developer through Padel Score.
 
-The app receives information needed to display available supporter products, start the purchase process, determine the purchase result, and recognize the supporter purchase.
+To provide the supporter feature, the app receives information from Google Play that is required to:
 
-Padel Score does not operate a developer-controlled billing server or independently store payment-card information.
+- display the available product and localised price;
+- start the purchase flow;
+- determine whether a purchase is pending or completed;
+- acknowledge a completed purchase; and
+- recognise an existing supporter purchase.
 
-The supporter purchase is optional and does not affect the app's core scoring functions.
+The supporter purchase is optional and does not affect the core scoring functions.
+
+Padel Score does not operate a developer-controlled billing server.
+
+## Google Play and Google Play services
+
+Some optional features rely on services supplied by Google:
+
+- Google Play Billing for the optional supporter purchase;
+- Google Play services Wearable APIs for watch-to-phone communication;
+- Google Play for app installation and updates when the app is installed through Google Play; and
+- a Play Store link that the companion setup function may open on a paired device.
+
+Google may process information independently when users interact with these services. Such processing is governed by Google's own terms and privacy policies and is not controlled by Padel Score.
+
+## Internet access
+
+Neither the Wear OS app nor the Android companion app requests the Android Internet permission.
+
+The apps do not connect directly to a developer-operated Internet service.
+
+Google Play, Google Play services, Health Connect and the Android operating system are separate platform components and may perform their own communications independently of the app.
+
+## Advertising, analytics and crash reporting
+
+Padel Score does not integrate:
+
+- advertising SDKs;
+- analytics SDKs;
+- developer-operated telemetry;
+- third-party crash-reporting SDKs;
+- social-network SDKs; or
+- developer-operated cloud storage.
+
+Diagnostic information may still be recorded by Android, Wear OS, device manufacturers, Google Play or other system components according to their own settings and policies.
 
 ## Data backup
 
-Android system backup is disabled for Padel Score.
+Android system backup is disabled for both the Wear OS app and the companion app.
 
-Locally stored match information is not backed up by the app to a developer-controlled service or restored through Android Auto Backup.
+Padel Score does not back up match, workout or synchronisation information to a server operated by the developer.
+
+Uninstalling an app normally removes the information stored in that app's private local storage. Records already written to Health Connect are managed separately by Health Connect and may remain until they are deleted through the companion app or Health Connect settings.
+
+## Data retention
+
+Match and workout information remains in local app storage until it is:
+
+- deleted within the app where a deletion function is available;
+- cleared through Android application settings; or
+- removed by uninstalling the app.
+
+Pending synchronisation data and local synchronisation receipts may remain until a transfer or deletion has been confirmed, the relevant app storage is cleared, or the app is uninstalled.
+
+Health Connect records are retained according to the user's Health Connect settings and Android platform behaviour.
+
+Google Play purchase records are controlled by Google and are not removed by clearing Padel Score's local application storage.
 
 ## Data deletion
 
-Padel Score does not provide user accounts.
+Users can delete locally stored Padel Score information by:
 
-Users can delete locally stored information by:
-
-- clearing the app's storage through the device settings; or
+- deleting individual supported records within the app;
+- clearing the app's storage through Android or Wear OS settings; or
 - uninstalling the app.
 
-Uninstalling the app removes its locally stored match data from the device.
+Users can manage or delete records written to Health Connect through:
 
-Purchase records managed by Google Play are controlled by Google and are not deleted by clearing Padel Score's local app storage.
+- the PadelScore Sync companion app where supported; or
+- Android Health Connect settings.
 
-## Third-party services
-
-Padel Score integrates Google Play Billing solely for the optional supporter purchase.
-
-Google Play may also process information independently when users download, update, or purchase through the app. Such processing is governed by Google's own privacy policies and is not controlled by Padel Score.
-
-Padel Score does not integrate advertising, analytics, crash-reporting, social, or developer-controlled cloud-storage services.
+Clearing or uninstalling only the Wear OS app does not necessarily delete records already imported into Health Connect on the phone.
 
 ## Children's privacy
 
 Padel Score is a general sports utility and is not specifically directed at children.
 
-The app does not knowingly collect personal information from children or other users.
+The developer does not knowingly collect personal information from children or other users through a developer-operated server.
 
 ## Security
 
-Match information is stored in the app's private local storage on the Wear OS device. Padel Score does not transmit match information to the developer.
+Match and fitness information is stored in application-private storage and, when explicitly enabled, transferred between paired devices through the Wearable Data Layer.
 
-No method of electronic storage or processing can be guaranteed to be completely secure.
+Padel Score uses bounded payload sizes, integrity hashes and synchronisation receipts to reduce accidental duplicate, incomplete or stale workout imports.
 
-## Changes to this privacy policy
+No method of electronic storage or processing can be guaranteed to be completely secure. Users should keep their watch, paired phone, Android system and Google Play services updated and protect their devices with appropriate screen-lock settings.
 
-This privacy policy may be updated if the app's functionality or data practices change.
+## Changes to this policy
 
-The current version will remain available at this page. Material changes will be reflected by updating the effective date.
+This policy may be updated when Padel Score's functionality, permissions, distribution methods or data practices change.
+
+Material changes will be reflected by updating the date at the top of this document.
 
 ## Contact
 
-For privacy questions concerning Padel Score, contact:
+Privacy questions and suspected privacy issues can be submitted through the project's GitHub issue tracker:
 
-padelscore.support@proton.me
+https://github.com/Hygros/PadelScore/issues
+
+Do not include health records, purchase tokens, device identifiers, account credentials or other sensitive information in a public issue.
