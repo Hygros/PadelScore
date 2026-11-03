@@ -64,10 +64,14 @@
     <string name="purchase_pending_title">PURCHASE PENDING</string>
     <string name="purchase_pending_message">Supporter status will be activated as soon as Google Play confirms the payment.</string>
     <string name="starting_purchase">STARTING PURCHASE</string>
-    <string name="match_tie_break">MATCH-TIE-BREAK</string>
+    <string name="match_tie_break">MATCH-TB</string>
     <string name="tie_break">TIE-BREAK</string>
     <string name="advantage_opponent">ADV OPPONENT</string>
     <string name="advantage_us">ADV US</string>
+    <string name="advantage_opponent_short">ADV OPP</string>
+    <string name="golden_point_short">GOLDEN</string>
+    <string name="star_point_short">STAR</string>
+    <string name="change_sides_short">CHANGE</string>
     <string name="games_abbr">G %d</string>
     <string name="sets_abbr">S %d</string>
     <string name="advantage_abbr">AD</string>
@@ -90,7 +94,6 @@
     <string name="purchase_acknowledge_error">The purchase was detected but could not yet be confirmed. Please try restoring again.</string>
     <string name="back_to_home">BACK TO HOME</string>
     <string name="back_to_home_message">Returning home discards the current match.</string>
-    <string name="change_sides">CHANGE SIDES</string>
     <string name="average_heart_rate">Avg. HR: %d bpm</string>
     <string name="end_and_save">END &amp; SAVE</string>
     <string name="ended_early">ENDED EARLY</string>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -70,7 +71,6 @@ import ch.hygro.padelscore.vibration.HapticFeedbackManager
 import ch.hygro.padelscore.presentation.theme.*
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun PadelScoreContent(
@@ -311,27 +311,18 @@ fun PadelScoreContent(
         (activity as? MainActivity)?.setMatchQuietMode(isActiveMatch)
         onDispose { (activity as? MainActivity)?.setMatchQuietMode(false) }
     }
-    var ambientClock by remember {
-        mutableStateOf(
-            java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                .format(java.util.Date())
-        )
-    }
+    var ambientClock by remember { mutableStateOf(formatClock(context)) }
     ambientModeManager.AmbientTickEffect {
-        ambientClock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date())
+        ambientClock = formatClock(context)
     }
-    LaunchedEffect(isReducedDisplay, isAmbientMode) {
-        while (isReducedDisplay && !isAmbientMode) {
-            ambientClock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                .format(java.util.Date())
-            delay(1.minutes)
-        }
-    }
+    // Keep the clock current in interactive mode, aligned to full minutes.
     LaunchedEffect(isAmbientMode) {
-        ambientClock = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date())
         Log.d("PadelInput", "ambient=$isAmbientMode activeMatch=$isActiveMatch")
+        ambientClock = formatClock(context)
+        while (!isAmbientMode) {
+            delay((60_000L - System.currentTimeMillis() % 60_000L).milliseconds)
+            ambientClock = formatClock(context)
+        }
     }
 
     if (showResumePrompt) {
@@ -523,9 +514,10 @@ fun PadelScoreContent(
                 modifier = Modifier.fillMaxSize().alpha(if (isReducedDisplay) 0f else 1f),
                 matchState = matchState,
                 showCourtChange = showCourtChange,
+                clockText = ambientClock,
                 canUndo = !isReducedDisplay && history.isNotEmpty(),
                 onUndo = { if (!isReducedDisplay) undoLastPoint() },
-                onReset = { if (!isReducedDisplay) resetMatch() }
+                onReset = { if (!isReducedDisplay) showExitConfirmation = true }
             )
             if (isReducedDisplay) {
                 Text(text = ambientClock, color = Color.White, fontSize = 12.sp)
@@ -634,6 +626,8 @@ fun ScoreArea(
 
         // Serve indicator: full screen width matching CenterScoreArea horizontal coordinate system, offset by 21dp for ScoreStatistics
         if (isServing) {
+            // The opponent (top) faces us, so their deuce court (their right) is on our left.
+            val dotOnRight = if (statsAtTop) !isDeuceCourt else isDeuceCourt
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -648,7 +642,7 @@ fun ScoreArea(
                     modifier = Modifier.width(46.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (!isDeuceCourt) {
+                    if (!dotOnRight) {
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
@@ -666,7 +660,7 @@ fun ScoreArea(
                     modifier = Modifier.width(46.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isDeuceCourt) {
+                    if (dotOnRight) {
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
@@ -751,6 +745,7 @@ fun CenterScoreArea(
     modifier: Modifier,
     matchState: MatchState,
     showCourtChange: Boolean,
+    clockText: String,
     canUndo: Boolean,
     onUndo: () -> Unit,
     onReset: () -> Unit
@@ -809,27 +804,63 @@ fun CenterScoreArea(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            val labelText = centerLabel(matchState, showCourtChange)
+            val baseFontSize = centerLabelFontSize(matchState)
+            // The label shares one line with the games, so shrink it with its length.
+            val adjustedFontSize = minOf(baseFontSize.value, 66f / labelText.length)
+                .coerceAtLeast(7f).sp
+            val started = matchHasStarted(matchState)
+
             Text(
-                text = centerLabel(matchState, showCourtChange),
-                color = if (showCourtChange) ColorCourtChange else centerLabelColor(matchState),
-                fontSize = centerLabelFontSize(matchState),
-                lineHeight = 9.sp,
-                fontWeight = FontWeight.Bold,
+                text = clockText,
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 10.sp,
+                lineHeight = 11.sp,
+                fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
-                maxLines = 2
+                maxLines = 1,
+                softWrap = false
             )
-            Text(
-                text = if (matchHasStarted(matchState)) {
-                    "${matchState.ourGames} : ${matchState.opponentGames}"
-                } else {
-                    scoringModeLabel(matchState.configuration.scoringMode)
-                },
-                color = Color.White,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier.requiredWidth(94.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Label ends at the center line, games start at the center line.
+                Box(
+                    modifier = Modifier.weight(1f).padding(end = 3.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Text(
+                        text = labelText,
+                        color = if (showCourtChange) ColorCourtChange else centerLabelColor(matchState),
+                        fontSize = adjustedFontSize,
+                        lineHeight = adjustedFontSize,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
+                Box(
+                    modifier = Modifier.weight(1f).padding(start = 3.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = if (started) {
+                            "${matchState.ourGames} : ${matchState.opponentGames}"
+                        } else {
+                            scoringModeLabel(matchState.configuration.scoringMode)
+                        },
+                        color = Color.White,
+                        fontSize = if (started) 15.sp else 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                }
+            }
         }
 
         Box(
@@ -873,6 +904,9 @@ fun CenterScoreArea(
         }
     }
 }
+
+private fun formatClock(context: android.content.Context): String =
+    android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date())
 
 private fun performScoreHapticFeedback(
     previousState: MatchState,

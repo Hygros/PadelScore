@@ -17,7 +17,7 @@ import ch.hygro.padelscore.presentation.theme.ColorStarPoint
 
 @Composable
 fun centerLabel(state: MatchState, showCourtChange: Boolean): String {
-    if (showCourtChange) return stringResource(R.string.change_sides)
+    if (showCourtChange) return stringResource(R.string.change_sides_short)
     return when {
         state.phase == MatchPhase.MATCH_FINISHED &&
                 state.ourSets > state.opponentSets -> stringResource(R.string.match_won)
@@ -25,9 +25,9 @@ fun centerLabel(state: MatchState, showCourtChange: Boolean): String {
                 state.opponentSets > state.ourSets -> stringResource(R.string.match_lost)
         state.phase == MatchPhase.MATCH_TIE_BREAK -> stringResource(R.string.match_tie_break)
         state.isTieBreak -> stringResource(R.string.tie_break)
-        state.isStarPointActive -> stringResource(R.string.star_point)
-        state.isGoldenPointActive -> stringResource(R.string.golden_point)
-        state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_opponent)
+        state.isStarPointActive -> stringResource(R.string.star_point_short)
+        state.isGoldenPointActive -> stringResource(R.string.golden_point_short)
+        state.advantageTeam == Team.OPPONENT -> stringResource(R.string.advantage_opponent_short)
         state.advantageTeam == Team.US -> stringResource(R.string.advantage_us)
         state.opponentPoints == 3 && state.ourPoints == 3 -> deuceLabel(state)
         else -> stringResource(R.string.games)
