@@ -1,26 +1,21 @@
 package ch.hygro.padelscore.presentation
 
 import android.app.Activity
+import android.content.Context
 import android.os.SystemClock
+import android.text.format.DateFormat
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
@@ -35,43 +30,43 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.AmbientMode
 import androidx.wear.compose.foundation.AmbientTickEffect
 import androidx.wear.compose.foundation.LocalAmbientModeManager
-import androidx.wear.compose.material3.CircularProgressIndicator
-import androidx.wear.compose.material3.Icon
-import androidx.wear.compose.material3.ProgressIndicatorDefaults
 import androidx.wear.compose.material3.Text
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.billing.SupporterBillingState
+import ch.hygro.padelscore.health.FitnessTrackingService
 import ch.hygro.padelscore.logic.PadelScoreEngine
 import ch.hygro.padelscore.logic.ServeCalculator
+import ch.hygro.padelscore.minigame.PadelPongScreen
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
+import ch.hygro.padelscore.presentation.theme.ColorTeamOpponent
+import ch.hygro.padelscore.presentation.theme.ColorTeamUs
 import ch.hygro.padelscore.storage.MatchHistoryRepository
 import ch.hygro.padelscore.storage.MatchRepository
+import ch.hygro.padelscore.storage.SettingsRepository
 import ch.hygro.padelscore.vibration.HapticFeedbackManager
-import ch.hygro.padelscore.presentation.theme.*
 import kotlinx.coroutines.delay
+import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Root composable of the watch UI. It owns the match state and the undo history and decides
+ * which screen is shown.
+ *
+ * Screens are selected by the `show*` flags through early returns further down. The order of
+ * those checks matters because several flags can be true at once (for example
+ * `showConfiguration` together with `showPadelPong`).
+ */
 @Composable
 fun PadelScoreContent(
     supporterBillingState: SupporterBillingState,
@@ -96,7 +91,7 @@ fun PadelScoreContent(
         MatchHistoryRepository(context.applicationContext)
     }
     val settingsRepository = remember(context) {
-        ch.hygro.padelscore.storage.SettingsRepository(context.applicationContext)
+        SettingsRepository(context.applicationContext)
     }
     val initialSnapshot = remember { matchRepository.loadSnapshot() }
     val initialState = initialSnapshot.currentState
@@ -126,12 +121,12 @@ fun PadelScoreContent(
     var showSettings by remember { mutableStateOf(false) }
     var showPadelPong by remember { mutableStateOf(false) }
     var draftConfiguration by remember { mutableStateOf(initialState.configuration) }
-    val bodySensorPermissionsLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-        contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+    val bodySensorPermissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { permissions: Map<String, Boolean> ->
             val allGranted = permissions.entries.all { it.value }
             if (allGranted) {
-                ch.hygro.padelscore.health.FitnessTrackingService.start(context, matchState.startedAtEpochMillis)
+                FitnessTrackingService.start(context, matchState.startedAtEpochMillis)
             } else {
                 Log.d("FitnessTracker", "Body sensor permissions not granted")
             }
@@ -171,16 +166,20 @@ fun PadelScoreContent(
         val courtChange = ServeCalculator.isCourtChange(previousState, newState)
         showCourtChange = courtChange
 
-        if (previousState.phase != MatchPhase.MATCH_FINISHED &&
+        val matchJustFinished = previousState.phase != MatchPhase.MATCH_FINISHED &&
             newState.phase == MatchPhase.MATCH_FINISHED
-        ) {
-            val completedState = newState.copy(averageHeartRate = ch.hygro.padelscore.health.FitnessTrackingService.averageHeartRate)
+        if (matchJustFinished) {
+            // The average heart rate is read from the service again for the stored match state
+            // below; the two reads are deliberately kept separate.
+            val completedState = newState.copy(averageHeartRate = FitnessTrackingService.averageHeartRate)
             matchHistoryRepository.saveCompletedMatch(completedState, completedState.averageHeartRate)
         }
         updateMatch(
-            if (newState.phase == MatchPhase.MATCH_FINISHED &&
-                previousState.phase != MatchPhase.MATCH_FINISHED
-            ) newState.copy(averageHeartRate = ch.hygro.padelscore.health.FitnessTrackingService.averageHeartRate) else newState
+            if (matchJustFinished) {
+                newState.copy(averageHeartRate = FitnessTrackingService.averageHeartRate)
+            } else {
+                newState
+            }
         )
         performScoreHapticFeedback(
             previousState = previousState,
@@ -209,8 +208,7 @@ fun PadelScoreContent(
 
         val stoppedState = matchState.copy(
             finishedAtEpochMillis = System.currentTimeMillis(),
-            averageHeartRate =
-                ch.hygro.padelscore.health.FitnessTrackingService.averageHeartRate
+            averageHeartRate = FitnessTrackingService.averageHeartRate
         )
 
         try {
@@ -221,15 +219,15 @@ fun PadelScoreContent(
             )
         } catch (exception: Exception) {
             Log.e("PadelScore", "Could not save ended match", exception)
-            android.widget.Toast.makeText(
+            Toast.makeText(
                 context,
                 saveMatchFailedMessage,
-                android.widget.Toast.LENGTH_LONG
+                Toast.LENGTH_LONG
             ).show()
             return
         }
 
-        ch.hygro.padelscore.health.FitnessTrackingService.stop(context)
+        FitnessTrackingService.stop(context)
         history.clear()
         lastAcceptedPointAtMillis = 0L
         showCourtChange = false
@@ -240,7 +238,7 @@ fun PadelScoreContent(
     }
 
     fun resetMatch() {
-        ch.hygro.padelscore.health.FitnessTrackingService.discard(context)
+        FitnessTrackingService.discard(context)
         val currentConfiguration = matchState.configuration
         lastAcceptedPointAtMillis = 0L
         showCourtChange = false
@@ -255,7 +253,7 @@ fun PadelScoreContent(
             !showMatchHistory && !showSupporter && !showSettings && !showPadelPong && !matchFinished
     val isReducedDisplay = isAmbientMode ||
             (isActiveMatch && (activity as? MainActivity)?.wristLowered?.value == true)
-    
+
     DisposableEffect(activity, isActiveMatch, isAmbientMode) {
         (activity as? MainActivity)?.setWristDetectionEnabled(isActiveMatch && !isAmbientMode)
         onDispose { (activity as? MainActivity)?.setWristDetectionEnabled(false) }
@@ -283,26 +281,20 @@ fun PadelScoreContent(
     LaunchedEffect(hasOngoingMatch, matchState) {
         (activity as? MainActivity)?.updateOngoingMatch(hasOngoingMatch, matchState)
     }
-    
+
     val swipeGesturesEnabled by settingsRepository.swipeGesturesEnabled.collectAsState()
     val healthTrackingEnabled by settingsRepository.healthTrackingEnabled.collectAsState()
     val isMatchRunning = !showConfiguration && !showResumePrompt && !matchFinished && matchState.startedAtEpochMillis > 0L
     LaunchedEffect(isMatchRunning, healthTrackingEnabled) {
         if (isMatchRunning && healthTrackingEnabled) {
-            val requiredPermissions = listOf(
-                if (android.os.Build.VERSION.SDK_INT >= 36) "android.permission.health.READ_HEART_RATE" else android.Manifest.permission.BODY_SENSORS,
-                android.Manifest.permission.ACTIVITY_RECOGNITION
-            )
-            val missingPermissions = requiredPermissions.filter {
-                androidx.core.content.ContextCompat.checkSelfPermission(context, it) != android.content.pm.PackageManager.PERMISSION_GRANTED
-            }
+            val missingPermissions = missingFitnessPermissions(context)
             if (missingPermissions.isEmpty()) {
-                ch.hygro.padelscore.health.FitnessTrackingService.start(context, matchState.startedAtEpochMillis)
+                FitnessTrackingService.start(context, matchState.startedAtEpochMillis)
             } else {
                 bodySensorPermissionsLauncher.launch(missingPermissions.toTypedArray())
             }
         } else {
-            ch.hygro.padelscore.health.FitnessTrackingService.stop(context)
+            FitnessTrackingService.stop(context)
         }
     }
 
@@ -330,7 +322,7 @@ fun PadelScoreContent(
             matchState = matchState,
             onContinueMatch = { showResumePrompt = false },
             onDiscardMatch = {
-                ch.hygro.padelscore.health.FitnessTrackingService.discard(context)
+                FitnessTrackingService.discard(context)
                 val previousConfiguration = matchState.configuration
                 history.clear()
                 lastAcceptedPointAtMillis = 0L
@@ -377,7 +369,7 @@ fun PadelScoreContent(
 
     if (showPadelPong && showConfiguration) {
         BackHandler { showPadelPong = false }
-        ch.hygro.padelscore.minigame.PadelPongScreen(onExit = { showPadelPong = false })
+        PadelPongScreen(onExit = { showPadelPong = false })
         return
     }
     if (showConfiguration) {
@@ -542,371 +534,8 @@ fun PadelScoreContent(
     }
 }
 
-@Composable
-fun ScoreArea(
-    modifier: Modifier,
-    teamName: String,
-    pointText: String,
-    games: Int,
-    sets: Int,
-    backgroundColor: Color,
-    isServing: Boolean,
-    isDeuceCourt: Boolean,
-    statsAtTop: Boolean,
-    enabled: Boolean,
-    swipeGesturesEnabled: Boolean = false,
-    ambient: Boolean,
-    onClick: () -> Unit
-) {
-    val isRound = LocalConfiguration.current.isScreenRound
-    val displayedBackgroundColor = when {
-        ambient -> Color.Black
-        enabled -> backgroundColor
-        else -> backgroundColor.copy(alpha = 0.58f)
-    }
-    val shape = RectangleShape
-    val scoreFontSize = if (ambient) 35.sp else 55.sp
-
-    Box(
-        modifier = modifier
-            .background(color = displayedBackgroundColor, shape = shape)
-            .clickable(enabled = enabled && !swipeGesturesEnabled, onClick = onClick)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Top button: statistics above the score.
-            if (statsAtTop) {
-                Spacer(modifier = Modifier.height(8.dp))
-                ScoreStatistics(
-                    games = games,
-                    sets = sets,
-                    ambient = ambient,
-                    isRound = isRound
-                )
-            }
-
-            // Center the score in the remaining space between the
-            // statistics row and the inner edge of the button.
-            Box(
-                modifier = Modifier.fillMaxWidth().weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = pointText,
-                    color = if (enabled) Color.White else Color.White.copy(alpha = 0.70f),
-                    style = TextStyle(
-                        fontSize = scoreFontSize,
-                        lineHeight = scoreFontSize,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        platformStyle = PlatformTextStyle(includeFontPadding = false),
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.Both
-                        )
-                    ),
-                    maxLines = 1,
-                    softWrap = false
-                )
-            }
-
-            // Bottom button: statistics below the score.
-            if (!statsAtTop) {
-                ScoreStatistics(
-                    games = games,
-                    sets = sets,
-                    ambient = ambient,
-                    isRound = isRound
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-
-        // Serve indicator: full screen width matching CenterScoreArea horizontal coordinate system, offset by 21dp for ScoreStatistics
-        if (isServing) {
-            // The opponent (top) faces us, so their deuce court (their right) is on our left.
-            val dotOnRight = if (statsAtTop) !isDeuceCourt else isDeuceCourt
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = if (statsAtTop) 21.dp else 0.dp,
-                        bottom = if (!statsAtTop) 21.dp else 0.dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier.width(46.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (!dotOnRight) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(
-                                    color = if (ambient) Color.White else ColorServeIndicator,
-                                    shape = CircleShape
-                                )
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.width(82.dp))
-
-                Box(
-                    modifier = Modifier.width(46.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (dotOnRight) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(
-                                    color = if (ambient) Color.White else ColorServeIndicator,
-                                    shape = CircleShape
-                                )
-                        )
-                    }
-                }
-            }
-        }
-
-        // Team name label horizontally centered with the Reset button
-        if (teamName.isNotEmpty()) {
-            val teamAlignment = if (statsAtTop) Alignment.BottomCenter else Alignment.TopCenter
-            val teamPadding = if (statsAtTop) Modifier.padding(bottom = 0.dp) else Modifier.padding(top = 0.dp)
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(teamAlignment)
-                    .then(teamPadding),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(modifier = Modifier.width(46.dp))
-                Spacer(modifier = Modifier.width(82.dp))
-                Box(
-                    modifier = Modifier.width(46.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = teamName,
-                        color = if (ambient) Color.White else Color.White.copy(alpha = 0.55f),
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ScoreStatistics(
-    games: Int,
-    sets: Int,
-    ambient: Boolean = false,
-    isRound: Boolean = false
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().height(13.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = stringResource(R.string.games_with_count, games),
-            color = if (ambient) Color.White else Color.White.copy(alpha = 0.9f),
-            fontSize = if (ambient) 9.sp else if (isRound) 10.sp else 12.sp,
-            lineHeight = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1
-        )
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = stringResource(R.string.sets_with_count, sets),
-            color = if (ambient) Color.White else Color.White.copy(alpha = 0.9f),
-            fontSize = if (ambient) 9.sp else if (isRound) 10.sp else 12.sp,
-            lineHeight = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1
-        )
-    }
-}
-
-@Composable
-fun CenterScoreArea(
-    modifier: Modifier,
-    matchState: MatchState,
-    showCourtChange: Boolean,
-    clockText: String,
-    canUndo: Boolean,
-    onUndo: () -> Unit,
-    onReset: () -> Unit
-) {
-    val hapticFeedback = LocalHapticFeedback.current
-    var isResetHolding by remember { mutableStateOf(false) }
-    var resetPerformed by remember { mutableStateOf(false) }
-    
-    // Track hold duration to animate the progress indicator
-    var holdDuration by remember { mutableLongStateOf(0L) }
-
-    LaunchedEffect(isResetHolding) {
-        if (isResetHolding) {
-            resetPerformed = false
-            holdDuration = 0L
-            val startTime = SystemClock.elapsedRealtime()
-            while (holdDuration < RESET_HOLD_DURATION_MILLIS && isResetHolding) {
-                delay(16.milliseconds) // ~60fps update rate
-                holdDuration = SystemClock.elapsedRealtime() - startTime
-            }
-            if (isResetHolding) {
-                resetPerformed = true
-                onReset()
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                isResetHolding = false
-            }
-        } else {
-            holdDuration = 0L
-        }
-    }
-
-    Row(
-        modifier = modifier.padding(vertical = 7.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier.width(46.dp).height(40.dp)
-                .background(
-                    color = if (canUndo) ColorUndoButtonBgEnabled else ColorUndoButtonBgDisabled,
-                    shape = CircleShape
-                )
-                .clickable(enabled = canUndo, onClick = onUndo),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_undo),
-                contentDescription = stringResource(R.string.undo),
-                tint = if (canUndo) Color.White else Color.DarkGray,
-                modifier = Modifier.padding(10.dp)
-            )
-        }
-
-        Column(
-            modifier = Modifier.width(82.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            val labelText = centerLabel(matchState, showCourtChange)
-            val baseFontSize = centerLabelFontSize(matchState)
-            // The label shares one line with the games, so shrink it with its length.
-            val adjustedFontSize = minOf(baseFontSize.value, 66f / labelText.length)
-                .coerceAtLeast(7f).sp
-            val started = matchHasStarted(matchState)
-
-            Text(
-                text = clockText,
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 10.sp,
-                lineHeight = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                softWrap = false
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier.requiredWidth(94.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Label ends at the center line, games start at the center line.
-                Box(
-                    modifier = Modifier.weight(1f).padding(end = 3.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    Text(
-                        text = labelText,
-                        color = if (showCourtChange) ColorCourtChange else centerLabelColor(matchState),
-                        fontSize = adjustedFontSize,
-                        lineHeight = adjustedFontSize,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End,
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-                Box(
-                    modifier = Modifier.weight(1f).padding(start = 3.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    Text(
-                        text = if (started) {
-                            "${matchState.ourGames} : ${matchState.opponentGames}"
-                        } else {
-                            scoringModeLabel(matchState.configuration.scoringMode)
-                        },
-                        color = Color.White,
-                        fontSize = if (started) 15.sp else 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Start,
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-            }
-        }
-
-        Box(
-            modifier = Modifier.width(46.dp).height(40.dp)
-                .background(
-                    color = ColorResetButtonBg,
-                    shape = CircleShape
-                )
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            resetPerformed = false
-                            isResetHolding = true
-                            tryAwaitRelease()
-                            if (!resetPerformed) {
-                                isResetHolding = false
-                            }
-                        }
-                    )
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            if (isResetHolding) {
-                CircularProgressIndicator(
-                    progress = { (holdDuration.toFloat() / RESET_HOLD_DURATION_MILLIS.toFloat()).coerceIn(0f, 1f) },
-                    modifier = Modifier.fillMaxSize(),
-                    colors = ProgressIndicatorDefaults.colors(
-                        indicatorColor = Color.White,
-                        trackColor = ColorResetButtonBgHolding
-                    ),
-                    strokeWidth = 3.dp
-                )
-            }
-            Text(
-                text = stringResource(R.string.reset),
-                color = Color.White,
-                fontSize = 8.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-private fun formatClock(context: android.content.Context): String =
-    android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date())
+private fun formatClock(context: Context): String =
+    DateFormat.getTimeFormat(context).format(Date())
 
 private fun performScoreHapticFeedback(
     previousState: MatchState,

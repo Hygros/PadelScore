@@ -2,6 +2,7 @@ package ch.hygro.padelscore.sync
 
 import android.app.Activity
 import android.os.Bundle
+import android.widget.ScrollView
 import android.widget.TextView
 
 class PermissionsRationaleActivity : Activity() {
@@ -12,6 +13,6 @@ class PermissionsRationaleActivity : Activity() {
             textSize = 17f
             setPadding(32, 64, 32, 32)
         }
-        setContentView(android.widget.ScrollView(this).apply { addView(content) })
+        setContentView(ScrollView(this).apply { addView(content) })
     }
 }

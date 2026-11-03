@@ -3,28 +3,33 @@ package ch.hygro.padelscore.presentation
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.foundation.LocalAmbientModeManager
 import androidx.wear.compose.foundation.rememberAmbientModeManager
 import ch.hygro.padelscore.billing.SupporterBillingManager
 import ch.hygro.padelscore.billing.SupporterBillingState
+import ch.hygro.padelscore.health.WorkoutDataSender
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
+import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
 
-    private val syncExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
+    private val syncExecutor = Executors.newSingleThreadExecutor()
     private lateinit var supporterBillingManager: SupporterBillingManager
     private val supporterBillingState = mutableStateOf(SupporterBillingState())
 
@@ -45,10 +50,10 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (::ongoingMatch.isInitialized) ongoingMatch.refresh()
-        if (!granted) android.widget.Toast.makeText(
+        if (!granted) Toast.makeText(
             this,
             "Allow notifications in app settings to keep the match available on your watch.",
-            android.widget.Toast.LENGTH_LONG
+            Toast.LENGTH_LONG
         ).show()
     }
 
@@ -63,9 +68,9 @@ class MainActivity : ComponentActivity() {
         permissionPreferences.edit {
             putBoolean("notifications_prompted", true)
         }
-        if (androidx.core.content.ContextCompat.checkSelfPermission(
+        if (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.POST_NOTIFICATIONS
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
@@ -153,7 +158,7 @@ class MainActivity : ComponentActivity() {
         ongoingMatch.refresh()
         wristDisplayController.onResume()
         syncExecutor.execute {
-            try { ch.hygro.padelscore.health.WorkoutDataSender(applicationContext).publishAll() }
+            try { WorkoutDataSender(applicationContext).publishAll() }
             catch (e: Exception) { Log.w("PadelScoreSync", "Pending sync deferred", e) }
         }
     }

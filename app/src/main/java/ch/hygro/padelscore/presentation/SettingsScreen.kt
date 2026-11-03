@@ -1,7 +1,5 @@
 package ch.hygro.padelscore.presentation
 
-import android.Manifest
-import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -13,15 +11,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ch.hygro.padelscore.health.CompanionSetup
+import ch.hygro.padelscore.health.FitnessTrackingService
 import ch.hygro.padelscore.health.WorkoutDataSender
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import ch.hygro.padelscore.R
@@ -29,9 +31,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
@@ -54,8 +57,8 @@ fun SettingsScreen(
     val defaultCompanionStatus = stringResource(R.string.companion_status_optional)
     val checkingStatus = stringResource(R.string.companion_status_checking)
     val openingStoreStatus = stringResource(R.string.companion_status_opening_store)
-    var companionStatus by remember(defaultCompanionStatus) { androidx.compose.runtime.mutableStateOf(defaultCompanionStatus) }
-    var companionBusy by remember { androidx.compose.runtime.mutableStateOf(false) }
+    var companionStatus by remember(defaultCompanionStatus) { mutableStateOf(defaultCompanionStatus) }
+    var companionBusy by remember { mutableStateOf(false) }
 
     val bodySensorLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -128,19 +131,9 @@ fun SettingsScreen(
                         checked = healthTrackingEnabled,
                         onCheckedChange = { enabled ->
                             repository.setHealthTrackingEnabled(enabled)
-                            if (!enabled) ch.hygro.padelscore.health.FitnessTrackingService.stop(context)
+                            if (!enabled) FitnessTrackingService.stop(context)
                             if (enabled) {
-                                val requiredPermissions = listOf(
-                                    if (android.os.Build.VERSION.SDK_INT >= 36) {
-                                        "android.permission.health.READ_HEART_RATE"
-                                    } else {
-                                        Manifest.permission.BODY_SENSORS
-                                    },
-                                    Manifest.permission.ACTIVITY_RECOGNITION
-                                )
-                                val missingPermissions = requiredPermissions.filter {
-                                    ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-                                }
+                                val missingPermissions = missingFitnessPermissions(context)
                                 if (missingPermissions.isNotEmpty()) {
                                     bodySensorLauncher.launch(missingPermissions.toTypedArray())
                                 }
@@ -199,14 +192,14 @@ fun SettingsScreen(
                 }
             }
             item {
-                androidx.wear.compose.material3.Button(
+                Button(
                     onClick = {
                         if (!companionBusy) {
                             companionBusy = true
                             companionStatus = checkingStatus
                             syncScope.launch {
                                 try {
-                                    companionStatus = ch.hygro.padelscore.health.CompanionSetup.status(context.applicationContext)
+                                    companionStatus = CompanionSetup.status(context.applicationContext)
                                 } finally {
                                     companionBusy = false
                                 }
@@ -217,14 +210,14 @@ fun SettingsScreen(
             }
             item { Text(companionStatus, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f)) }
             item {
-                androidx.wear.compose.material3.Button(
+                Button(
                     onClick = {
                         if (!companionBusy) {
                             companionBusy = true
                             companionStatus = openingStoreStatus
                             syncScope.launch {
                                 try {
-                                    companionStatus = ch.hygro.padelscore.health.CompanionSetup.openStore(context.applicationContext)
+                                    companionStatus = CompanionSetup.openStore(context.applicationContext)
                                 } finally {
                                     companionBusy = false
                                 }
@@ -244,7 +237,7 @@ fun SettingsScreen(
                         .transformedHeight(itemScope, transformationSpec)
                         .padding(vertical = 2.dp)
                 ) {
-                    androidx.wear.compose.material3.Button(
+                    Button(
                         onClick = { (context as? MainActivity)?.configureMatchQuietMode() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -262,11 +255,11 @@ fun SettingsScreen(
                         .padding(top = 8.dp, bottom = 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.wear.compose.material3.Button(
+                    Button(
                         modifier = Modifier
-                            .fillMaxWidth(if (androidx.compose.ui.platform.LocalConfiguration.current.isScreenRound) 0.82f else 0.88f)
+                            .fillMaxWidth(if (LocalConfiguration.current.isScreenRound) 0.82f else 0.88f)
                             .height(48.dp),
-                        colors = androidx.wear.compose.material3.ButtonDefaults.buttonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),

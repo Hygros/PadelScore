@@ -2,6 +2,7 @@ package ch.hygro.padelscore.storage
 
 import android.content.Context
 import ch.hygro.padelscore.health.LocalWorkoutRepository
+import ch.hygro.padelscore.health.WorkoutDataSender
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.MatchHistoryEntry
@@ -75,7 +76,7 @@ class MatchHistoryRepository(private val context: Context) {
             if (deleteHealthData) workouts.removeMatch(matchId, deleteHealthData = true)
             saveEntries(loadEntries().filterNot { it.matchId == matchId })
             if (deleteHealthData) {
-                ch.hygro.padelscore.health.WorkoutDataSender(context).scheduleDeletionSync()
+                WorkoutDataSender(context).scheduleDeletionSync()
             }
         }
     }

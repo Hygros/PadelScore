@@ -1,6 +1,7 @@
 package ch.hygro.padelscore.tiles
 
 import androidx.wear.protolayout.ActionBuilders
+import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ResourceBuilders
@@ -31,7 +32,7 @@ class PadelScoreTileService : TileService() {
             .setFontStyle(
                 LayoutElementBuilders.FontStyle.Builder()
                     .setSize(
-                        androidx.wear.protolayout.DimensionBuilders.sp(16f)
+                        DimensionBuilders.sp(16f)
                     )
                     .build()
             )
@@ -48,8 +49,8 @@ class PadelScoreTileService : TileService() {
             .build()
 
         val box = LayoutElementBuilders.Box.Builder()
-            .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
-            .setHeight(androidx.wear.protolayout.DimensionBuilders.expand())
+            .setWidth(DimensionBuilders.expand())
+            .setHeight(DimensionBuilders.expand())
             .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
             .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
             .addContent(text)

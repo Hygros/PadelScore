@@ -1,5 +1,6 @@
 package ch.hygro.padelscore.logic
 
+import ch.hygro.padelscore.model.GamePoint
 import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
@@ -41,7 +42,7 @@ object PadelScoreEngine {
                 else -> "40"
             }
         }
-        val point = ch.hygro.padelscore.model.GamePoint(
+        val point = GamePoint(
             number = next.totalPointsPlayed,
             setNumber = setNumber,
             gameNumber = gameNumber,

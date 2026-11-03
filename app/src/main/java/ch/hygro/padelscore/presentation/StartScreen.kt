@@ -1,5 +1,6 @@
 package ch.hygro.padelscore.presentation
 
+import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -88,7 +90,7 @@ fun StartScreen(
     val isRound = LocalConfiguration.current.isScreenRound
     val haptic = LocalHapticFeedback.current
     var secretTapCount by remember { mutableIntStateOf(0) }
-    var lastSecretTapMillis by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+    var lastSecretTapMillis by remember { mutableLongStateOf(0L) }
 
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         TransformingLazyColumn(
@@ -107,7 +109,7 @@ fun StartScreen(
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onTap = {
-                                    val now = android.os.SystemClock.elapsedRealtime()
+                                    val now = SystemClock.elapsedRealtime()
 
                                     // Easter-Egg-Einstellungen
                                     val requiredTaps = 7

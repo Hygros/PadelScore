@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.SystemClock
 import android.util.Log
 import kotlin.math.acos
 import kotlin.math.exp
@@ -61,7 +62,7 @@ class WristDisplayController(
     fun onInteraction() {
         if (!enabled) return
         reference = gravity?.copyOf()
-        interactionUntil = android.os.SystemClock.elapsedRealtimeNanos() + 250_000_000L
+        interactionUntil = SystemClock.elapsedRealtimeNanos() + 250_000_000L
         candidate = null
         publish(false)
     }

@@ -1,16 +1,34 @@
 package ch.hygro.padelscore.sync
 
+import android.app.AlertDialog
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
-import androidx.core.content.edit
-import androidx.core.net.toUri
-import androidx.concurrent.futures.await
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.Switch
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.concurrent.futures.await
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
+import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.google.android.gms.tasks.Tasks
+import com.google.android.gms.wearable.Wearable
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,6 +36,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : ComponentActivity() {
@@ -29,11 +50,11 @@ class MainActivity : ComponentActivity() {
     private var watchInstallJob: Job? = null
     private lateinit var watchInstallButton: Button
     private lateinit var watchInstallStatus: TextView
-    private var watchSelectionDialog: android.app.AlertDialog? = null
+    private var watchSelectionDialog: AlertDialog? = null
     private val receiptPreferences by lazy {
         getSharedPreferences("health_sync_receipts", MODE_PRIVATE)
     }
-    private val receiptListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+    private val receiptListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
         if (key == "last_status") runOnUiThread {
             if (::status.isInitialized) status.text = prefs.getString("last_status", "")
         }
@@ -66,19 +87,19 @@ class MainActivity : ComponentActivity() {
         val page = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(24), dp(20), dp(32))
-            setBackgroundColor(android.graphics.Color.rgb(246, 247, 249))
+            setBackgroundColor(Color.rgb(246, 247, 249))
         }
 
         page.addView(TextView(this).apply {
             text = getString(R.string.app_title)
             textSize = 28f
-            setTextColor(android.graphics.Color.rgb(24, 32, 40))
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTextColor(Color.rgb(24, 32, 40))
+            setTypeface(typeface, Typeface.BOLD)
         })
         page.addView(TextView(this).apply {
             text = getString(R.string.app_subtitle)
             textSize = 15f
-            setTextColor(android.graphics.Color.rgb(91, 101, 111))
+            setTextColor(Color.rgb(91, 101, 111))
             setPadding(0, dp(4), 0, dp(20))
         })
 
@@ -88,15 +109,15 @@ class MainActivity : ComponentActivity() {
         statusCard.addView(TextView(this).apply {
             text = getString(R.string.current_status)
             textSize = 12f
-            setTextColor(android.graphics.Color.rgb(1, 40, 83))
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTextColor(Color.rgb(1, 40, 83))
+            setTypeface(typeface, Typeface.BOLD)
         })
         status = TextView(this).apply {
             text = getString(R.string.checking_health_connect)
             textSize = 17f
-            setTextColor(android.graphics.Color.rgb(24, 32, 40))
+            setTextColor(Color.rgb(24, 32, 40))
             setPadding(0, dp(6), 0, 0)
-            accessibilityLiveRegion = android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE
+            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
         statusCard.addView(status)
         page.addView(statusCard, spacedParams(dp(14)))
@@ -106,7 +127,7 @@ class MainActivity : ComponentActivity() {
             summary = getString(R.string.health_connect_summary),
             initiallyExpanded = true
         ) { content ->
-            val syncToggle = android.widget.Switch(this).apply {
+            val syncToggle = Switch(this).apply {
                 text = getString(R.string.allow_workout_imports)
                 textSize = 16f
                 isChecked = receiptPreferences.getBoolean("sync_enabled", false)
@@ -125,12 +146,12 @@ class MainActivity : ComponentActivity() {
             content.addView(syncButton, spacedParams(dp(10)))
 
             content.addView(secondaryButton(getString(R.string.manage_health_connect_access)) {
-                openExternal(android.content.Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS))
+                openExternal(Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS))
             }, spacedParams(dp(10)))
 
             content.addView(secondaryButton(getString(R.string.install_or_update_health_connect)) {
-                openExternal(android.content.Intent(
-                    android.content.Intent.ACTION_VIEW,
+                openExternal(Intent(
+                    Intent.ACTION_VIEW,
                     "https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata".toUri()
                 ))
             }, spacedParams(dp(10)))
@@ -158,7 +179,7 @@ class MainActivity : ComponentActivity() {
             initiallyExpanded = false
         ) { content ->
             content.addView(secondaryButton(getString(R.string.privacy_and_deletion_info)) {
-                startActivity(android.content.Intent(
+                startActivity(Intent(
                     this@MainActivity,
                     PermissionsRationaleActivity::class.java
                 ))
@@ -166,17 +187,17 @@ class MainActivity : ComponentActivity() {
 
             content.addView(bodyText(getString(R.string.privacy_explanation)), spacedParams(dp(12)))
 
-            val phoneManufacturer = android.os.Build.MANUFACTURER
-                .lowercase(java.util.Locale.ROOT)
-            val phoneBrand = android.os.Build.BRAND
-                .lowercase(java.util.Locale.ROOT)
+            val phoneManufacturer = Build.MANUFACTURER
+                .lowercase(Locale.ROOT)
+            val phoneBrand = Build.BRAND
+                .lowercase(Locale.ROOT)
             val xiaomiBrands = setOf("xiaomi", "redmi", "poco")
             if (phoneManufacturer in xiaomiBrands || phoneBrand in xiaomiBrands) {
                 content.addView(bodyText(getString(R.string.xiaomi_workaround)), spacedParams(dp(12)))
             }
         }, spacedParams(dp(14)))
 
-        setContentView(android.widget.ScrollView(this).apply {
+        setContentView(ScrollView(this).apply {
             isFillViewport = true
             addView(page)
         })
@@ -192,11 +213,11 @@ class MainActivity : ComponentActivity() {
         val section = card()
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.CENTER_VERTICAL
+            gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(18), dp(16), dp(14), dp(16))
             isClickable = true
             isFocusable = true
-            foreground = android.util.TypedValue().let { value ->
+            foreground = TypedValue().let { value ->
                 theme.resolveAttribute(android.R.attr.selectableItemBackground, value, true)
                 getDrawable(value.resourceId)
             }
@@ -205,29 +226,29 @@ class MainActivity : ComponentActivity() {
         labels.addView(TextView(this).apply {
             text = title
             textSize = 18f
-            setTextColor(android.graphics.Color.rgb(24, 32, 40))
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setTextColor(Color.rgb(24, 32, 40))
+            setTypeface(typeface, Typeface.BOLD)
         })
         labels.addView(TextView(this).apply {
             text = summary
             textSize = 14f
-            setTextColor(android.graphics.Color.rgb(91, 101, 111))
+            setTextColor(Color.rgb(91, 101, 111))
             setPadding(0, dp(3), 0, 0)
         })
         header.addView(labels, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         val indicator = TextView(this).apply {
             text = if (initiallyExpanded) "-" else "+"
             textSize = 24f
-            gravity = android.view.Gravity.CENTER
-            setTextColor(android.graphics.Color.rgb(1, 40, 83))
-            importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
+            gravity = Gravity.CENTER
+            setTextColor(Color.rgb(1, 40, 83))
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
         }
         header.addView(indicator, LinearLayout.LayoutParams(dp(40), dp(40)))
 
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(18), 0, dp(18), dp(18))
-            visibility = if (initiallyExpanded) android.view.View.VISIBLE else android.view.View.GONE
+            visibility = if (initiallyExpanded) View.VISIBLE else View.GONE
         }
         populate(content)
 
@@ -237,8 +258,8 @@ class MainActivity : ComponentActivity() {
         }
         updateAccessibility(initiallyExpanded)
         header.setOnClickListener {
-            val expand = content.visibility != android.view.View.VISIBLE
-            content.visibility = if (expand) android.view.View.VISIBLE else android.view.View.GONE
+            val expand = content.visibility != View.VISIBLE
+            content.visibility = if (expand) View.VISIBLE else View.GONE
             indicator.text = if (expand) "-" else "+"
             updateAccessibility(expand)
         }
@@ -251,11 +272,11 @@ class MainActivity : ComponentActivity() {
     private fun card(): LinearLayout = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
         elevation = dp(2).toFloat()
-        background = android.graphics.drawable.GradientDrawable().apply {
-            shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+        background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
             cornerRadius = dp(18).toFloat()
-            setColor(android.graphics.Color.WHITE)
-            setStroke(dp(1), android.graphics.Color.rgb(226, 230, 234))
+            setColor(Color.WHITE)
+            setStroke(dp(1), Color.rgb(226, 230, 234))
         }
     }
 
@@ -264,9 +285,9 @@ class MainActivity : ComponentActivity() {
         textSize = 15f
         isAllCaps = false
         minHeight = dp(52)
-        setTextColor(android.graphics.Color.WHITE)
-        backgroundTintList = android.content.res.ColorStateList.valueOf(
-            android.graphics.Color.rgb(1, 40, 83)
+        setTextColor(Color.WHITE)
+        backgroundTintList = ColorStateList.valueOf(
+            Color.rgb(1, 40, 83)
         )
         setOnClickListener { action() }
     }
@@ -276,9 +297,9 @@ class MainActivity : ComponentActivity() {
         textSize = 15f
         isAllCaps = false
         minHeight = dp(52)
-        setTextColor(android.graphics.Color.rgb(1, 40, 83))
-        backgroundTintList = android.content.res.ColorStateList.valueOf(
-            android.graphics.Color.rgb(229, 237, 245)
+        setTextColor(Color.rgb(1, 40, 83))
+        backgroundTintList = ColorStateList.valueOf(
+            Color.rgb(229, 237, 245)
         )
         setOnClickListener { action() }
     }
@@ -286,7 +307,7 @@ class MainActivity : ComponentActivity() {
     private fun bodyText(value: String): TextView = TextView(this).apply {
         text = value
         textSize = 14f
-        setTextColor(android.graphics.Color.rgb(76, 86, 96))
+        setTextColor(Color.rgb(76, 86, 96))
         setLineSpacing(0f, 1.15f)
     }
 
@@ -305,9 +326,9 @@ class MainActivity : ComponentActivity() {
         watchInstallJob = scope.launch {
             try {
                 val nodes = withContext(Dispatchers.IO) {
-                    com.google.android.gms.tasks.Tasks.await(
-                        com.google.android.gms.wearable.Wearable.getNodeClient(applicationContext)
-                            .connectedNodes, 10, java.util.concurrent.TimeUnit.SECONDS
+                    Tasks.await(
+                        Wearable.getNodeClient(applicationContext)
+                            .connectedNodes, 10, TimeUnit.SECONDS
                     ).sortedByDescending { it.isNearby }
                 }
                 when (nodes.size) {
@@ -315,7 +336,7 @@ class MainActivity : ComponentActivity() {
                     1 -> watchInstallStatus.text = openWatchStore(nodes.single().id)
                     else -> {
                         watchInstallStatus.text = getString(R.string.status_choose_watch)
-                        watchSelectionDialog = android.app.AlertDialog.Builder(this@MainActivity)
+                        watchSelectionDialog = AlertDialog.Builder(this@MainActivity)
                             .setTitle(getString(R.string.choose_watch_title))
                             .setItems(nodes.map { it.displayName }.toTypedArray()) { _, index ->
                                 installOnSelectedWatch(nodes[index].id)
@@ -325,7 +346,7 @@ class MainActivity : ComponentActivity() {
                         watchSelectionDialog?.show()
                     }
                 }
-            } catch (e: kotlinx.coroutines.CancellationException) {
+            } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 watchInstallStatus.text = getString(R.string.status_watch_discovery_failed, (e.cause ?: e).javaClass.simpleName)
@@ -349,7 +370,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun openWatchStore(nodeId: String): String {
-        val helper = androidx.wear.remote.interactions.RemoteActivityHelper(
+        val helper = RemoteActivityHelper(
             applicationContext
         ) { it.run() }
         val links = listOf(
@@ -359,16 +380,16 @@ class MainActivity : ComponentActivity() {
         var failure = "Timeout"
         for (link in links) {
             try {
-                val sent = kotlinx.coroutines.withTimeoutOrNull(15_000L.milliseconds) {
+                val sent = withTimeoutOrNull(15_000L.milliseconds) {
                     helper.startRemoteActivity(
-                        android.content.Intent(android.content.Intent.ACTION_VIEW, link.toUri())
-                            .addCategory(android.content.Intent.CATEGORY_BROWSABLE), nodeId
+                        Intent(Intent.ACTION_VIEW, link.toUri())
+                            .addCategory(Intent.CATEGORY_BROWSABLE), nodeId
                     ).await()
                     true
                 } ?: false
                 if (sent) return getString(R.string.status_store_request_sent)
                 failure = "Timeout"
-            } catch (e: kotlinx.coroutines.CancellationException) {
+            } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 failure = (e.cause ?: e).javaClass.simpleName
@@ -377,8 +398,8 @@ class MainActivity : ComponentActivity() {
         return getString(R.string.status_store_request_failed, failure)
     }
 
-    private fun openExternal(intent: android.content.Intent) {
-        try { startActivity(intent) } catch (_: android.content.ActivityNotFoundException) {
+    private fun openExternal(intent: Intent) {
+        try { startActivity(intent) } catch (_: ActivityNotFoundException) {
             status.text = getString(R.string.status_no_app_for_action)
         }
     }
@@ -430,7 +451,7 @@ class MainActivity : ComponentActivity() {
             WorkoutHealthImporter(applicationContext).importPending { message ->
                 withContext(Dispatchers.Main) { status.text = message }
             }
-        } catch (e: kotlinx.coroutines.CancellationException) {
+        } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Log.e("PadelScoreSync", getString(R.string.log_sync_failed), e)
