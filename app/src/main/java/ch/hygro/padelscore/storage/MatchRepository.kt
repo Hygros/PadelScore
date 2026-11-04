@@ -1,17 +1,19 @@
 package ch.hygro.padelscore.storage
 
 import android.content.Context
-import ch.hygro.padelscore.model.MatchConfiguration
-import ch.hygro.padelscore.model.MatchFormat
+import androidx.core.content.edit
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
-import ch.hygro.padelscore.model.ScoringMode
-import ch.hygro.padelscore.model.SetResult
 import ch.hygro.padelscore.model.Team
 import org.json.JSONArray
 import org.json.JSONObject
-import androidx.core.content.edit
 
+/**
+ * Persists the active match state and bounded undo history in local `SharedPreferences`.
+ *
+ * If no JSON snapshot exists yet, [loadSnapshot] falls back once to the legacy flat-key format
+ * and immediately migrates it into the current JSON snapshot key.
+ */
 class MatchRepository(context: Context) {
 
     private val preferences = context.getSharedPreferences(
@@ -91,7 +93,7 @@ class MatchRepository(context: Context) {
                 state.opponentMatchTieBreakPoints
             )
             .put("ourMatchTieBreakPoints", state.ourMatchTieBreakPoints)
-            .put("configuration", encodeConfiguration(state.configuration))
+            .put("configuration", MatchJsonCodec.encodeConfiguration(state.configuration))
             .put("phase", state.phase.name)
             .put("advantageTeam", state.advantageTeam?.name)
             .put("deuceReturnCount", state.deuceReturnCount)
@@ -105,7 +107,7 @@ class MatchRepository(context: Context) {
             .put(
                 "completedSets",
                 JSONArray().apply {
-                    state.completedSets.forEach { put(encodeSetResult(it)) }
+                    state.completedSets.forEach { put(MatchJsonCodec.encodeSetResult(it)) }
                 }
             )
             .put("pointsInCurrentGame", state.pointsInCurrentGame)
@@ -118,14 +120,14 @@ class MatchRepository(context: Context) {
     }
 
     internal fun decodeState(json: JSONObject): MatchState {
-        val configuration = decodeConfiguration(
+        val configuration = MatchJsonCodec.decodeConfiguration(
             json.optJSONObject("configuration") ?: JSONObject()
         )
         val completedSetsJson = json.optJSONArray("completedSets") ?: JSONArray()
         val completedSets = buildList {
             for (index in 0 until completedSetsJson.length()) {
                 runCatching {
-                    add(decodeSetResult(completedSetsJson.getJSONObject(index)))
+                    add(MatchJsonCodec.decodeSetResult(completedSetsJson.getJSONObject(index)))
                 }
             }
         }
@@ -146,7 +148,7 @@ class MatchRepository(context: Context) {
             ),
             ourMatchTieBreakPoints = json.optInt("ourMatchTieBreakPoints", 0),
             configuration = configuration,
-            phase = enumValueOrDefault(
+            phase = MatchJsonCodec.enumValueOrDefault(
                 json.optString("phase"),
                 MatchPhase.NORMAL_GAME
             ),
@@ -159,7 +161,7 @@ class MatchRepository(context: Context) {
                 false
             ),
             isStarPointActive = json.optBoolean("isStarPointActive", false),
-            servingTeam = enumValueOrDefault(
+            servingTeam = MatchJsonCodec.enumValueOrDefault(
                 json.optString("servingTeam"),
                 configuration.firstServingTeam
             ),
@@ -175,73 +177,6 @@ class MatchRepository(context: Context) {
                 .takeIf { it != 0L },
             averageHeartRate = json.optInt("averageHeartRate", 0).takeIf { it > 0 },
             pointHistory = PointHistoryCodec.decode(json.optJSONArray("pointHistory"))
-        )
-    }
-
-    private fun encodeConfiguration(
-        configuration: MatchConfiguration
-    ): JSONObject {
-        return JSONObject()
-            .put("scoringMode", configuration.scoringMode.name)
-            .put("matchFormat", configuration.matchFormat.name)
-            .put("gamesRequiredToWinSet", configuration.gamesRequiredToWinSet)
-            .put("tieBreakEnabled", configuration.tieBreakEnabled)
-            .put("tieBreakAtGames", configuration.tieBreakAtGames)
-            .put("tieBreakPointsToWin", configuration.tieBreakPointsToWin)
-            .put(
-                "matchTieBreakPointsToWin",
-                configuration.matchTieBreakPointsToWin
-            )
-            .put("firstServingTeam", configuration.firstServingTeam.name)
-    }
-
-    private fun decodeConfiguration(json: JSONObject): MatchConfiguration {
-        val gamesRequired = json.optInt("gamesRequiredToWinSet", 6)
-        val defaultTieBreakAt = if (gamesRequired == 4) 4 else 6
-
-        return MatchConfiguration(
-            scoringMode = enumValueOrDefault(
-                json.optString("scoringMode"),
-                ScoringMode.STAR_POINT
-            ),
-            matchFormat = enumValueOrDefault(
-                json.optString("matchFormat"),
-                MatchFormat.BEST_OF_THREE
-            ),
-            gamesRequiredToWinSet = gamesRequired,
-            tieBreakEnabled = json.optBoolean("tieBreakEnabled", true),
-            tieBreakAtGames = json.optInt(
-                "tieBreakAtGames",
-                defaultTieBreakAt
-            ),
-            tieBreakPointsToWin = json.optInt("tieBreakPointsToWin", 7),
-            matchTieBreakPointsToWin = json.optInt(
-                "matchTieBreakPointsToWin",
-                10
-            ),
-            firstServingTeam = enumValueOrDefault(
-                json.optString("firstServingTeam"),
-                Team.US
-            )
-        )
-    }
-
-    private fun encodeSetResult(result: SetResult): JSONObject {
-        return JSONObject()
-            .put("opponentGames", result.opponentGames)
-            .put("ourGames", result.ourGames)
-            .put("wasTieBreak", result.wasTieBreak)
-            .put("opponentTieBreakPoints", result.opponentTieBreakPoints)
-            .put("ourTieBreakPoints", result.ourTieBreakPoints)
-    }
-
-    private fun decodeSetResult(json: JSONObject): SetResult {
-        return SetResult(
-            opponentGames = json.optInt("opponentGames", 0),
-            ourGames = json.optInt("ourGames", 0),
-            wasTieBreak = json.optBoolean("wasTieBreak", false),
-            opponentTieBreakPoints = json.optInt("opponentTieBreakPoints", 0),
-            ourTieBreakPoints = json.optInt("ourTieBreakPoints", 0)
         )
     }
 
@@ -270,13 +205,6 @@ class MatchRepository(context: Context) {
             ourTieBreakPoints = preferences.getInt("our_tie_break_points", 0),
             phase = phase
         )
-    }
-
-    private inline fun <reified T : Enum<T>> enumValueOrDefault(
-        value: String,
-        default: T
-    ): T {
-        return runCatching { enumValueOf<T>(value) }.getOrDefault(default)
     }
 
     private inline fun <reified T : Enum<T>> nullableEnumValue(

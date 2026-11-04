@@ -4,7 +4,7 @@ Thank you for considering a contribution to Padel Score.
 
 ## Project Scope
 
-The project is a standalone, offline Wear OS padel scorekeeper. Contributions should preserve that focus unless a proposed change is discussed and accepted first.
+The project is an offline-first Wear OS padel scorekeeper (`:app`) with optional on-watch fitness tracking and an optional Android companion app (`:mobile`, `PadelScore Sync`) for Health Connect synchronisation. Core scoring and local match history remain standalone on the watch. Contributions should preserve that focus unless a proposed change is discussed and accepted first.
 
 Before implementing a substantial feature, open an issue describing:
 
@@ -20,19 +20,20 @@ Before implementing a substantial feature, open an issue describing:
 - Use Java 25 to run Gradle.
 - Keep Java source and target compatibility at version 11 unless a separate compatibility change is justified.
 - Preserve the application ID and namespace `ch.hygro.padelscore`.
-- Do not add a phone component, backend, account system, advertising, analytics, crash reporting, network access, location access, health permissions, or sensor permissions without prior discussion.
+- Do not add a backend, account system, advertising, analytics, crash reporting, direct network access, location access, or additional permissions or companion scope without prior discussion.
 - Do not update dependencies solely because newer versions exist. Dependency changes must have a documented compatibility, security, consistency, or release reason.
 
 ## Build and Test
 
-On Windows, set `JAVA_HOME` to a compatible JDK or Android Studio's bundled JBR, then run:
+On Windows, set `JAVA_HOME` to a compatible JDK (Java 25 in CI) or Android Studio's bundled JBR, then run:
 
 ```powershell
-.\gradlew.bat testDebugUnitTest
-.\gradlew.bat assembleDebug
-.\gradlew.bat lint
-.\gradlew.bat processReleaseMainManifest
-.\gradlew.bat assembleRelease
+.\gradlew.bat :app:testDebugUnitTest :mobile:testDebugUnitTest
+.\gradlew.bat :app:assembleDebug :mobile:assembleDebug
+.\gradlew.bat :app:lintDebug :mobile:lintDebug
+.\gradlew.bat :app:lintRelease :mobile:lintRelease
+.\gradlew.bat :app:processReleaseMainManifest :mobile:processReleaseMainManifest
+.\gradlew.bat :app:bundleRelease :mobile:bundleRelease
 ```
 
 Changes to scoring or serving behavior must include or update focused unit tests. UI, persistence, lifecycle, and ambient-mode changes should also be tested on a Wear OS emulator and, where possible, a physical watch.

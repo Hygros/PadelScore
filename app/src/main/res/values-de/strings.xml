@@ -98,6 +98,7 @@
     <string name="end_and_save">END &amp; SAVE</string>
     <string name="ended_early">ENDED EARLY</string>
     <string name="save_match_failed">Could not save match. Please try again.</string>
+    <string name="delete_match_failed">Could not delete match. Please try again.</string>
     <string name="companion_status_no_reachable_device">Kein erreichbares Gerät. Überprüfe die Kopplung von Smartphone und Uhr sowie die Google Play-Dienste.</string>
     <string name="companion_status_capability_missing">%s\nCompanion-App hat geantwortet, aber die Funktionstesterkennung fehlt. Bitte aktualisiere beide Apps.</string>
     <string name="companion_status_capability_lookup_failed">Funktionstesterkennung fehlgeschlagen. </string>

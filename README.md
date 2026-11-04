@@ -164,7 +164,7 @@ Padel Score does not include:
 - user accounts; or
 - developer-operated cloud storage.
 
-Neither the Wear OS app nor the Android companion app requests the Android Internet permission.
+Neither `app/src/main/AndroidManifest.xml` nor `mobile/src/main/AndroidManifest.xml` declares `android.permission.INTERNET`, and the mobile companion's merged release manifest does not include it. In the Wear OS release build, the Google Play Billing dependency merges `com.android.vending.BILLING`, `android.permission.INTERNET`, and `android.permission.ACCESS_NETWORK_STATE` into the final manifest; the application code itself performs no direct network requests.
 
 ### Local match data
 
@@ -195,25 +195,45 @@ See the full docs/privacy-policy.md for details about permissions, local storage
 
 ```text
 app/
-└── src/main/
-    ├── java/ch/hygro/padelscore/
-    │   ├── billing/        # Optional Google Play supporter purchase
-    │   ├── complications/  # Watch-face complication data source
-    │   ├── health/         # Health Services recording and phone sync
-    │   ├── logic/          # Scoring engine and serve calculator
-    │   ├── minigame/       # Local Padel Pong minigame
-    │   ├── model/          # Match configuration and state models
-    │   ├── presentation/   # Wear OS Compose user interface
-    │   ├── storage/        # Local match and workout storage
-    │   ├── tiles/          # Wear OS Tile
-    │   └── vibration/      # Haptic feedback
-    └── res/
+├── src/main/
+│   ├── java/ch/hygro/padelscore/
+│   │   ├── billing/        # Optional Google Play supporter purchase
+│   │   ├── complications/  # Watch-face complication data source
+│   │   ├── health/         # Health Services recording and phone sync
+│   │   ├── logic/          # Scoring engine and serve calculator
+│   │   ├── minigame/       # Local Padel Pong minigame
+│   │   ├── model/          # Match configuration and state models
+│   │   ├── presentation/   # Wear OS Compose screens, controllers and chart
+│   │   ├── storage/        # Local match, history and JSON codecs
+│   │   ├── tiles/          # Wear OS Tile
+│   │   └── vibration/      # Haptic feedback
+│   └── res/
+└── src/test/               # JVM unit tests for scoring, sync, billing and storage codecs
 
 mobile/
-└── src/main/
-    ├── java/ch/hygro/padelscore/sync/
-    │   └──               # Wearable transfer and Health Connect import
-    └── res/
+├── src/main/
+│   ├── java/ch/hygro/padelscore/sync/
+│   │   └──                 # Wearable transfer listener, Health Connect importer and UI
+│   └── res/
+└── src/test/               # JVM unit tests for the sync protocol
+
+docs/
+├── privacy-policy.md       # Privacy policy
+└── screenshots/            # Store and README screenshots
+```
+
+---
+
+## 🛠️ Build and test
+
+Use the included Gradle Wrapper (configured for Java 25 in CI; Java source/target compatibility is 11):
+
+```powershell
+.\gradlew.bat :app:testDebugUnitTest :mobile:testDebugUnitTest
+.\gradlew.bat :app:lintDebug :mobile:lintDebug
+.\gradlew.bat :app:lintRelease :mobile:lintRelease
+.\gradlew.bat :app:assembleDebug :mobile:assembleDebug
+.\gradlew.bat :app:bundleRelease :mobile:bundleRelease
 ```
 
 ---

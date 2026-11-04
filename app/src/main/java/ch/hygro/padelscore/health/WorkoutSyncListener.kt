@@ -1,36 +1,63 @@
 package ch.hygro.padelscore.health
 
 import android.util.Log
+import ch.hygro.padelscore.storage.SettingsRepository
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
+import org.json.JSONArray
 import org.json.JSONObject
 
 /** Runs on WearableListenerService's background callback thread, not the UI thread. */
 class WorkoutSyncListener : WearableListenerService() {
     companion object {
         private val executor = java.util.concurrent.Executors.newSingleThreadExecutor()
-    }
 
-    override fun onRequest(nodeId: String, path: String, request: ByteArray): com.google.android.gms.tasks.Task<ByteArray>? {
-        if (!path.startsWith(WorkoutSyncProtocol.CONSENT)) return null
-        return try {
+        internal fun handleConsentRequest(
+            path: String,
+            request: ByteArray,
+            repository: LocalWorkoutRepository,
+            healthSyncEnabled: Boolean
+        ): ByteArray {
             val id = path.removePrefix(WorkoutSyncProtocol.CONSENT).toLong()
             val hash = String(request, Charsets.UTF_8)
             require(id > 0L && hash.matches(Regex("[0-9a-f]{64}")))
-            val repository = LocalWorkoutRepository(applicationContext)
             val deleted = repository.isDeleted(id)
-            val workouts = org.json.JSONArray(repository.completedWorkoutsJson())
+            val pendingDeletion = repository.isDeletionPending(id)
+            val workouts = JSONArray(repository.completedWorkoutsJson())
             val exists = (0 until workouts.length()).any {
                 val workout = workouts.optJSONObject(it)
                 workout != null && workout.optLong("startTimeMillis") == id &&
                     WorkoutSyncProtocol.digest(workout.toString().toByteArray(Charsets.UTF_8)) == hash
             }
-            val enabled = ch.hygro.padelscore.storage.SettingsRepository(applicationContext).healthSyncEnabled.value
-            val reply = JSONObject().put("id", id).put("sha256", hash)
-                .put("deleted", deleted).put("allowed", enabled && !deleted && exists && repository.activeMatchId() != id)
-            com.google.android.gms.tasks.Tasks.forResult(reply.toString().toByteArray(Charsets.UTF_8))
-        } catch (e: Exception) { com.google.android.gms.tasks.Tasks.forException(e) }
+            val reply = JSONObject()
+                .put("id", id)
+                .put("sha256", hash)
+                .put("deleted", deleted)
+                .put(
+                    "allowed",
+                    healthSyncEnabled && !deleted && !pendingDeletion && exists &&
+                        repository.activeMatchId() != id
+                )
+            return reply.toString().toByteArray(Charsets.UTF_8)
+        }
+    }
+
+    override fun onRequest(nodeId: String, path: String, request: ByteArray): Task<ByteArray>? {
+        if (!path.startsWith(WorkoutSyncProtocol.CONSENT)) return null
+        return try {
+            val reply = handleConsentRequest(
+                path = path,
+                request = request,
+                repository = LocalWorkoutRepository(applicationContext),
+                healthSyncEnabled = SettingsRepository(applicationContext).healthSyncEnabled.value
+            )
+            Tasks.forResult(reply)
+        } catch (e: Exception) {
+            Tasks.forException(e)
+        }
     }
 
     override fun onMessageReceived(event: MessageEvent) {

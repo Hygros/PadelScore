@@ -8,6 +8,13 @@ import ch.hygro.padelscore.model.ScoringMode
 import ch.hygro.padelscore.model.SetResult
 import ch.hygro.padelscore.model.Team
 
+/**
+ * Pure state machine for padel match scoring.
+ *
+ * Advances a [MatchState] by one point via [awardPoint], handling regular games
+ * ([ScoringMode.CLASSIC_ADVANTAGE], [ScoringMode.GOLDEN_POINT], and [ScoringMode.STAR_POINT]),
+ * set tie-breaks, match tie-breaks, server rotation, and point-by-point history recording.
+ */
 object PadelScoreEngine {
 
     fun awardPoint(state: MatchState, team: Team): MatchState {
@@ -130,6 +137,11 @@ object PadelScoreEngine {
         )
     }
 
+    /**
+     * Star Point (FIP hybrid deuce rule): the first two deuces are played with advantage;
+     * once a game returns to deuce a second time ([MatchState.deuceReturnCount] >= 2),
+     * the next point is a Sudden Death "Star Point".
+     */
     private fun awardStarPoint(state: MatchState, team: Team): MatchState {
         val countedState = state.copy(
             totalPointsPlayed = state.totalPointsPlayed + 1,

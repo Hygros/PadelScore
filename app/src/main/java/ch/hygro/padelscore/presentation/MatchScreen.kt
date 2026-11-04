@@ -148,6 +148,9 @@ fun PadelScoreContent(
         if (history.size > MAX_HISTORY_SIZE) history.removeAt(0)
     }
 
+    val saveMatchFailedMessage = stringResource(R.string.save_match_failed)
+    val deleteMatchFailedMessage = stringResource(R.string.delete_match_failed)
+
     fun addPoint(team: Team) {
         if (PadelScoreEngine.isMatchFinished(matchState)) return
 
@@ -158,13 +161,9 @@ fun PadelScoreContent(
         }
         Log.d("PadelInput", "point accepted team=$team ambient=$isAmbientMode")
 
-        lastAcceptedPointAtMillis = now
-        saveCurrentStateToHistory()
-
         val previousState = matchState
         val newState = PadelScoreEngine.awardPoint(previousState, team)
         val courtChange = ServeCalculator.isCourtChange(previousState, newState)
-        showCourtChange = courtChange
 
         val matchJustFinished = previousState.phase != MatchPhase.MATCH_FINISHED &&
             newState.phase == MatchPhase.MATCH_FINISHED
@@ -172,8 +171,22 @@ fun PadelScoreContent(
             // The average heart rate is read from the service again for the stored match state
             // below; the two reads are deliberately kept separate.
             val completedState = newState.copy(averageHeartRate = FitnessTrackingService.averageHeartRate)
-            matchHistoryRepository.saveCompletedMatch(completedState, completedState.averageHeartRate)
+            try {
+                matchHistoryRepository.saveCompletedMatch(completedState, completedState.averageHeartRate)
+            } catch (exception: Exception) {
+                Log.e("PadelScore", "Could not save completed match", exception)
+                Toast.makeText(
+                    context,
+                    saveMatchFailedMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+                return
+            }
         }
+
+        lastAcceptedPointAtMillis = now
+        saveCurrentStateToHistory()
+        showCourtChange = courtChange
         updateMatch(
             if (matchJustFinished) {
                 newState.copy(averageHeartRate = FitnessTrackingService.averageHeartRate)
@@ -198,8 +211,6 @@ fun PadelScoreContent(
             hapticFeedbackManager.undo()
         }
     }
-
-    val saveMatchFailedMessage = stringResource(R.string.save_match_failed)
 
     fun endAndSaveMatch() {
         if (PadelScoreEngine.isMatchFinished(matchState) ||
@@ -350,7 +361,16 @@ fun PadelScoreContent(
         MatchHistoryScreen(
             entries = matchHistoryEntries,
             onDeleteMatch = { matchId ->
-                matchHistoryRepository.removeByMatchId(matchId)
+                try {
+                    matchHistoryRepository.removeByMatchId(matchId)
+                } catch (exception: Exception) {
+                    Log.e("PadelScore", "Could not delete match", exception)
+                    Toast.makeText(
+                        context,
+                        deleteMatchFailedMessage,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
                 matchHistoryEntries = matchHistoryRepository.loadEntries()
             },
             onBack = { showMatchHistory = false }
@@ -436,7 +456,20 @@ fun PadelScoreContent(
             canUndo = history.isNotEmpty(),
             onUndo = {
                 if (history.isNotEmpty()) {
-                    matchHistoryRepository.removeByMatchId(matchState.startedAtEpochMillis, deleteHealthData = false)
+                    try {
+                        matchHistoryRepository.removeByMatchId(
+                            matchState.startedAtEpochMillis,
+                            deleteHealthData = false
+                        )
+                    } catch (exception: Exception) {
+                        Log.e("PadelScore", "Could not undo completed match", exception)
+                        Toast.makeText(
+                            context,
+                            deleteMatchFailedMessage,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return@MatchFinishedScreen
+                    }
                     lastAcceptedPointAtMillis = 0L
                     updateMatch(history.removeAt(history.lastIndex))
                     hapticFeedbackManager.undo()

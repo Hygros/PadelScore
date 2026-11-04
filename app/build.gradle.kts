@@ -112,6 +112,7 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
 
     testImplementation(libs.junit)
+    testImplementation(libs.json)
 
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.ui.tooling)

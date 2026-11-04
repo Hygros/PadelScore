@@ -4,6 +4,9 @@ import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
 
+/**
+ * Computes court side (Deuce/Advantage), side changes, and tie-break service rotation.
+ */
 object ServeCalculator {
 
     fun isDeuceCourtServe(pointsInCurrentGame: Int): Boolean {
@@ -48,6 +51,10 @@ object ServeCalculator {
         return false
     }
 
+    /**
+     * Returns the server for the next tie-break point using the standard 1-2-2 sequence:
+     * [firstServingTeam] serves point 0 (the first point), then teams alternate every two points.
+     */
     fun servingTeamForNextTieBreakPoint(
         firstServingTeam: Team,
         pointsPlayed: Int
