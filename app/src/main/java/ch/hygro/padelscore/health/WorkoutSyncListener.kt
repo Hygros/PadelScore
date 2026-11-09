@@ -63,6 +63,7 @@ class WorkoutSyncListener : WearableListenerService() {
     override fun onMessageReceived(event: MessageEvent) {
         try {
             when (event.path) {
+ "/padelscore/sync/history/request" -> MatchHistorySync.schedule(applicationContext)
                 WorkoutSyncProtocol.REQUEST -> {
                     Log.i("WorkoutSyncListener", "Workout request received from ${event.sourceNodeId}")
                     executor.execute {
@@ -86,6 +87,7 @@ class WorkoutSyncListener : WearableListenerService() {
     override fun onCapabilityChanged(info: CapabilityInfo) {
         if (info.name == WorkoutSyncProtocol.RECEIVER && info.nodes.isNotEmpty()) {
             WorkoutDataSender(applicationContext).schedulePublish()
+ MatchHistorySync.schedule(applicationContext)
         }
     }
 }

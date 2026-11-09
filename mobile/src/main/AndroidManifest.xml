@@ -40,6 +40,14 @@
             </intent-filter>
         </activity-alias>
         <service
+            android:name=".MatchHistoryListener"
+            android:exported="true">
+            <intent-filter>
+            <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+            <data android:scheme="wear" android:host="*" android:path="/padelscore/history/snapshot" />
+            </intent-filter>
+            </service>
+            <service
             android:name=".WorkoutDataListener"
             android:exported="true">
             <intent-filter>

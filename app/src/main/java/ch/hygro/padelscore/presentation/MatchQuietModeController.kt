@@ -14,6 +14,7 @@ import android.service.notification.Condition
 import android.service.notification.ZenPolicy
 import android.util.Log
 import androidx.core.net.toUri
+import ch.hygro.padelscore.R
 
 /** Owns only the app's rule; never changes the user's global DND policy. */
 class MatchQuietModeController(private val activity: Activity) {
@@ -76,9 +77,9 @@ class MatchQuietModeController(private val activity: Activity) {
         if (!resumed || activity.isFinishing || activity.isDestroyed) return
         if (manager.isNotificationPolicyAccessGranted) {
             AlertDialog.Builder(activity)
-                .setTitle("Match quiet mode")
-                .setMessage("Do Not Disturb access is already granted. Quiet mode activates only during matches when enabled.")
-                .setPositiveButton("OK", null)
+                .setTitle(activity.getString(R.string.quiet_mode_title))
+                .setMessage(activity.getString(R.string.dnd_already_granted_message))
+                .setPositiveButton(activity.getString(R.string.ok), null)
                 .show()
         } else {
             showPermissionExplanation()
@@ -92,10 +93,10 @@ class MatchQuietModeController(private val activity: Activity) {
     private fun showPermissionExplanation() {
         dialog?.dismiss()
         dialog = AlertDialog.Builder(activity)
-            .setTitle("Match quiet mode")
-            .setMessage("Allow Do Not Disturb access now so Padel Score can silence interruptions during matches. This is optional and can be changed in Settings.")
-            .setPositiveButton("Open settings") { _, _ -> openSettings() }
-            .setNegativeButton("Not now", null)
+            .setTitle(activity.getString(R.string.quiet_mode_title))
+            .setMessage(activity.getString(R.string.dnd_allow_now_message))
+            .setPositiveButton(activity.getString(R.string.open_settings)) { _, _ -> openSettings() }
+            .setNegativeButton(activity.getString(R.string.not_now), null)
             .show()
     }
 
@@ -136,10 +137,10 @@ class MatchQuietModeController(private val activity: Activity) {
         }
         dialog?.dismiss()
         dialog = AlertDialog.Builder(activity)
-            .setTitle("Manual quiet mode")
-            .setMessage("Automatic quiet mode is unavailable or has not been allowed on this watch. Turn on Do Not Disturb in your watch settings or quick panel before playing, then turn it off afterward. Opening settings does not grant Padel Score automatic control. Calls and notifications follow your watch's Do Not Disturb exceptions.")
-            .setPositiveButton("Watch settings") { _, _ -> openManualSettings() }
-            .setNegativeButton("Continue") { _, _ -> acknowledgeManualMode() }
+            .setTitle(activity.getString(R.string.manual_quiet_mode_title))
+            .setMessage(activity.getString(R.string.manual_quiet_mode_message))
+            .setPositiveButton(activity.getString(R.string.watch_settings)) { _, _ -> openManualSettings() }
+            .setNegativeButton(activity.getString(R.string.continue_action)) { _, _ -> acknowledgeManualMode() }
             .show()
     }
 
@@ -159,9 +160,9 @@ class MatchQuietModeController(private val activity: Activity) {
         }
         if (!resumed || activity.isFinishing || activity.isDestroyed) return
         dialog = AlertDialog.Builder(activity)
-            .setTitle("Open settings manually")
-            .setMessage("This watch cannot open settings from Padel Score. Open the watch settings or quick panel yourself and enable Do Not Disturb before playing. Turn it off afterward if you no longer need it.")
-            .setPositiveButton("OK") { _, _ -> acknowledgeManualMode() }
+            .setTitle(activity.getString(R.string.open_settings_manually))
+            .setMessage(activity.getString(R.string.open_settings_manually_message))
+            .setPositiveButton(activity.getString(R.string.ok)) { _, _ -> acknowledgeManualMode() }
             .show()
     }
 
@@ -182,7 +183,7 @@ class MatchQuietModeController(private val activity: Activity) {
                     .hideAllVisualEffects()
                 if (Build.VERSION.SDK_INT >= 35) policyBuilder.allowPriorityChannels(false)
                 val rule = AutomaticZenRule(
-                    "Padel Score match", null,
+                    activity.getString(R.string.ongoing_match_title), null,
                     ComponentName(activity, MatchQuietModeSettingsActivity::class.java),
                     conditionId, policyBuilder.build(),
                     NotificationManager.INTERRUPTION_FILTER_PRIORITY, true
@@ -194,7 +195,7 @@ class MatchQuietModeController(private val activity: Activity) {
             }
             manager.setAutomaticZenRuleState(
                 id,
-                Condition(conditionId, "Padel Score match",
+                Condition(conditionId, activity.getString(R.string.ongoing_match_title),
                     if (active) Condition.STATE_TRUE else Condition.STATE_FALSE)
             )
         } catch (exception: RuntimeException) {

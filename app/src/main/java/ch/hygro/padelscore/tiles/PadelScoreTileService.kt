@@ -9,6 +9,7 @@ import androidx.wear.protolayout.TimelineBuilders
 import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
+import ch.hygro.padelscore.R
 import ch.hygro.padelscore.presentation.MainActivity
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import com.google.common.util.concurrent.ListenableFuture
@@ -28,7 +29,7 @@ class PadelScoreTileService : TileService() {
             ).build()
 
         val text = LayoutElementBuilders.Text.Builder()
-            .setText("Start Match")
+            .setText(getString(R.string.start_match_tile))
             .setFontStyle(
                 LayoutElementBuilders.FontStyle.Builder()
                     .setSize(

@@ -4,9 +4,9 @@ title: Privacy Policy for Padel Score
 
 # Privacy Policy for Padel Score
 
-**Last updated: 2 November 2026**
+**Last updated: 5 November 2026**
 
-Padel Score is a Wear OS application for keeping score during padel matches. It can optionally record workout information on the watch and transfer completed workouts to the PadelScore Sync companion app on a paired Android phone.
+Padel Score is a Wear OS application for keeping score during padel matches. It can optionally record workout information on the watch and transfer match history, statistics and completed workouts to the PadelScore Sync companion app on a paired Android phone.
 
 This policy explains what information the apps process, where that information is stored, and which optional platform services are involved.
 
@@ -22,11 +22,12 @@ Padel Score:
 - does not request the Android Internet permission;
 - stores match information locally on the Wear OS device;
 - can optionally record health and fitness information on the watch;
+- can optionally synchronise match history and statistics directly to a paired Android phone;
 - can optionally transfer completed workout information directly to a paired Android phone;
 - can optionally write transferred workouts to Android Health Connect; and
 - can optionally use Google Play Billing for a one-time supporter purchase.
 
-The scoring functions can be used without enabling fitness tracking, installing the companion app, enabling Health Connect synchronisation, or making a supporter purchase.
+The scoring functions can be used without enabling fitness tracking, installing the companion app, enabling match-history or Health Connect synchronisation, or making a supporter purchase.
 
 ## Information stored on the Wear OS device
 
@@ -37,7 +38,8 @@ This may include:
 - the current match state;
 - match configuration;
 - point and undo history;
-- completed-set results;
+- completed-set and tie-break results;
+- early-stopped match state;
 - match start and end times;
 - match duration;
 - numbers of points and games;
@@ -56,6 +58,7 @@ When enabled and when the required Android permissions have been granted, the We
 
 - heart-rate measurements;
 - average heart rate;
+- maximum heart rate;
 - step counts;
 - active-calorie information when supported by the device;
 - workout start and end times; and
@@ -90,19 +93,36 @@ The service stops when the workout is ended or discarded, subject to Android and
 
 ## Optional companion app and watch-to-phone transfer
 
-PadelScore Sync is an optional Android companion app.
+PadelScore Sync is an optional Android companion app. Watch-to-phone transfers use the Google Play services Wearable Data Layer between the user's paired devices. Padel Score does not send this information to a developer-operated server.
 
-When health synchronisation is enabled, completed workout information may be transferred directly between the watch and the paired phone using the Google Play services Wearable Data Layer.
+### Match history and statistics synchronisation
 
-Transferred information may include:
+When **Match history on phone** is enabled in the watch settings, the Wear OS app transfers a watch-authoritative snapshot of up to 100 completed or early-stopped matches to the companion app. This synchronisation is independent of Health Connect consent and stores the snapshot in the companion app's private local storage so the phone app can display match history, overall statistics, set and tie-break breakdowns, game score charts and rally-by-rally point history.
+
+Transferred match-history snapshots may include:
+
+- match identifiers, start and finish timestamps, and duration;
+- match configuration (scoring mode, match format and set length);
+- set, tie-break and match tie-break scores, plus early-stop state where applicable;
+- rally-by-rally point history and total games and points played;
+- per-match summary metrics recorded on the watch (average heart rate, maximum heart rate and step count); and
+- snapshot revision and enabled state.
+
+Per-match step counts included in match-history snapshots are used only for display within the companion app and are not exported to Health Connect.
+
+Users can disable **Match history on phone** in the watch settings at any time. Turning it off publishes a disabled snapshot that clears the synced match-history copy stored in the companion app.
+
+### Workout synchronisation for Health Connect
+
+When **Health Sync** is enabled, completed workout information may be transferred directly between the watch and the paired phone for import into Health Connect.
+
+Transferred workout information may include:
 
 - workout start and end times;
 - heart-rate samples;
 - match duration;
 - revision and synchronisation information; and
 - identifiers and hashes used to prevent duplicate or stale imports.
-
-The transfer occurs between the user's paired devices. Padel Score does not send this information to a developer-operated server.
 
 The apps may temporarily retain pending transfer data and synchronisation receipts so that interrupted transfers can be retried and duplicate imports can be avoided.
 
@@ -121,17 +141,21 @@ The companion app may write:
 - exercise-session records; and
 - heart-rate records.
 
+Match step counts remain in local app storage and are not written to Health Connect.
+
 Health Connect stores and manages these records on the Android device under the user's Health Connect settings.
 
 Padel Score does not operate Health Connect and does not receive Health Connect data on a developer-controlled server.
 
 Users can inspect or revoke the companion app's Health Connect permissions through Android settings. Revoking permissions prevents further Health Connect writes but may not automatically delete records already stored in Health Connect.
 
-## Workout deletion
+## Match and workout deletion
 
-When a locally stored workout is deleted on the watch, Padel Score may retain a local deletion marker. This marker prevents an older queued copy of the workout from being imported again.
+When a locally stored match is deleted on the watch, Padel Score removes the match from local watch history, purges its local workout and step data, and retains a local deletion marker (reconciling any interrupted two-phase deletions on startup or history load). This marker prevents an older queued copy of the workout from being imported again.
 
-If the companion app is installed and reachable, the deletion request may be transmitted to the paired phone so that corresponding Health Connect records can be deleted.
+If **Match history on phone** is enabled, the updated match-history snapshot without the deleted match is also published to the companion app.
+
+If the companion app is installed and reachable, the workout deletion request may be transmitted to the paired phone so that corresponding Health Connect records can be deleted.
 
 Deletion may remain pending if:
 
@@ -206,6 +230,7 @@ Uninstalling an app normally removes the information stored in that app's privat
 Match and workout information remains in local app storage until it is:
 
 - deleted within the app where a deletion function is available;
+- cleared on the phone by disabling **Match history on phone** on the watch;
 - cleared through Android application settings; or
 - removed by uninstalling the app.
 
@@ -220,6 +245,7 @@ Google Play purchase records are controlled by Google and are not removed by cle
 Users can delete locally stored Padel Score information by:
 
 - deleting individual supported records within the app;
+- disabling **Match history on phone** on the watch to clear the synced match-history copy in the companion app;
 - clearing the app's storage through Android or Wear OS settings; or
 - uninstalling the app.
 

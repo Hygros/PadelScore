@@ -209,24 +209,25 @@ fun SupporterScreen(
                     ) {
                         Button(
                             modifier = Modifier
-                                .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                                .fillMaxWidth(if (isRound) 0.84f else 0.88f)
                                 .height(48.dp),
                             enabled = !state.isRefreshing &&
                                     state.purchaseStatus != SupporterPurchaseStatus.PURCHASE_IN_PROGRESS,
+                            contentPadding = CompactButtonContentPadding,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ColorSecondary,
                                 contentColor = Color.White
                             ),
                             onClick = onRestorePurchases
                         ) {
-                            Text(
+                            AutoSizeText(
                                 text = if (state.isRefreshing) {
                                     stringResource(R.string.checking_purchases)
                                 } else {
                                     stringResource(R.string.restore_purchases)
                                 },
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
+                                maxFontSize = 11.sp,
+                                minFontSize = 7.5.sp,
                                 maxLines = 1
                             )
                         }
@@ -245,18 +246,19 @@ fun SupporterScreen(
                 ) {
                     Button(
                         modifier = Modifier
-                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .fillMaxWidth(if (isRound) 0.84f else 0.88f)
                             .height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = onBack
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.back),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
                             maxLines = 1
                         )
                     }
@@ -279,24 +281,25 @@ private fun PurchaseAvailabilityContent(
 
             Button(
                 modifier = Modifier
-                    .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                    .fillMaxWidth(if (isRound) 0.84f else 0.88f)
                     .height(48.dp),
                 enabled = state.canStartPurchase,
+                contentPadding = CompactButtonContentPadding,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ColorPrimary,
                     contentColor = Color.White
                 ),
                 onClick = onPurchase
             ) {
-                Text(
+                AutoSizeText(
                     text = if (price != null) {
                         stringResource(R.string.support_with_price, price)
                     } else {
                         stringResource(R.string.loading_price)
                     },
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1
+                    maxFontSize = 12.sp,
+                    minFontSize = 7.5.sp,
+                    maxLines = 2
                 )
             }
         }

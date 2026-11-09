@@ -71,7 +71,6 @@ A pull request should:
 2. identify behavior, privacy, permission, dependency, or release impacts;
 3. include relevant tests;
 4. pass the project checks;
-5. avoid unrelated generated files; and
-6. update `CHANGELOG.md` when the change affects users or releases.
+5. avoid unrelated generated files
 
 By submitting a contribution, you agree that it may be licensed under the Apache License, Version 2.0, as described in [LICENSE](LICENSE).

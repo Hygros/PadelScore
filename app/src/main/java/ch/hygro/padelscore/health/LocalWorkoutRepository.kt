@@ -46,25 +46,22 @@ class LocalWorkoutRepository internal constructor(
     fun isDeleted(matchId: Long): Boolean {
         if (matchId <= 0L) return false
         reconcilePendingDeletions()
-        if (deletions.getBoolean(matchId.toString(), false)) return true
-        return !isInFlightDeletion(matchId) &&
-            deletions.getBoolean("$PENDING_PREFIX$matchId", false) &&
-            isPresentInHistory(matchId) == false
+        return deletions.getBoolean(matchId.toString(), false) || !isInFlightDeletion(matchId) &&
+                deletions.getBoolean("$PENDING_PREFIX$matchId", false) &&
+                isPresentInHistory(matchId) == false
     }
 
     @Synchronized
     internal fun isDeletionPending(matchId: Long): Boolean {
         if (matchId <= 0L) return false
         reconcilePendingDeletions()
-        if (isDeleted(matchId)) return false
-        return deletions.getBoolean("$PENDING_PREFIX$matchId", false) &&
-            isInFlightDeletion(matchId)
+        return !isDeleted(matchId) && deletions.getBoolean("$PENDING_PREFIX$matchId", false) &&
+                isInFlightDeletion(matchId)
     }
 
     @Synchronized
     internal fun hasPendingDeletionMarker(matchId: Long): Boolean {
-        if (matchId <= 0L) return false
-        return deletions.getBoolean("$PENDING_PREFIX$matchId", false)
+        return matchId > 0L && deletions.getBoolean("$PENDING_PREFIX$matchId", false)
     }
 
     @Synchronized
@@ -229,20 +226,33 @@ class LocalWorkoutRepository internal constructor(
         }
     }
 
+    private fun workoutMetricsMap(): Map<Long, WorkoutMetrics> {
+        val json = preferences.getString("completed_workouts", "[]") ?: "[]"
+        val cached = cachedWorkoutsSnapshot
+        if (cached != null && cached.first == json) {
+            return cached.second
+        }
+        val parsed = LinkedHashMap<Long, WorkoutMetrics>()
+        val history = JSONArray(json)
+        for (index in 0 until history.length()) {
+            val item = history.optJSONObject(index) ?: continue
+            val id = item.optLong("startTimeMillis", 0L)
+            if (id <= 0L || parsed.containsKey(id)) continue
+            val avg = item.optInt("averageHeartRate", 0).takeIf { it in 30..240 }
+            val max = item.optInt("maximumHeartRate", 0).takeIf { it > 0 }
+            parsed[id] = WorkoutMetrics(averageHeartRate = avg, maximumHeartRate = max)
+        }
+        cachedWorkoutsSnapshot = json to parsed
+        return parsed
+    }
+
     @Synchronized
     fun averageHeartRateForMatch(matchId: Long): Int? {
         if (matchId <= 0L || isDeleted(matchId)) return null
         if (preferences.getLong("active_start", 0L) == matchId) {
             return preferences.getInt("active_average", 0).takeIf { it in 30..240 }
         }
-        val history = JSONArray(preferences.getString("completed_workouts", "[]"))
-        for (index in 0 until history.length()) {
-            val item = history.optJSONObject(index) ?: continue
-            if (item.optLong("startTimeMillis", 0L) == matchId) {
-                return item.optInt("averageHeartRate", 0).takeIf { it in 30..240 }
-            }
-        }
-        return null
+        return workoutMetricsMap()[matchId]?.averageHeartRate
     }
 
     /** Match ID is the original match start time in milliseconds. */
@@ -255,14 +265,7 @@ class LocalWorkoutRepository internal constructor(
                 .maxOfOrNull { samples.optJSONObject(it)?.optInt("bpm", 0) ?: 0 }
                 ?.takeIf { it > 0 }
         }
-        val history = JSONArray(preferences.getString("completed_workouts", "[]"))
-        for (index in 0 until history.length()) {
-            val item = history.optJSONObject(index) ?: continue
-            if (item.optLong("startTimeMillis", 0L) == matchId) {
-                return item.optInt("maximumHeartRate", 0).takeIf { it > 0 }
-            }
-        }
-        return null
+        return workoutMetricsMap()[matchId]?.maximumHeartRate
     }
 
     internal inline fun <T> withInFlightDeletion(matchId: Long, block: () -> T): T {
@@ -417,16 +420,19 @@ class LocalWorkoutRepository internal constructor(
         }
 
         val activeMatches = preferences.getLong("active_start", 0L) in matchIds
-        val historyJson = preferences.getString("completed_workouts", null)
-        val history = if (historyJson != null) JSONArray(historyJson) else JSONArray()
+        val metrics = workoutMetricsMap()
         var foundInHistory = false
         val updated = JSONArray()
-        for (index in 0 until history.length()) {
-            val item = history.optJSONObject(index) ?: continue
-            if (item.optLong("startTimeMillis", 0L) in matchIds) {
-                foundInHistory = true
-            } else {
-                updated.put(item)
+        if (matchIds.any { it in metrics }) {
+            val historyJson = preferences.getString("completed_workouts", null)
+            val history = if (historyJson != null) JSONArray(historyJson) else JSONArray()
+            for (index in 0 until history.length()) {
+                val item = history.optJSONObject(index) ?: continue
+                if (item.optLong("startTimeMillis", 0L) in matchIds) {
+                    foundInHistory = true
+                } else {
+                    updated.put(item)
+                }
             }
         }
         if (activeMatches || foundInHistory) {
@@ -456,9 +462,16 @@ class LocalWorkoutRepository internal constructor(
 
     fun completedWorkoutsJson(): String = preferences.getString("completed_workouts", "[]") ?: "[]"
 
+    private data class WorkoutMetrics(
+        val averageHeartRate: Int?,
+        val maximumHeartRate: Int?
+    )
+
     companion object {
         private const val PENDING_PREFIX = "pending_"
         private val inFlightDeletions = ConcurrentHashMap<Long, Int>()
+        @Volatile
+        private var cachedWorkoutsSnapshot: Pair<String, Map<Long, WorkoutMetrics>>? = null
 
         internal fun beginInFlightDeletion(matchId: Long) {
             if (matchId <= 0L) return

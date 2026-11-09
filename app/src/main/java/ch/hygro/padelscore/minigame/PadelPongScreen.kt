@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,6 +40,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
 import kotlinx.coroutines.delay
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -192,8 +194,8 @@ fun PadelPongScreen(onExit: () -> Unit) {
         }
         if (gameOver) {
             Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("GAME OVER", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text("TAP TO RETRY", color = Color(0xFF70FF80), fontSize = 10.sp)
+                Text(stringResource(R.string.game_over), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.tap_to_retry), color = Color(0xFF70FF80), fontSize = 10.sp)
             }
         }
     }

@@ -61,13 +61,12 @@ fun ExitMatchScreen(
                         .transformedHeight(itemScope, transformationSpec),
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = stringResource(R.string.exit_match_title),
                         color = Color.White,
-                        fontSize = 13.sp,
-                        lineHeight = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        maxFontSize = 13.sp,
+                        minFontSize = 10.sp,
+                        maxLines = 1
                     )
                 }
             }
@@ -105,18 +104,19 @@ fun ExitMatchScreen(
                 ) {
                     Button(
                         modifier = Modifier
-                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .fillMaxWidth(if (isRound) 0.84f else 0.88f)
                             .height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = onContinueMatch
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.continue_match),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
                             maxLines = 1
                         )
                     }
@@ -124,18 +124,19 @@ fun ExitMatchScreen(
                     if (onEndAndSave != null) {
                         Button(
                             modifier = Modifier
-                                .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                                .fillMaxWidth(if (isRound) 0.84f else 0.88f)
                                 .height(48.dp),
+                            contentPadding = CompactButtonContentPadding,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ColorPrimary,
                                 contentColor = Color.White
                             ),
                             onClick = onEndAndSave
                         ) {
-                            Text(
+                            AutoSizeText(
                                 text = stringResource(R.string.end_and_save),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
+                                maxFontSize = 12.sp,
+                                minFontSize = 8.sp,
                                 maxLines = 1
                             )
                         }
@@ -143,18 +144,19 @@ fun ExitMatchScreen(
 
                     Button(
                         modifier = Modifier
-                            .fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                            .fillMaxWidth(if (isRound) 0.84f else 0.88f)
                             .height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ColorDestructive,
                             contentColor = Color.White
                         ),
                         onClick = onBackToHome
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.back_to_home),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
                             maxLines = 1
                         )
                     }

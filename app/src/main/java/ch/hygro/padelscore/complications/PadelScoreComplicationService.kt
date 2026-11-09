@@ -8,6 +8,7 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceService
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
+import ch.hygro.padelscore.R
 import ch.hygro.padelscore.presentation.MainActivity
 
 class PadelScoreComplicationService : ComplicationDataSourceService() {
@@ -16,7 +17,7 @@ class PadelScoreComplicationService : ComplicationDataSourceService() {
         if (type != ComplicationType.SHORT_TEXT) {
             return null
         }
-        return createComplicationData("Start", "Start Match")
+        return createComplicationData("Start", getString(R.string.start_match_tile))
     }
 
     override fun onComplicationRequest(
@@ -27,7 +28,7 @@ class PadelScoreComplicationService : ComplicationDataSourceService() {
             listener.onComplicationData(null)
             return
         }
-        listener.onComplicationData(createComplicationData("Padel", "Start Padel Match"))
+        listener.onComplicationData(createComplicationData("Padel", getString(R.string.start_padel_match_content_desc)))
     }
 
     private fun createComplicationData(text: String, contentDescription: String): ComplicationData {

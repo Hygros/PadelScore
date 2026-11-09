@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_title">PadelScore Sync</string>
-    <string name="app_subtitle">Connect your watch workouts with Health Connect</string>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">Match statistics, charts &amp; Health Connect sync</string>
     <string name="current_status">CURRENT STATUS</string>
     <string name="checking_health_connect">Checking Health Connect…</string>
     <string name="health_connect">Health Connect</string>
@@ -12,6 +12,8 @@
     <string name="manage_health_connect_access">Manage Health Connect access</string>
     <string name="install_or_update_health_connect">Install or update Health Connect</string>
     <string name="health_sync_explanation">Health Sync must also be enabled on your watch. Your watch remains usable without this companion app.</string>
+    <string name="health_connect_advanced">Health Connect settings &amp; app</string>
+    <string name="health_connect_advanced_summary">Manage permissions or open Health Connect in Play Store</string>
 
     <string name="watch_app">Watch app</string>
     <string name="watch_app_summary">Install or update PadelScore on a connected watch</string>
@@ -22,13 +24,19 @@
     <string name="privacy_summary">Data handling, deletion and connection help</string>
     <string name="privacy_and_deletion_info">Privacy and deletion information</string>
     <string name="privacy_explanation">Match steps stay on the watch and are not exported. Deleting a match requests deletion of its PadelScore records from Health Connect. Copies in other health apps may need to be deleted separately.</string>
-    <string name="xiaomi_workaround">Watch links not opening? Some Xiaomi, Redmi and POCO phones can block links opened by the watch plugin. In phone Settings > Apps, select your watch plugin, open Other permissions and allow background pop-up windows if that option exists.</string>
+    <string name="xiaomi_workaround">Watch links not opening? Some Xiaomi, Redmi and POCO phones can block links opened by the watch plugin. In phone Settings &gt; Apps, select your watch plugin, open Other permissions and allow background pop-up windows if that option exists.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">Matches &amp; Stats</string>
+    <string name="tab_health_sync">Health Sync</string>
+    <string name="tab_watch_help">Watch &amp; Info</string>
 
     <!-- UI State & Accessibility -->
     <string name="expanded">expanded</string>
     <string name="collapsed">collapsed</string>
     <string name="choose_watch_title">Choose watch</string>
     <string name="cancel">Cancel</string>
+    <string name="back_to_matches">← Back to matches</string>
 
     <!-- Status messages -->
     <string name="status_permission_granted">Permission granted. Ready to sync recorded workouts.</string>
@@ -80,4 +88,69 @@
     <string name="log_import_deferred">Import deferred; source workouts retained</string>
 
     <string name="permissions_rationale">PadelScore Sync requests permission to write exercise sessions to Health Connect only after you choose to connect. When sync is enabled on the watch, the app can also write recorded heart-rate measurements. You can revoke access at any time in Health Connect settings.\n\nThe watch records heart-rate samples and match steps locally only when Health Tracking is enabled. Steps are not exported. Workout sessions and heart-rate samples are transferred through the paired-device data layer only with Health Sync enabled on the watch. New imports also require the phone sync switch, Health Connect write permissions, and a live consent check with the source watch. No account or developer-operated server is used.\n\nDeleting a match sends a durable deletion request for that match\'s PadelScore records. Explicit deletion requests are processed even when sync is off. Already imported copies in Samsung Health or other apps may require separate deletion. Turning sync off does not delete existing data. Uninstalling the watch app before pending deletions have been delivered can lose those deletion requests. Incomplete transfers remain in private phone storage for retry. This is a fitness feature, not a medical device.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">Played matches</string>
+    <string name="match_history_summary">Tap a match for charts, set scores &amp; detailed rally stats</string>
+    <string name="overall_statistics_title">Overall statistics</string>
+    <string name="refresh_match_history">Refresh match history</string>
+    <string name="match_history_disabled">Match history sync is disabled on the watch. Enable \"Match history on phone\" in the watch settings.</string>
+    <string name="no_matches_yet">No matches synced yet.</string>
+    <string name="match_statistics">Matches: %1$d | Wins: %2$d | Games: %3$d | Points: %4$d</string>
+    <string name="stat_matches">MATCHES</string>
+    <string name="stat_wins_rate">WINS (%d%%)</string>
+    <string name="stat_total_time">PLAY TIME</string>
+    <string name="stat_total_steps">TOTAL STEPS</string>
+    <string name="match_won">WON</string>
+    <string name="match_lost">LOST</string>
+    <string name="won_at_stop">WON AT STOP</string>
+    <string name="lost_at_stop">LOST AT STOP</string>
+    <string name="tied_at_stop">TIED AT STOP</string>
+    <string name="ended_early">ENDED EARLY</string>
+    <string name="provisional_result">%s · provisional result</string>
+    <string name="match_details">Games: %1$d | Points: %2$d</string>
+    <string name="match_heart_rate">Avg. HR: %d bpm</string>
+    <string name="match_max_heart_rate">Max HR: %d bpm</string>
+    <string name="match_steps">Steps: %d</string>
+    <string name="steps_unavailable">Steps unavailable</string>
+    <string name="hours_format">%1$d:%2$02d h</string>
+    <string name="minutes_format">%d min</string>
+    <string name="our_team">US</string>
+    <string name="opponent_short">OPP</string>
+    <string name="sets_label">SETS</string>
+    <string name="sets_result">Sets %1$d:%2$d</string>
+    <string name="games_result">Games %1$d:%2$d</string>
+    <string name="tie_break">TIE-BREAK</string>
+    <string name="tie_break_result">TB %1$d:%2$d</string>
+    <string name="match_tie_break_result">MTB %1$d:%2$d</string>
+    <string name="match_tie_break_full">MATCH TIE-BREAK</string>
+    <string name="set_number">SET %d</string>
+    <string name="current_set">CURRENT SET</string>
+    <string name="tie_break_points">TIE-BREAK POINTS</string>
+    <string name="points_at_stop">POINTS AT STOP</string>
+    <string name="duration">DURATION</string>
+    <string name="points_played">POINTS PLAYED</string>
+    <string name="games_played">GAMES PLAYED</string>
+    <string name="steps_label">STEPS</string>
+    <string name="avg_heart_rate_label">AVG HEART RATE</string>
+    <string name="max_heart_rate_label">MAX HEART RATE</string>
+    <string name="set_tie_break_title">SET %d · TIE-BREAK</string>
+    <string name="set_game_title">SET %1$d · GAME %2$d</string>
+    <string name="chart_prev">Prev</string>
+    <string name="chart_next">Next</string>
+    <string name="chart_tie_break_points">Tie-break points</string>
+    <string name="chart_game_score">Game score</string>
+    <string name="chart_match_point_number">Match point number</string>
+    <string name="older_matches_no_point_history">Older matches may have no point history.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · score after each rally</string>
+    <string name="point_number_team">POINT #%1$d · %2$s</string>
+    <string name="game_won_rallies">Game won · rallies %1$d:%2$d</string>
+    <string name="show_rally_list">Show rally-by-rally points (%d)</string>
+    <string name="tap_for_details">Tap for charts &amp; stats →</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="adv_abbr">AD</string>
+    <string name="game_label">GAME</string>
 </resources>

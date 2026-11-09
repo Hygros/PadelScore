@@ -36,7 +36,17 @@ class SettingsRepository(context: Context) {
         _swipeGesturesEnabled.value = enabled
     }
 
-    private val _healthSyncEnabled = MutableStateFlow(
+    private val _matchHistorySyncEnabled = MutableStateFlow(
+ prefs.getBoolean("match_history_sync_enabled", false)
+ )
+ val matchHistorySyncEnabled = _matchHistorySyncEnabled.asStateFlow()
+
+ fun setMatchHistorySyncEnabled(enabled: Boolean) {
+ prefs.edit(commit = true) { putBoolean("match_history_sync_enabled", enabled) }
+ _matchHistorySyncEnabled.value = enabled
+ }
+
+ private val _healthSyncEnabled = MutableStateFlow(
         prefs.getBoolean(KEY_HEALTH_SYNC, false)
     )
     val healthSyncEnabled: StateFlow<Boolean> = _healthSyncEnabled.asStateFlow()

@@ -92,6 +92,7 @@ When enabled and supported by the watch, Padel Score can record:
 
 - heart-rate samples;
 - average heart rate;
+- maximum heart rate;
 - steps;
 - active calories when provided by the device; and
 - workout and match duration.
@@ -104,6 +105,8 @@ Core scoring remains available when fitness tracking is disabled.
 
 The optional `PadelScore Sync` Android application can:
 
+- synchronise match history and extended statistics from the watch when **Match history on phone** is enabled on the watch;
+- display overall statistics, set and tie-break breakdowns, interactive game score charts, rally-by-rally point history, and per-match metrics (duration, points, games, steps, average heart rate and maximum heart rate);
 - receive completed workouts from the paired watch;
 - write exercise sessions and heart-rate records to Android Health Connect;
 - synchronise supported workout deletions;
@@ -126,7 +129,7 @@ The purchase is optional and does not unlock or restrict the core scoring functi
 
 1. Download the current APK files from [GitHub Releases](https://github.com/Hygros/PadelScore/releases).
 2. Install the Wear OS APK on a compatible watch.
-3. Optionally install the mobile companion APK on the paired Android phone if Health Connect synchronisation is required.
+3. Optionally install the mobile companion APK on the paired Android phone if phone match-history viewing or Health Connect synchronisation is required.
 
 For development devices, installation can be performed with Android Debug Bridge:
 
@@ -166,13 +169,15 @@ Padel Score does not include:
 
 Neither `app/src/main/AndroidManifest.xml` nor `mobile/src/main/AndroidManifest.xml` declares `android.permission.INTERNET`, and the mobile companion's merged release manifest does not include it. In the Wear OS release build, the Google Play Billing dependency merges `com.android.vending.BILLING`, `android.permission.INTERNET`, and `android.permission.ACCESS_NETWORK_STATE` into the final manifest; the application code itself performs no direct network requests.
 
-### Local match data
+### Local and synced match data
 
 Match state, point history, statistics and completed-match history are stored in the Wear OS app's private local storage.
 
+If **Match history on phone** is enabled on the watch, a snapshot of the watch's match history (including point history and recorded match summary metrics such as average heart rate, maximum heart rate and steps) is transferred directly to the paired phone's private local storage via the Wearable Data Layer. Turning off **Match history on phone** on the watch clears the synced phone copy.
+
 ### Optional health data
 
-If fitness tracking is enabled, the Wear OS app processes health and fitness information locally. If Health Connect synchronisation is also enabled, completed workout information is transferred directly between the paired watch and phone and may be written to Health Connect.
+If fitness tracking is enabled, the Wear OS app processes health and fitness information locally. If Health Connect synchronisation is also enabled, completed workout information is transferred directly between the paired watch and phone and may be written to Health Connect. Match step counts stay in local app storage (and optional phone match-history summaries) and are not exported to Health Connect.
 
 No match or health information is uploaded to a server operated by the developer.
 
@@ -213,9 +218,9 @@ app/
 mobile/
 ├── src/main/
 │   ├── java/ch/hygro/padelscore/sync/
-│   │   └──                 # Wearable transfer listener, Health Connect importer and UI
+│   │   └──                 # Wearable workout/history listeners, Health Connect importer, charts and UI
 │   └── res/
-└── src/test/               # JVM unit tests for the sync protocol
+└── src/test/               # JVM unit tests for the sync protocol and match-history parser
 
 docs/
 ├── privacy-policy.md       # Privacy policy

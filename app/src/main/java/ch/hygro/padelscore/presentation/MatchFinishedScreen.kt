@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -63,13 +64,12 @@ fun MatchFinishedScreen(
                         .transformedHeight(itemScope, transformationSpec),
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
+                    AutoSizeText(
                         text = if (weWon) stringResource(R.string.match_won) else stringResource(R.string.match_lost),
                         color = if (weWon) Color(0xFF66E59A) else Color(0xFFFF7B72),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        maxFontSize = 15.sp,
+                        minFontSize = 10.sp,
+                        maxLines = 1
                     )
                 }
             }
@@ -159,11 +159,12 @@ private fun Statistic(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
+        AutoSizeText(
             text = label,
+            fillMaxWidth = false,
             color = Color.LightGray,
-            fontSize = 10.sp,
-            lineHeight = 12.sp,
+            maxFontSize = 10.sp,
+            minFontSize = 7.5.sp,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1
         )
@@ -185,20 +186,24 @@ private fun FinishedActionButton(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
+    val isRound = LocalConfiguration.current.isScreenRound
     Button(
-        modifier = Modifier.fillMaxWidth(0.9f),
+        modifier = Modifier
+            .fillMaxWidth(if (isRound) 0.84f else 0.9f)
+            .height(48.dp),
         onClick = onClick,
         enabled = enabled,
+        contentPadding = CompactButtonContentPadding,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
             disabledContainerColor = backgroundColor
         )
     ) {
-        Text(
+        AutoSizeText(
             text = text,
             color = if (enabled) Color.White else Color.DarkGray,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
+            maxFontSize = 12.sp,
+            minFontSize = 8.sp,
             maxLines = 1
         )
     }

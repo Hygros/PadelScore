@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.wear.remote.interactions)
     implementation(libs.concurrent.futures.ktx)
     testImplementation(libs.junit)
+    testImplementation(libs.json)
     implementation(libs.activity)
     implementation(libs.health.connect.client)
     implementation(libs.play.services.wearable)

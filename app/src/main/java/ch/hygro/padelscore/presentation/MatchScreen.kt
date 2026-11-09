@@ -46,6 +46,7 @@ import ch.hygro.padelscore.health.FitnessTrackingService
 import ch.hygro.padelscore.logic.PadelScoreEngine
 import ch.hygro.padelscore.logic.ServeCalculator
 import ch.hygro.padelscore.minigame.PadelPongScreen
+import ch.hygro.padelscore.model.MatchHistoryEntry
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
@@ -55,7 +56,9 @@ import ch.hygro.padelscore.storage.MatchHistoryRepository
 import ch.hygro.padelscore.storage.MatchRepository
 import ch.hygro.padelscore.storage.SettingsRepository
 import ch.hygro.padelscore.vibration.HapticFeedbackManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -115,7 +118,7 @@ fun PadelScoreContent(
     var showMatchHistory by remember { mutableStateOf(false) }
     var showCourtChange by remember { mutableStateOf(false) }
     var matchHistoryEntries by remember {
-        mutableStateOf(matchHistoryRepository.loadEntries())
+        mutableStateOf<List<MatchHistoryEntry>>(emptyList())
     }
     var showSupporter by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
@@ -281,6 +284,11 @@ fun PadelScoreContent(
             onResumeFromOngoingHandled()
         }
     }
+    LaunchedEffect(matchHistoryRepository, showMatchHistory) {
+        matchHistoryEntries = withContext(Dispatchers.IO) {
+            matchHistoryRepository.loadEntries()
+        }
+    }
     LaunchedEffect(showConfiguration, showResumePrompt, showMatchHistory, showSupporter, showSettings) {
         if (showConfiguration && !showResumePrompt && !showMatchHistory && !showSupporter && !showSettings) {
             (activity as? MainActivity)?.requestNotificationsOnFirstStartScreen()
@@ -411,7 +419,6 @@ fun PadelScoreContent(
                 showConfiguration = false
             },
             onOpenHistory = {
-                matchHistoryEntries = matchHistoryRepository.loadEntries()
                 showMatchHistory = true
             },
             onOpenSupporter = {

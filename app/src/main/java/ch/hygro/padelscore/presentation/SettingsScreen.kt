@@ -53,6 +53,7 @@ fun SettingsScreen(
     val healthTrackingEnabled by repository.healthTrackingEnabled.collectAsState()
     val matchQuietModeEnabled by repository.matchQuietModeEnabled.collectAsState()
     val healthSyncEnabled by repository.healthSyncEnabled.collectAsState()
+ val historySyncEnabled by repository.matchHistorySyncEnabled.collectAsState()
     val syncScope = rememberCoroutineScope()
     val defaultCompanionStatus = stringResource(R.string.companion_status_optional)
     val checkingStatus = stringResource(R.string.companion_status_checking)
@@ -112,8 +113,8 @@ fun SettingsScreen(
                     SwitchButton(
                         checked = swipeGesturesEnabled,
                         onCheckedChange = { repository.setSwipeGesturesEnabled(it) },
-                        label = { Text(stringResource(R.string.swipe_gestures), fontSize = 12.sp) },
-                        secondaryLabel = { Text(stringResource(R.string.swipe_gestures_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { SettingsLabel(stringResource(R.string.swipe_gestures)) },
+                        secondaryLabel = { SettingsDescription(stringResource(R.string.swipe_gestures_desc)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -139,8 +140,8 @@ fun SettingsScreen(
                                 }
                             }
                         },
-                        label = { Text(stringResource(R.string.health_tracking), fontSize = 12.sp) },
-                        secondaryLabel = { Text(stringResource(R.string.health_tracking_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { SettingsLabel(stringResource(R.string.health_tracking)) },
+                        secondaryLabel = { SettingsDescription(stringResource(R.string.health_tracking_desc)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -166,11 +167,31 @@ fun SettingsScreen(
                                 }
                             }
                         },
-                        label = { Text(stringResource(R.string.health_sync), fontSize = 12.sp) },
-                        secondaryLabel = { Text(stringResource(R.string.health_sync_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { SettingsLabel(stringResource(R.string.health_sync)) },
+                        secondaryLabel = { SettingsDescription(stringResource(R.string.health_sync_desc)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+            }
+            item {
+            val itemScope = this
+            Box(
+            modifier = Modifier
+            .fillMaxWidth(0.9f)
+            .transformedHeight(itemScope, transformationSpec)
+            .padding(vertical = 2.dp)
+            ) {
+            SwitchButton(
+            checked = historySyncEnabled,
+            onCheckedChange = { enabled ->
+            repository.setMatchHistorySyncEnabled(enabled)
+            ch.hygro.padelscore.health.MatchHistorySync.schedule(context)
+            },
+            label = { SettingsLabel(stringResource(R.string.match_history_sync)) },
+            secondaryLabel = { SettingsDescription(stringResource(R.string.match_history_sync_desc)) },
+            modifier = Modifier.fillMaxWidth()
+            )
+            }
             }
             item {
                 val itemScope = this
@@ -185,8 +206,8 @@ fun SettingsScreen(
                             repository.setMatchQuietModeEnabled(enabled)
                             (context as? MainActivity)?.refreshMatchQuietModeSettings()
                         },
-                        label = { Text(stringResource(R.string.match_quiet_mode), fontSize = 12.sp) },
-                        secondaryLabel = { Text(stringResource(R.string.match_quiet_mode_desc), fontSize = 10.sp, color = Color.Gray, maxLines = 3) },
+                        label = { SettingsLabel(stringResource(R.string.match_quiet_mode)) },
+                        secondaryLabel = { SettingsDescription(stringResource(R.string.match_quiet_mode_desc)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -205,8 +226,18 @@ fun SettingsScreen(
                                 }
                             }
                         }
-                    }, enabled = !companionBusy, modifier = Modifier.fillMaxWidth(0.9f)
-                ) { Text(stringResource(R.string.check_phone_setup), fontSize = 12.sp) }
+                    },
+                    enabled = !companionBusy,
+                    contentPadding = CompactButtonContentPadding,
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                ) {
+                    AutoSizeText(
+                        text = stringResource(R.string.check_phone_setup),
+                        maxFontSize = 12.sp,
+                        minFontSize = 8.5.sp,
+                        maxLines = 2
+                    )
+                }
             }
             item { Text(companionStatus, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f)) }
             item {
@@ -223,8 +254,18 @@ fun SettingsScreen(
                                 }
                             }
                         }
-                    }, enabled = !companionBusy, modifier = Modifier.fillMaxWidth(0.9f)
-                ) { Text(stringResource(R.string.install_phone_companion), fontSize = 12.sp) }
+                    },
+                    enabled = !companionBusy,
+                    contentPadding = CompactButtonContentPadding,
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                ) {
+                    AutoSizeText(
+                        text = stringResource(R.string.install_phone_companion),
+                        maxFontSize = 12.sp,
+                        minFontSize = 8.5.sp,
+                        maxLines = 2
+                    )
+                }
             }
             item {
                 Text(stringResource(R.string.companion_sync_info),
@@ -239,9 +280,15 @@ fun SettingsScreen(
                 ) {
                     Button(
                         onClick = { (context as? MainActivity)?.configureMatchQuietMode() },
+                        contentPadding = CompactButtonContentPadding,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(stringResource(R.string.configure_quiet_mode), fontSize = 12.sp)
+                        AutoSizeText(
+                            text = stringResource(R.string.configure_quiet_mode),
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.5.sp,
+                            maxLines = 2
+                        )
                     }
                 }
             }
@@ -257,18 +304,19 @@ fun SettingsScreen(
                 ) {
                     Button(
                         modifier = Modifier
-                            .fillMaxWidth(if (LocalConfiguration.current.isScreenRound) 0.82f else 0.88f)
+                            .fillMaxWidth(if (LocalConfiguration.current.isScreenRound) 0.84f else 0.88f)
                             .height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
                         onClick = onBack
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.back),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
                             maxLines = 1
                         )
                     }
@@ -276,4 +324,25 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+@Composable
+private fun SettingsLabel(text: String) {
+ Text(
+ text = text,
+ fontSize = 11.sp,
+ lineHeight = 13.sp,
+ maxLines = 2
+ )
+}
+
+@Composable
+private fun SettingsDescription(text: String) {
+    Text(
+    text = text,
+    fontSize = 9.sp,
+    lineHeight = 11.sp,
+    color = Color.Gray,
+    maxLines = 4
+    )
 }

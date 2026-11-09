@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -236,6 +235,7 @@ fun StartScreen(
                 ) {
                     Button(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ColorPrimary,
                             contentColor = Color.White
@@ -258,12 +258,11 @@ fun StartScreen(
                             onStartMatch(configuration)
                         }
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.start),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
+                            maxLines = 1
                         )
                     }
                 }
@@ -280,6 +279,7 @@ fun StartScreen(
                 ) {
                     Button(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = ColorSecondary,
                             contentColor = Color.White
@@ -289,13 +289,11 @@ fun StartScreen(
                             onOpenSettings()
                         }
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.settings),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 10.sp,
-                            maxLines = 1,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            maxFontSize = 11.sp,
+                            minFontSize = 8.sp,
+                            maxLines = 1
                         )
                     }
                 }
@@ -316,20 +314,17 @@ fun StartScreen(
                             containerColor = ColorSecondary,
                             contentColor = Color.White
                         ),
-                        contentPadding = PaddingValues(0.dp),
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onOpenHistory()
                         }
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.matches_history),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 9.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            maxFontSize = 10.sp,
+                            minFontSize = 7.sp,
+                            maxLines = 1
                         )
                     }
 
@@ -339,24 +334,22 @@ fun StartScreen(
                             containerColor = if (isSupporterActive) ColorPrimary else ColorSecondary,
                             contentColor = if (isSupporterActive) Color(0xFF66E59A) else Color.White
                         ),
-                        contentPadding = PaddingValues(0.dp),
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp),
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onOpenSupporter()
                         }
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = if (isSupporterActive) {
                                 stringResource(R.string.supporter_active)
                             } else {
                                 stringResource(R.string.supporter_inactive)
                             },
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 9.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            color = if (isSupporterActive) Color(0xFF66E59A) else Color.White,
+                            maxFontSize = 10.sp,
+                            minFontSize = 7.sp,
+                            maxLines = 1
                         )
                     }
                 }
@@ -380,30 +373,28 @@ private fun ConfigurationField(
                 shape = RoundedCornerShape(10.dp)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 2.dp, vertical = 2.dp),
+            .padding(horizontal = 4.dp, vertical = 2.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
+            AutoSizeText(
                 text = title,
                 color = Color.LightGray,
-                fontSize = 8.sp,
-                lineHeight = 9.sp,
+                maxFontSize = 8.sp,
+                minFontSize = 6.5.sp,
                 fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
                 maxLines = 1
             )
 
-            Text(
+            AutoSizeText(
                 text = value,
                 color = Color(0xFFFFD54F),
-                fontSize = 11.sp,
-                lineHeight = 12.sp,
+                maxFontSize = 11.sp,
+                minFontSize = 8.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
                 maxLines = 2
             )
         }

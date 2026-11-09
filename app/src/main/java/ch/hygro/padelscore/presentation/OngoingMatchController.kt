@@ -72,10 +72,16 @@ class OngoingMatchController(context: Context) {
             context, NOTIFICATION_ID, returnIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val summary = "Games ${match.ourGames}:${match.opponentGames} | Sets ${match.ourSets}:${match.opponentSets}"
+        val summary = context.getString(
+            R.string.ongoing_match_summary,
+            match.ourGames,
+            match.opponentGames,
+            match.ourSets,
+            match.opponentSets
+        )
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_ongoing_match)
-            .setContentTitle("Padel Score match")
+            .setContentTitle(context.getString(R.string.ongoing_match_title))
             .setContentText(summary)
             .setContentIntent(touchIntent)
             .setCategory(NotificationCompat.CATEGORY_WORKOUT)

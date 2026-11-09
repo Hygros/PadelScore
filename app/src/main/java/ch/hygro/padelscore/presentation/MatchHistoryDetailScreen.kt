@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -62,44 +63,44 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
         else -> stringResource(R.string.lost)
     }
     val stopped = entry.stoppedState
+    val tieBreakLabel = stringResource(R.string.tie_break)
+    val matchTieBreakLabel = stringResource(R.string.match_tie_break_full)
+    val currentSetLabel = stringResource(R.string.current_set)
+    val tieBreakPointsLabel = stringResource(R.string.tie_break_points)
+    val setLabels = entry.completedSets.indices.map { index ->
+        stringResource(R.string.set_number, index + 1)
+    }
     val scoreRows = buildList {
         entry.completedSets.forEachIndexed { index, set ->
-            add(Triple("SET ${index + 1}", set.ourGames.toString(), set.opponentGames.toString()))
+            add(Triple(setLabels[index], set.ourGames.toString(), set.opponentGames.toString()))
             if (set.wasTieBreak) {
-                add(Triple("TIE-BREAK", set.ourTieBreakPoints.toString(), set.opponentTieBreakPoints.toString()))
+                add(Triple(tieBreakLabel, set.ourTieBreakPoints.toString(), set.opponentTieBreakPoints.toString()))
             }
         }
         if (stopped != null) {
             if (stopped.phase == MatchPhase.MATCH_TIE_BREAK) {
-                add(Triple("MATCH TIE-BREAK", stopped.ourMatchTieBreakPoints.toString(), stopped.opponentMatchTieBreakPoints.toString()))
+                add(Triple(matchTieBreakLabel, stopped.ourMatchTieBreakPoints.toString(), stopped.opponentMatchTieBreakPoints.toString()))
             } else {
-                add(Triple("CURRENT SET", stopped.ourGames.toString(), stopped.opponentGames.toString()))
+                add(Triple(currentSetLabel, stopped.ourGames.toString(), stopped.opponentGames.toString()))
                 if (stopped.isTieBreak) {
-                    add(Triple("TIE-BREAK POINTS", stopped.ourTieBreakPoints.toString(), stopped.opponentTieBreakPoints.toString()))
+                    add(Triple(tieBreakPointsLabel, stopped.ourTieBreakPoints.toString(), stopped.opponentTieBreakPoints.toString()))
                 }
             }
         } else if (entry.ourMatchTieBreakPoints > 0 || entry.opponentMatchTieBreakPoints > 0) {
-            add(Triple("MATCH TIE-BREAK", entry.ourMatchTieBreakPoints.toString(), entry.opponentMatchTieBreakPoints.toString()))
+            add(Triple(matchTieBreakLabel, entry.ourMatchTieBreakPoints.toString(), entry.opponentMatchTieBreakPoints.toString()))
         }
     }
     val pointScore = stopped?.let { pointText(it, Team.US) + " : " + pointText(it, Team.OPPONENT) }
-    var selectedGameNumber by rememberSaveable(entry.matchId) { mutableStateOf<Int?>(null) }
-    val selectedGame = entry.pointHistory.filter { it.gameNumber == selectedGameNumber }
-    if (selectedGame.isNotEmpty()) {
-        BackHandler { selectedGameNumber = null }
-        GamePointDetailScreen(selectedGame, onBack = { selectedGameNumber = null })
-        return
-    }
     val gameGroups = remember(entry.pointHistory) {
         entry.pointHistory.groupBy { it.setNumber to it.gameNumber }.values.toList()
     }
     var chartGameIndex by rememberSaveable(entry.matchId) { mutableIntStateOf(0) }
     val chartIndex = chartGameIndex.coerceIn(0, maxOf(0, gameGroups.lastIndex))
     val metricPairs = listOf(
-        listOf("DURATION" to historyDurationText(entry), "POINTS PLAYED" to entry.totalPointsPlayed.toString()),
-        listOf("GAMES PLAYED" to entry.totalGamesPlayed.toString(), "STEPS" to (entry.steps?.takeIf { it >= 0L }?.toString() ?: "--")),
-        listOf("AVG HEART RATE" to (entry.averageHeartRate?.takeIf { it > 0 }?.let { "$it bpm" } ?: "--"),
-            "MAX HEART RATE" to (entry.maximumHeartRate?.takeIf { it > 0 }?.let { "$it bpm" } ?: "--"))
+        listOf(stringResource(R.string.duration) to historyDurationText(entry), stringResource(R.string.points_played) to entry.totalPointsPlayed.toString()),
+        listOf(stringResource(R.string.games_played) to entry.totalGamesPlayed.toString(), stringResource(R.string.steps_label) to (entry.steps?.takeIf { it >= 0L }?.toString() ?: "--")),
+        listOf(stringResource(R.string.avg_heart_rate_label) to (entry.averageHeartRate?.takeIf { it > 0 }?.let { "$it bpm" } ?: "--"),
+            stringResource(R.string.max_heart_rate_label) to (entry.maximumHeartRate?.takeIf { it > 0 }?.let { "$it bpm" } ?: "--"))
     )
     ScreenScaffold(scrollState = columnState) { contentPadding ->
         TransformingLazyColumn(
@@ -113,8 +114,13 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                     modifier = Modifier.fillMaxWidth().transformedHeight(itemScope, transformationSpec),
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
-                    Text("MATCH STATS", color = Color.White, fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    AutoSizeText(
+                        text = stringResource(R.string.match_stats),
+                        color = Color.White,
+                        maxFontSize = 13.sp,
+                        minFontSize = 10.sp,
+                        maxLines = 1
+                    )
                 }
             }
             item {
@@ -127,21 +133,21 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text(status, color = accent, fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    AutoSizeText(status, color = accent, maxFontSize = 11.sp, minFontSize = 8.sp, maxLines = 1)
                     if (entry.stoppedState != null) {
-                        Text("${stringResource(R.string.ended_early)} · provisional result", color = Color.LightGray,
+                        Text(stringResource(R.string.provisional_result, stringResource(R.string.ended_early)), color = Color.LightGray,
                             fontSize = 9.sp, textAlign = TextAlign.Center)
                     }
                     Text(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray, fontSize = 9.sp, textAlign = TextAlign.Center)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Text("US", color = ColorTeamUsText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Text("SETS", color = Color.LightGray, fontSize = 9.sp)
-                        Text("OPP", color = ColorTeamOpponentText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.our_team), color = ColorTeamUsText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.sets_label), color = Color.LightGray, fontSize = 9.sp)
+                        Text(stringResource(R.string.opponent_short), color = ColorTeamOpponentText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     }
                     Text("${entry.ourSets} : ${entry.opponentSets}", color = Color.White,
                         fontSize = 34.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     if (pointScore != null) {
-                        Text("POINTS AT STOP", color = accent, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.points_at_stop), color = accent, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                         Text(pointScore, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                 }
@@ -206,8 +212,21 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text(metric.first, color = Color(0xFF9AAFC1), fontSize = 8.sp, lineHeight = 10.sp, textAlign = TextAlign.Center)
-                            Text(metric.second, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                            AutoSizeText(
+                                text = metric.first,
+                                color = Color(0xFF9AAFC1),
+                                maxFontSize = 8.sp,
+                                minFontSize = 6.5.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1
+                            )
+                            AutoSizeText(
+                                text = metric.second,
+                                color = Color.White,
+                                maxFontSize = 15.sp,
+                                minFontSize = 10.sp,
+                                maxLines = 1
+                            )
                         }
                     }
                 }
@@ -220,92 +239,37 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    if (stopped == null) {
-                        Text("Older matches may have no point history.", color = Color.Gray, fontSize = 9.sp, textAlign = TextAlign.Center)
+                    if (gameGroups.isEmpty() && stopped == null) {
+                        Text(stringResource(R.string.older_matches_no_point_history), color = Color.Gray, fontSize = 9.sp, textAlign = TextAlign.Center)
                     }
                 }
             }
             item {
                 val itemScope = this
                 Button(
-                    modifier = Modifier.fillMaxWidth(if (isRound) 0.82f else 0.88f)
+                    modifier = Modifier.fillMaxWidth(if (isRound) 0.84f else 0.88f).height(48.dp)
                         .transformedHeight(itemScope, transformationSpec).padding(top = 4.dp, bottom = 12.dp),
+                    contentPadding = CompactButtonContentPadding,
                     colors = ButtonDefaults.buttonColors(containerColor = ColorSecondary, contentColor = Color.White),
                     onClick = onBack
-                ) { Text(stringResource(R.string.back), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                ) {
+                    AutoSizeText(
+                        text = stringResource(R.string.back),
+                        maxFontSize = 12.sp,
+                        minFontSize = 8.sp,
+                        maxLines = 1
+                    )
+                }
             }
         }
     }
-}
-
-private fun gameTitle(point: GamePoint): String = when {
-    point.matchTieBreak -> "MATCH TIE-BREAK"
-    point.numeric -> "SET ${point.setNumber} · TIE-BREAK"
-    else -> "SET ${point.setNumber} · GAME ${point.gameNumber}"
 }
 
 @Composable
-private fun GamePointDetailScreen(points: List<GamePoint>, onBack: () -> Unit) {
-    val state = rememberTransformingLazyColumnState()
-    val spec = rememberTransformationSpec()
-    val isRound = LocalConfiguration.current.isScreenRound
-    ScreenScaffold(scrollState = state) { padding ->
-        TransformingLazyColumn(
-            state = state, contentPadding = padding,
-            modifier = Modifier.fillMaxSize().background(Color.Black),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                val scope = this
-                ListHeader(
-                    modifier = Modifier.fillMaxWidth().transformedHeight(scope, spec),
-                    transformation = with(scope) { SurfaceTransformation(spec) }
-                ) {
-                    Text(gameTitle(points.first()), color = Color.White, fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                }
-            }
-            item {
-                val scope = this
-                Box(Modifier.fillMaxWidth(if (isRound) 0.94f else 0.98f)
-                    .transformedHeight(scope, spec).padding(vertical = 5.dp)) { GameScoreChart(points) }
-            }
-            item {
-                val scope = this
-                Text("US : OPP · score after each rally", color = Color.LightGray, fontSize = 9.sp,
-                    textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(0.85f)
-                        .transformedHeight(scope, spec).padding(vertical = 6.dp))
-            }
-            items(points, key = { it.number }) { point ->
-                val scope = this
-                val color = if (point.scoringTeam == Team.US) Color(0xFF66E59A) else Color(0xFF82B8FF)
-                Column(
-                    modifier = Modifier.fillMaxWidth(if (isRound) 0.86f else 0.94f)
-                        .transformedHeight(scope, spec).padding(vertical = 3.dp)
-                        .background(Color(0xFF1B2028), RoundedCornerShape(14.dp))
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(3.dp)
-                ) {
-                    Text("POINT #${point.number} · ${if (point.scoringTeam == Team.US) "US" else "OPP"}",
-                        color = color, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                    Text("${recordedScore(points, points.indexOf(point), true) ?: "?"} : ${recordedScore(points, points.indexOf(point), false) ?: "?"}",
-                        color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    if (point.gameEnded) {
-                        Text("Game won · rallies ${point.ourRallies}:${point.opponentRallies}", color = color,
-                            fontSize = 9.sp, textAlign = TextAlign.Center)
-                    }
-                }
-            }
-            item {
-                val scope = this
-                Button(
-                    modifier = Modifier.fillMaxWidth(if (isRound) 0.82f else 0.88f)
-                        .transformedHeight(scope, spec).padding(top = 6.dp, bottom = 12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF245A81), contentColor = Color.White),
-                    onClick = onBack
-                ) { Text(stringResource(R.string.back), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
-            }
-        }
-    }
+private fun gameTitle(point: GamePoint): String = when {
+    point.matchTieBreak -> stringResource(R.string.match_tie_break_full)
+    point.numeric -> stringResource(R.string.set_tie_break_title, point.setNumber)
+    else -> stringResource(R.string.set_game_title, point.setNumber, point.gameNumber)
 }
+
+

@@ -91,8 +91,13 @@ fun MatchHistoryScreen(
                     modifier = Modifier.fillMaxWidth().transformedHeight(itemScope, transformationSpec),
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
-                    Text(stringResource(R.string.played_matches), color = Color.White, fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    AutoSizeText(
+                        text = stringResource(R.string.played_matches),
+                        color = Color.White,
+                        maxFontSize = 13.sp,
+                        minFontSize = 10.sp,
+                        maxLines = 1
+                    )
                 }
             }
             if (entries.isEmpty()) {
@@ -127,11 +132,17 @@ fun MatchHistoryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        modifier = Modifier.fillMaxWidth(if (isRound) 0.82f else 0.88f).height(48.dp),
+                        modifier = Modifier.fillMaxWidth(if (isRound) 0.84f else 0.88f).height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(containerColor = ColorSecondary, contentColor = Color.White),
                         onClick = onBack
                     ) {
-                        Text(stringResource(R.string.back), fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        AutoSizeText(
+                            text = stringResource(R.string.back),
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
+                            maxLines = 1
+                        )
                     }
                 }
             }
@@ -157,8 +168,13 @@ private fun DeleteMatchConfirmation(entry: MatchHistoryEntry, onConfirm: () -> U
                     modifier = Modifier.fillMaxWidth().transformedHeight(itemScope, transformationSpec),
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
-                    Text(stringResource(R.string.delete_match_title), color = Color(0xFFFF7B72), fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    AutoSizeText(
+                        text = stringResource(R.string.delete_match_title),
+                        color = Color(0xFFFF7B72),
+                        maxFontSize = 13.sp,
+                        minFontSize = 10.sp,
+                        maxLines = 1
+                    )
                 }
             }
             item {
@@ -186,18 +202,30 @@ private fun DeleteMatchConfirmation(entry: MatchHistoryEntry, onConfirm: () -> U
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     Button(
-                        modifier = Modifier.fillMaxWidth(if (isRound) 0.82f else 0.88f).height(48.dp),
+                        modifier = Modifier.fillMaxWidth(if (isRound) 0.84f else 0.88f).height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(containerColor = ColorDestructive, contentColor = Color.White),
                         onClick = onConfirm
                     ) {
-                        Text(stringResource(R.string.delete), fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        AutoSizeText(
+                            text = stringResource(R.string.delete),
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
+                            maxLines = 1
+                        )
                     }
                     Button(
-                        modifier = Modifier.fillMaxWidth(if (isRound) 0.82f else 0.88f).height(48.dp),
+                        modifier = Modifier.fillMaxWidth(if (isRound) 0.84f else 0.88f).height(48.dp),
+                        contentPadding = CompactButtonContentPadding,
                         colors = ButtonDefaults.buttonColors(containerColor = ColorSecondary, contentColor = Color.White),
                         onClick = onCancel
                     ) {
-                        Text(stringResource(R.string.cancel), fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        AutoSizeText(
+                            text = stringResource(R.string.cancel).uppercase(),
+                            maxFontSize = 12.sp,
+                            minFontSize = 8.sp,
+                            maxLines = 1
+                        )
                     }
                 }
             }
@@ -215,18 +243,22 @@ private fun HistoryEntryCard(entry: MatchHistoryEntry, onClick: () -> Unit, onLo
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically) {
-            Text(
+            AutoSizeText(
                 text = when {
                     entry.stoppedState != null -> earlyStopLabel(entry)
                     entry.weWon -> stringResource(R.string.won)
                     else -> stringResource(R.string.lost)
                 },
+                modifier = Modifier.weight(1f),
                 color = when {
                     entry.stoppedState != null -> earlyStopColor(entry)
                     entry.weWon -> Color(0xFF66E59A)
                     else -> Color(0xFFFF7B72)
                 },
-                fontSize = 11.sp, fontWeight = FontWeight.Bold
+                maxFontSize = 11.sp,
+                minFontSize = 7.5.sp,
+                textAlign = TextAlign.Start,
+                maxLines = 1
             )
             Text(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray, fontSize = 9.sp)
         }
@@ -237,8 +269,14 @@ private fun HistoryEntryCard(entry: MatchHistoryEntry, onClick: () -> Unit, onLo
         val hrText = entry.averageHeartRate?.takeIf { it > 0 }?.let { " · $it bpm" } ?: ""
         Text(statsText + hrText + (entry.maximumHeartRate?.let { " · Max $it bpm" } ?: ""),
             color = Color.LightGray, fontSize = 9.sp, lineHeight = 11.sp, maxLines = 2)
-        Text(entry.steps?.let { "Steps: $it" } ?: "Steps unavailable", color = Color.LightGray,
-            fontSize = 9.sp, lineHeight = 11.sp, maxLines = 1)
+        Text(
+            text = entry.steps?.let { stringResource(R.string.steps_count, it) }
+                ?: stringResource(R.string.steps_unavailable),
+            color = Color.LightGray,
+            fontSize = 9.sp,
+            lineHeight = 11.sp,
+            maxLines = 1
+        )
     }
 }
 

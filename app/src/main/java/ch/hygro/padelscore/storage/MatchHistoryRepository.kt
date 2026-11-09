@@ -17,6 +17,7 @@ class MatchHistoryRepository internal constructor(
     private val preferences: SharedPreferences,
     private val workouts: LocalWorkoutRepository,
     private val scheduleDeletionSync: () -> Unit,
+    private val scheduleHistorySync: () -> Unit = {},
     private val encodeStoppedState: (MatchState) -> JSONObject = {
         error("Stopped-state encoding requires a MatchRepository")
     },
@@ -32,10 +33,18 @@ class MatchHistoryRepository internal constructor(
     constructor(context: Context) : this(
         preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE),
         workouts = LocalWorkoutRepository(context),
-        scheduleDeletionSync = { WorkoutDataSender(context).scheduleDeletionSync() },
+        scheduleDeletionSync = {
+ WorkoutDataSender(context).scheduleDeletionSync()
+ },
+ scheduleHistorySync = {
+ ch.hygro.padelscore.health.MatchHistorySync.schedule(context)
+ },
         encodeStoppedState = { MatchRepository(context).encodeState(it) },
         decodeStoppedState = { MatchRepository(context).decodeState(it) }
     )
+
+    @Volatile
+    private var cachedHistorySnapshot: Pair<String, List<MatchHistoryEntry>>? = null
 
     private fun reconcileDeletions() {
         if (workouts.reconcilePendingDeletions()) {
@@ -47,12 +56,20 @@ class MatchHistoryRepository internal constructor(
         reconcileDeletions()
         val storedJson = preferences.getString(KEY_HISTORY_JSON, null) ?: return emptyList()
         return runCatching {
-            val array = JSONArray(storedJson)
-            buildList {
-                for (index in 0 until array.length()) {
-                    runCatching { add(decodeEntry(array.getJSONObject(index))) }
+            val snapshot = cachedHistorySnapshot
+            val baseEntries = if (snapshot != null && snapshot.first == storedJson) {
+                snapshot.second
+            } else {
+                val array = JSONArray(storedJson)
+                buildList {
+                    for (index in 0 until array.length()) {
+                        runCatching { add(decodeEntry(array.getJSONObject(index))) }
+                    }
+                }.also { decoded ->
+                    cachedHistorySnapshot = storedJson to decoded
                 }
-            }.map { entry ->
+            }
+            baseEntries.map { entry ->
                 entry.copy(
                     averageHeartRate = workouts.averageHeartRateForMatch(entry.matchId)
                         ?: entry.averageHeartRate,
@@ -150,10 +167,14 @@ class MatchHistoryRepository internal constructor(
         }.sortedByDescending { it.finishedAtEpochMillis }
     }
 
-    private fun saveEntries(entries: List<MatchHistoryEntry>) {
+    fun exportForSync(): String =
+ JSONArray().apply { loadEntries().forEach { put(encodeEntry(it)) } }.toString()
+
+ private fun saveEntries(entries: List<MatchHistoryEntry>) {
         val array = JSONArray().apply { entries.forEach { put(encodeEntry(it)) } }
         val result = preferences.edit().putString(KEY_HISTORY_JSON, array.toString()).commit()
         check(result) { "Could not persist match history" }
+ scheduleHistorySync()
     }
 
     private fun encodeEntry(entry: MatchHistoryEntry) = JSONObject()

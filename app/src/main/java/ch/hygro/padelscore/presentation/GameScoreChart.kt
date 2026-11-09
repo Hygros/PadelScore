@@ -3,7 +3,6 @@ package ch.hygro.padelscore.presentation
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Text
+import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.GamePoint
 import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.ColorTeamOpponentText
@@ -88,6 +89,14 @@ internal fun GameScoreChart(
             color = android.graphics.Color.rgb(225, 232, 240)
         }
     }
+    val yAxisLabel = if (numeric) {
+        stringResource(R.string.chart_tie_break_points)
+    } else {
+        stringResource(R.string.chart_game_score)
+    }
+    val xAxisLabel = stringResource(R.string.chart_match_point_number)
+    val usShort = stringResource(R.string.our_team)
+    val oppShort = stringResource(R.string.opponent_short)
     val description = "Game score after recorded rallies. match point number. " +
             (if (numeric) "tie-break points." else "0, 15, 30, 40, AD, GAME. Equal score categories.") +
             " US solid circles; OPP solid circles. " +
@@ -120,7 +129,7 @@ internal fun GameScoreChart(
                     native.rotate(-90f, 6.dp.toPx(), centerY)
                     paint.textAlign = android.graphics.Paint.Align.CENTER
                     native.drawText(
-                        if (numeric) "Tie-break points" else "Game score",
+                        yAxisLabel,
                         6.dp.toPx(), centerY - (paint.ascent() + paint.descent()) / 2f, paint
                     )
                 } finally {
@@ -128,7 +137,7 @@ internal fun GameScoreChart(
                 }
                 paint.textAlign = android.graphics.Paint.Align.CENTER
                 canvas.nativeCanvas.drawText(
-                    "Match point number", (left + right) / 2f,
+                    xAxisLabel, (left + right) / 2f,
                     bottom + 24.dp.toPx(), paint
                 )
             }
@@ -260,24 +269,38 @@ internal fun GameScoreChart(
         }
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text("US ●", color = ColorTeamUsText, fontSize = 8.sp)
-            Text("OPP ●", color = ColorTeamOpponentText, fontSize = 8.sp)
+            Text("$usShort ●", color = ColorTeamUsText, fontSize = 8.sp)
+            Text("$oppShort ●", color = ColorTeamOpponentText, fontSize = 8.sp)
         }
         if (gamePosition != null) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                Button(modifier = Modifier.weight(1f).height(34.dp), enabled = canPrevious,
-                    onClick = onPrevious) {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("Prev", fontSize = 10.sp, textAlign = TextAlign.Center)
-                    }
+                Button(
+                    modifier = Modifier.weight(1f).height(34.dp),
+                    enabled = canPrevious,
+                    contentPadding = CompactButtonContentPadding,
+                    onClick = onPrevious
+                ) {
+                    AutoSizeText(
+                        text = stringResource(R.string.chart_prev),
+                        maxFontSize = 10.sp,
+                        minFontSize = 7.5.sp,
+                        maxLines = 1
+                    )
                 }
                 Text(gamePosition, color = Color.LightGray, fontSize = 8.sp, textAlign = TextAlign.Center)
-                Button(modifier = Modifier.weight(1f).height(34.dp), enabled = canNext,
-                    onClick = onNext) {
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("Next", fontSize = 10.sp, textAlign = TextAlign.Center)
-                    }
+                Button(
+                    modifier = Modifier.weight(1f).height(34.dp),
+                    enabled = canNext,
+                    contentPadding = CompactButtonContentPadding,
+                    onClick = onNext
+                ) {
+                    AutoSizeText(
+                        text = stringResource(R.string.chart_next),
+                        maxFontSize = 10.sp,
+                        minFontSize = 7.5.sp,
+                        maxLines = 1
+                    )
                 }
             }
         }

@@ -42,9 +42,9 @@ private fun earlyStopBalance(entry: MatchHistoryEntry): Int {
 
 @Composable
 internal fun earlyStopLabel(entry: MatchHistoryEntry): String = when {
-    earlyStopBalance(entry) > 0 -> "WON AT STOP"
-    earlyStopBalance(entry) < 0 -> "LOST AT STOP"
-    else -> "TIED AT STOP"
+    earlyStopBalance(entry) > 0 -> stringResource(R.string.won_at_stop)
+    earlyStopBalance(entry) < 0 -> stringResource(R.string.lost_at_stop)
+    else -> stringResource(R.string.tied_at_stop)
 }
 
 @Composable
@@ -90,7 +90,7 @@ internal fun historyResultText(entry: MatchHistoryEntry): String {
 internal fun historyDateText(epochMillis: Long): String {
     val locale = LocalConfiguration.current.locales[0]
     val formatter = remember(locale) {
-        DateTimeFormatter.ofPattern("dd.MM.yy HH:mm", locale).withZone(ZoneId.of("Europe/Zurich"))
+        DateTimeFormatter.ofPattern("dd.MM.yy HH:mm", locale).withZone(ZoneId.systemDefault())
     }
     return formatter.format(Instant.ofEpochMilli(epochMillis))
 }

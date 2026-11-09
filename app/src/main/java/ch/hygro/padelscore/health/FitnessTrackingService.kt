@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.content.ContextCompat
+import ch.hygro.padelscore.R
 import ch.hygro.padelscore.presentation.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -140,6 +141,7 @@ class FitnessTrackingService : Service() {
                     workoutRepository.removeMatch(matchId)
                 } else workoutRepository.finish(command.time)
                 WorkoutDataSender(applicationContext).schedulePublish()
+ MatchHistorySync.schedule(applicationContext)
                 // stopSelfResult protects newer queued starts; foreground is removed only
                 // when this was the latest service request.
                 if (stopSelfResult(command.startId)) stopForeground(STOP_FOREGROUND_REMOVE)
@@ -156,8 +158,8 @@ class FitnessTrackingService : Service() {
         )
         return Notification.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle("PadelScore workout")
-            .setContentText("Recording match heart rate")
+            .setContentTitle(getString(R.string.workout_notification_title))
+            .setContentText(getString(R.string.workout_notification_text))
             .setContentIntent(pending)
             .setOngoing(true)
             .build()
