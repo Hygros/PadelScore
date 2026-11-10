@@ -82,7 +82,10 @@ Contributions, bug reports, and feature suggestions are equally appreciated.
 - ⌚ **Tiles and complications:** Start Padel Score from a Wear OS Tile or supported watch-face complication.
 - 🔕 **Match Quiet Mode:** Optional integration with Android's notification-policy controls during an active match.
 - 🎯 **Watch-oriented controls:** Large touch targets, haptic feedback and a short point-input lock to reduce accidental double taps.
-- 🌙 **Always-on display support:** An ambient match display when Always-on Display is enabled on the watch.
+- 🤙 **Optional wrist gestures:** While looking at the watch, turn the wrist away and back once to score for your team or twice to score for the opponent.
+- 🌙 **Configurable ambient mode:** Use the low-power match display when Always-on Display is enabled, or keep the active match screen visible continuously.
+- 🌍 **Localised interface:** English, German, Arabic, Danish, Dutch, French, Italian, Portuguese, Spanish and Swedish resources are included.
+- ♿ **Accessible layouts and charts:** Score text adapts to the available watch space, translated labels can wrap or shrink, and game charts expose rally-by-rally descriptions to accessibility services.
 
 ### Optional fitness tracking
 
@@ -97,7 +100,7 @@ When enabled and supported by the watch, Padel Score can record:
 - active calories when provided by the device; and
 - workout and match duration.
 
-Fitness tracking uses AndroidX Health Services. Availability and measurements depend on the watch hardware, Wear OS version, permissions and other active workout applications.
+Fitness tracking uses AndroidX Health Services. Availability and measurements depend on the watch hardware, Wear OS version, permissions and other active workout applications. If the app process is interrupted during a match, Padel Score can reattach to an exercise session that it already owns and recover locally persisted workout progress.
 
 Core scoring remains available when fitness tracking is disabled.
 
@@ -109,8 +112,9 @@ The optional `PadelScore Sync` Android application can:
 - display overall statistics, set and tie-break breakdowns, interactive game score charts, rally-by-rally point history, and per-match metrics (duration, points, games, steps, average heart rate and maximum heart rate);
 - receive completed workouts from the paired watch;
 - write exercise sessions and heart-rate records to Android Health Connect;
-- synchronise supported workout deletions;
-- display synchronisation and permission status; and
+- synchronise supported workout deletions, including explicit deletion requests queued while normal sync is disabled;
+- retry incomplete workout transfers without acknowledging them before their records and local import state are durably stored;
+- display synchronisation, consent and permission status; and
 - open the app's Play Store page on the paired watch.
 
 Watch-to-phone transfer uses the Google Play services Wearable Data Layer. The companion app is not required for scoring or local match history.
@@ -173,11 +177,13 @@ Neither `app/src/main/AndroidManifest.xml` nor `mobile/src/main/AndroidManifest.
 
 Match state, point history, statistics and completed-match history are stored in the Wear OS app's private local storage.
 
-If **Match history on phone** is enabled on the watch, a snapshot of the watch's match history (including point history and recorded match summary metrics such as average heart rate, maximum heart rate and steps) is transferred directly to the paired phone's private local storage via the Wearable Data Layer. Turning off **Match history on phone** on the watch clears the synced phone copy.
+If **Match history on phone** is enabled on the watch, a snapshot of the watch's match history (including point history and recorded match summary metrics such as average heart rate, maximum heart rate and steps) is transferred directly to the paired phone's private local storage via the Wearable Data Layer. Sync state uses revisions and a watch-generation identifier so stale messages cannot re-enable or overwrite newer state after a reset. Turning off **Match history on phone** on the watch clears the synced phone copy.
 
 ### Optional health data
 
-If fitness tracking is enabled, the Wear OS app processes health and fitness information locally. If Health Connect synchronisation is also enabled, completed workout information is transferred directly between the paired watch and phone and may be written to Health Connect. Match step counts stay in local app storage (and optional phone match-history summaries) and are not exported to Health Connect.
+If fitness tracking is enabled, the Wear OS app processes health and fitness information locally. If Health Connect synchronisation is also enabled, completed workout information is transferred directly between the paired watch and phone and may be written to Health Connect. New imports require synchronisation to be enabled, the necessary Health Connect permissions and a live consent check with the source watch. Match step counts stay in local app storage (and optional phone match-history summaries) and are not exported to Health Connect.
+
+Deleting a match queues a durable request to remove its Padel Score workout records. Explicit deletion requests are processed even when normal synchronisation is disabled. Copies already imported by Samsung Health or another application may need to be deleted separately. Turning synchronisation off does not delete previously imported data, and uninstalling the watch app before a pending deletion is delivered can lose that request.
 
 No match or health information is uploaded to a server operated by the developer.
 
@@ -231,7 +237,7 @@ docs/
 
 ## 🛠️ Build and test
 
-Use the included Gradle Wrapper (configured for Java 25 in CI; Java source/target compatibility is 11):
+Use the included Gradle Wrapper (configured for Java 25 in CI; Java source/target compatibility is 11). Both Android modules compile against Android API 37:
 
 ```powershell
 .\gradlew.bat :app:testDebugUnitTest :mobile:testDebugUnitTest
