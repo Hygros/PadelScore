@@ -108,8 +108,8 @@ fun MatchHistoryScreen(
                             .transformedHeight(itemScope, transformationSpec).padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(stringResource(R.string.no_matches_yet), color = Color.LightGray,
-                            fontSize = 10.sp, textAlign = TextAlign.Center)
+                        AutoSizeText(stringResource(R.string.no_matches_yet), color = Color.LightGray,
+                            maxFontSize = 10.5.sp, minFontSize = 9.sp, fontWeight = FontWeight.Normal, maxLines = 5)
                     }
                 }
             } else {
@@ -185,12 +185,12 @@ private fun DeleteMatchConfirmation(entry: MatchHistoryEntry, onConfirm: () -> U
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(historyResultText(entry), color = Color.White, fontSize = 11.sp, lineHeight = 12.sp,
-                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 2)
-                    Text(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray,
-                        fontSize = 8.sp, lineHeight = 9.sp, textAlign = TextAlign.Center)
-                    Text(stringResource(R.string.delete_match_message), color = Color.White,
-                        fontSize = 9.sp, lineHeight = 11.sp, textAlign = TextAlign.Center)
+                    AutoSizeText(historyResultText(entry), color = Color.White, maxFontSize = 11.sp,
+                        minFontSize = 9.sp, maxLines = 2)
+                    AutoSizeText(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray,
+                        maxFontSize = 9.5.sp, minFontSize = 8.5.sp, fontWeight = FontWeight.Normal)
+                    AutoSizeText(stringResource(R.string.delete_match_message), color = Color.White,
+                        maxFontSize = 10.sp, minFontSize = 9.sp, fontWeight = FontWeight.Normal, maxLines = 6)
                 }
             }
             item {
@@ -260,22 +260,27 @@ private fun HistoryEntryCard(entry: MatchHistoryEntry, onClick: () -> Unit, onLo
                 textAlign = TextAlign.Start,
                 maxLines = 1
             )
-            Text(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray, fontSize = 9.sp)
+            AutoSizeText(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray,
+                maxFontSize = 9.sp, fontWeight = FontWeight.Normal, fillMaxWidth = false,
+                modifier = Modifier.padding(start = 4.dp), fallbackLines = 1)
         }
-        Text(historyResultText(entry), color = Color.White, fontSize = 14.sp, lineHeight = 15.sp,
-            fontWeight = FontWeight.Bold, maxLines = 2)
+        AutoSizeText(historyResultText(entry), color = Color.White, maxFontSize = 14.sp,
+            textAlign = TextAlign.Start, maxLines = 2)
         val statsText = stringResource(R.string.history_stats_format, entry.totalGamesPlayed,
             entry.totalPointsPlayed, historyDurationText(entry))
         val hrText = entry.averageHeartRate?.takeIf { it > 0 }?.let { " · $it bpm" } ?: ""
-        Text(statsText + hrText + (entry.maximumHeartRate?.let { " · Max $it bpm" } ?: ""),
-            color = Color.LightGray, fontSize = 9.sp, lineHeight = 11.sp, maxLines = 2)
-        Text(
+        AutoSizeText(statsText + hrText + (entry.maximumHeartRate?.takeIf { it > 0 }?.let { " · Max $it bpm" } ?: ""),
+            color = Color.LightGray, maxFontSize = 9.5.sp, minFontSize = 8.5.sp, fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Start, maxLines = 4)
+        AutoSizeText(
             text = entry.steps?.let { stringResource(R.string.steps_count, it) }
                 ?: stringResource(R.string.steps_unavailable),
             color = Color.LightGray,
-            fontSize = 9.sp,
-            lineHeight = 11.sp,
-            maxLines = 1
+            maxFontSize = 9.5.sp,
+            minFontSize = 8.5.sp,
+            fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Start,
+            maxLines = 3
         )
     }
 }

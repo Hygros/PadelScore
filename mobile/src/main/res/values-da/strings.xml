@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">Kampstatistik, grafer &amp; Health Connect-synkronisering</string>
+    <string name="current_status">AKTUEL STATUS</string>
+    <string name="checking_health_connect">Tjekker Health Connect…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">Tilladelser, træningsimport og manuel synkronisering</string>
+    <string name="allow_workout_imports">Tillad træningsimport på denne telefon</string>
+    <string name="connect_health_connect">Forbind til Health Connect</string>
+    <string name="sync_watch_workouts_now">Synkroniser urets træninger nu</string>
+    <string name="manage_health_connect_access">Administrer adgang til Health Connect</string>
+    <string name="install_or_update_health_connect">Installer eller opdater Health Connect</string>
+    <string name="health_sync_explanation">Sundhedssynkronisering skal også være aktiveret på dit ur. Dit ur kan stadig bruges uden denne ledsager-app.</string>
+    <string name="health_connect_advanced">Health Connect-indstillinger &amp; app</string>
+    <string name="health_connect_advanced_summary">Administrer tilladelser eller åbn Health Connect i Play Butik</string>
+
+    <string name="watch_app">Ur-app</string>
+    <string name="watch_app_summary">Installer eller opdater PadelScore på et tilsluttet ur</string>
+    <string name="install_or_update_on_watch">Installer / opdater ur-app</string>
+    <string name="watch_install_explanation">Åbner Play Butik på dit tilsluttede Wear OS-ur. Bekræft installationen på uret. Adgang til testsporet er stadig påkrævet.</string>
+
+    <string name="privacy_and_help">Privatliv &amp; hjælp</string>
+    <string name="privacy_summary">Datahåndtering, sletning og forbindelseshjælp</string>
+    <string name="privacy_and_deletion_info">Oplysninger om privatliv og sletning</string>
+    <string name="privacy_explanation">Kampskridt registreres lokalt på uret, inkluderes i den private kamphistorik på telefonen, når \"Kamphistorik på telefon\" er aktiveret, og eksporteres aldrig til Health Connect. Sletning af en kamp anmoder om sletning af dens PadelScore-poster i Health Connect. Kopier i andre sundhedsapps skal muligvis slettes separat.</string>
+    <string name="xiaomi_workaround">Åbner links fra uret ikke? Nogle Xiaomi-, Redmi- og POCO-telefoner kan blokere links, der åbnes af ur-pluginet. Gå til telefonens Indstillinger &gt; Apps, vælg dit ur-plugin, åbn Andre tilladelser, og tillad pop op-vinduer i baggrunden, hvis muligheden findes.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">Kampe &amp; statistik</string>
+    <string name="tab_health_sync">Sundhedssynk</string>
+    <string name="tab_watch_help">Ur &amp; info</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">udvidet</string>
+    <string name="collapsed">skjult</string>
+    <string name="choose_watch_title">Vælg ur</string>
+    <string name="cancel">Annuller</string>
+    <string name="back_to_matches">← Tilbage til kampe</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Tilladelse givet. Klar til at synkronisere registrerede træninger.</string>
+    <string name="status_permission_denied">De nødvendige tilladelser blev ikke givet. Tjek tilladelserne i Health Connect.</string>
+    <string name="status_sync_off">Sundhedssynkronisering er FRA. Sletning af kampe er fortsat aktiveret.</string>
+    <string name="status_finding_watches">Søger efter tilsluttede ure…</string>
+    <string name="status_no_watch">Intet tilsluttet Wear OS-ur. Tjek parring og Google Play-tjenester.</string>
+    <string name="status_choose_watch">Vælg det ur, der skal installeres eller opdateres på.</string>
+    <string name="status_watch_discovery_failed">Ursøgning mislykkedes (%s). Tjek parring og Google Play-tjenester.</string>
+    <string name="status_opening_play_store">Åbner Play Butik på uret…</string>
+    <string name="status_store_request_sent">Butiksanmodning sendt. Fortsæt på dit ur. Installation og adgang til testsporet bekræftes ikke af denne anmodning.</string>
+    <string name="status_store_request_failed">Butiksanmodning til uret mislykkedes (%s). Lås uret op, og tjek forbindelsen. Alternativt kan du åbne Play Butik på uret og søge efter Padel Score.</string>
+    <string name="status_no_app_for_action">Ingen app kan åbne denne handling. Åbn Health Connect fra telefonens Indstillinger.</string>
+    <string name="status_hc_unavailable">Health Connect er ikke tilgængelig eller kræver installation/opdatering (status %s).</string>
+    <string name="status_connected_ready">Forbundet. Klar til at synkronisere træninger.</string>
+    <string name="status_hc_available_connect">Health Connect er tilgængelig. Tryk på Forbind for at give skriveadgang til træninger og puls.</string>
+    <string name="status_connection_failed">Forbindelse mislykkedes: %1$s: %2$s</string>
+    <string name="status_syncing">Synkroniserer…</string>
+    <string name="status_sync_failed">Synkronisering mislykkedes: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Slettet fra Health Connect: %s. Tjek Samsung Health separat.</string>
+    <string name="status_hc_import_confirmed">Health Connect-import bekræftet: %1$s; pulsmålinger: %2$d</string>
+    <string name="status_sync_off_phone">Sundhedssynkronisering er FRA på denne telefon. Eksplicitte kampsletninger behandles stadig.</string>
+    <string name="status_hc_unavailable_permissions">Health Connect er ikke tilgængelig, eller skrivetilladelse til Træning / Puls mangler.</string>
+    <string name="status_sync_progress">Bekræftede importer: %1$d\nImporteret/gentaget: %2$d\nAnmodninger i kø: %3$d\nSundhedssynkronisering på uret skal være TIL.\nAfventende sletninger: %4$d\nEn anmodning i kø er ikke en importbekræftelse.</string>
+    <string name="status_deletion_pending_permission">Sletning af træning afventer: tilladelse eller tilgængelighed i Health Connect påkrævet.</string>
+    <string name="status_deletion_pending_no_record_id">Sletning afventer for %s: ældre import har intet gemt post-ID i Health Connect. Slet denne ældre træning manuelt i Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Sletning afventer for %s: ældre pulspost har intet gemt UID. Slet den manuelt i Health Connect.</string>
+    <string name="status_deletion_pending_error">Sletning i Health Connect afventer for %1$s: %2$s</string>
+    <string name="status_import_paused_consent">Import sat på pause: samtykke fra ur ikke tilgængeligt. Tilslut det opdaterede ur, og aktiver Sundhedssynkronisering.</string>
+
+    <string name="listener_hc_unavailable">Health Connect er ikke tilgængelig. Åbn telefonappen.</string>
+    <string name="listener_hc_permissions_missing">Tilladelser til Health Connect mangler. Åbn telefonappen.</string>
+    <string name="listener_sync_off">Telefonsynkronisering er FRA. Aktiver den i ledsager-appen.</string>
+    <string name="listener_phone_ready">Telefon klar. Import til Samsung Health bekræftes ikke separat.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Manuel eller automatisk synkronisering anmodet</string>
+    <string name="log_sync_failed">Synkronisering mislykkedes</string>
+    <string name="log_data_items_visible">Synlige DataItems på telefon=%d</string>
+    <string name="log_data_item_scan_unavailable">DataItem-scanning ikke tilgængelig; anmoder om direkte overførsel</string>
+    <string name="log_workout_request_queue_failed">Træningsanmodning kunne ikke sættes i kø</string>
+    <string name="log_hr_write_completed">Skrivning af puls fuldført workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">Skrivning af træningssession fuldført</string>
+    <string name="log_import_confirmed">Health Connect-import bekræftet workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">Allerede importeret workout=%s; bekræfter gentagelse uden dublet</string>
+    <string name="log_import_succeeded_ack_deferred">Import gennemført; bekræftelse udskudt til gentagelse</string>
+    <string name="log_import_deferred">Import udskudt; kildetræninger bevaret</string>
+
+    <string name="permissions_rationale">PadelScore Sync anmoder først om tilladelse til at skrive træningssessioner til Health Connect, efter at du har valgt at oprette forbindelse. Når synkronisering er aktiveret på uret, kan appen også gemme registrerede pulsmålinger. Du kan til enhver tid tilbagekalde adgangen i indstillingerne for Health Connect.\n\nUret registrerer kun pulsmålinger og kampskridt lokalt, når Sundhedssporing er aktiveret. Skridt eksporteres ikke til Health Connect, men skridtoversigter pr. kamp inkluderes i den private kamphistorik på telefonen, når \"Kamphistorik på telefon\" er aktiveret. Træningssessioner og pulsmålinger overføres kun via datalaget mellem parrede enheder, når Sundhedssynkronisering er aktiveret på uret. Nye importer kræver desuden, at synkroniseringsknappen på telefonen er slået til, skrivetilladelser i Health Connect samt et aktivt samtykketjek med kildeuret. Der bruges hverken brugerkonto eller udviklerstyret server.\n\nSletning af en kamp sender en vedvarende sletningsanmodning for kampens PadelScore-poster. Eksplicitte sletningsanmodninger behandles, selv når synkronisering er slået fra. Allerede importerede kopier i Samsung Health eller andre apps skal muligvis slettes separat. Deaktivering af synkronisering sletter ikke eksisterende data. Hvis ur-appen afinstalleres, før afventende sletninger er leveret, kan disse sletningsanmodninger gå tabt. Ufuldstændige overførsler forbliver i telefonens private lager til et nyt forsøg. Dette er en fitnessfunktion, ikke medicinsk udstyr.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">Spillede kampe</string>
+    <string name="match_history_summary">Tryk på en kamp for grafer, sætresultater &amp; detaljeret duelstatistik</string>
+    <string name="overall_statistics_title">Samlet statistik</string>
+    <string name="refresh_match_history">Opdater kamphistorik</string>
+    <string name="match_history_disabled">Synkronisering af kamphistorik er deaktiveret på uret. Aktiver \"Kamphistorik på telefon\" i urets indstillinger.</string>
+    <string name="no_matches_yet">Ingen kampe synkroniseret endnu.</string>
+    <string name="match_statistics">Kampe: %1$d | Sejre: %2$d | Partier: %3$d | Point: %4$d</string>
+    <string name="stat_matches">KAMPE</string>
+    <string name="stat_wins_rate">SEJRE (%d%%)</string>
+    <string name="stat_total_time">SPILLETID</string>
+    <string name="stat_total_steps">SKRIDT I ALT</string>
+    <string name="match_won">VUNDET</string>
+    <string name="match_lost">TABT</string>
+    <string name="won_at_stop">FØRING VED STOP</string>
+    <string name="lost_at_stop">BAGUD VED STOP</string>
+    <string name="tied_at_stop">UAFGJORT VED STOP</string>
+    <string name="ended_early">AFSLUTTET FØR TID</string>
+    <string name="provisional_result">%s · foreløbigt resultat</string>
+    <string name="match_details">Partier: %1$d | Point: %2$d</string>
+    <string name="match_heart_rate">Gns. puls: %d bpm</string>
+    <string name="match_max_heart_rate">Maks. puls: %d bpm</string>
+    <string name="match_steps">Skridt: %d</string>
+    <string name="steps_unavailable">Skridt ikke tilgængelige</string>
+    <string name="hours_format">%1$d:%2$02d t</string>
+    <string name="minutes_format">%d min</string>
+    <string name="our_team">OS</string>
+    <string name="opponent_short">MOD</string>
+    <string name="sets_label">SÆT</string>
+    <string name="sets_result">Sæt %1$d:%2$d</string>
+    <string name="games_result">Partier %1$d:%2$d</string>
+    <string name="tie_break">TIEBREAK</string>
+    <string name="tie_break_result">TB %1$d:%2$d</string>
+    <string name="match_tie_break_result">MTB %1$d:%2$d</string>
+    <string name="match_tie_break_full">MATCH-TIEBREAK</string>
+    <string name="set_number">SÆT %d</string>
+    <string name="current_set">AKTUELT SÆT</string>
+    <string name="tie_break_points">TIEBREAK-POINT</string>
+    <string name="points_at_stop">POINT VED STOP</string>
+    <string name="duration">VARIGHED</string>
+    <string name="points_played">SPILLEDE POINT</string>
+    <string name="games_played">SPILLEDE PARTIER</string>
+    <string name="steps_label">SKRIDT</string>
+    <string name="avg_heart_rate_label">GNS. PULS</string>
+    <string name="max_heart_rate_label">MAKS. PULS</string>
+    <string name="set_tie_break_title">SÆT %d · TIEBREAK</string>
+    <string name="set_game_title">SÆT %1$d · PARTI %2$d</string>
+    <string name="chart_prev">Forrige</string>
+    <string name="chart_next">Næste</string>
+    <string name="chart_tie_break_points">Tiebreak-point</string>
+    <string name="chart_game_score">Partistilling</string>
+    <string name="chart_match_point_number">Pointnummer</string>
+    <string name="older_matches_no_point_history">Ældre kampe har muligvis ingen pointhistorik.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · stilling efter hver duel</string>
+    <string name="point_number_team">POINT #%1$d · %2$s</string>
+    <string name="game_won_rallies">Parti vundet · dueller %1$d:%2$d</string>
+    <string name="show_rally_list">Vis point duel for duel (%d)</string>
+    <string name="tap_for_details">Tryk for grafer &amp; statistik →</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">Partistilling efter registrerede dueller. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">Partistilling efter registrerede dueller. 0, 15, 30, 40, AD, PARTI. %1$s</string>
+    <string name="chart_a11y_point">Point %1$d: %2$s mod %3$s</string>
+    <string name="adv_abbr">AD</string>
+    <string name="game_label">PARTI</string>
+</resources>

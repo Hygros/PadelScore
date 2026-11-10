@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">Wedstrijdstatistieken, grafieken &amp; Health Connect-synchronisatie</string>
+    <string name="current_status">HUIDIGE STATUS</string>
+    <string name="checking_health_connect">Health Connect controleren…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">Machtigingen, work-outimports en handmatige synchronisatie</string>
+    <string name="allow_workout_imports">Work-outimports op deze telefoon toestaan</string>
+    <string name="connect_health_connect">Verbinden met Health Connect</string>
+    <string name="sync_watch_workouts_now">Horloge-work-outs nu synchroniseren</string>
+    <string name="manage_health_connect_access">Toegang tot Health Connect beheren</string>
+    <string name="install_or_update_health_connect">Health Connect installeren of bijwerken</string>
+    <string name="health_sync_explanation">Gezondheidssynchronisatie moet ook op je horloge zijn ingeschakeld. Je horloge blijft bruikbaar zonder deze begeleidende app.</string>
+    <string name="health_connect_advanced">Health Connect-instellingen &amp; app</string>
+    <string name="health_connect_advanced_summary">Machtigingen beheren of Health Connect openen in de Play Store</string>
+
+    <string name="watch_app">Horloge-app</string>
+    <string name="watch_app_summary">PadelScore installeren of bijwerken op een verbonden horloge</string>
+    <string name="install_or_update_on_watch">Horloge-app installeren / bijwerken</string>
+    <string name="watch_install_explanation">Opent de Play Store op je verbonden Wear OS-horloge. Bevestig de installatie op het horloge. Toegang tot het testkanaal is nog steeds vereist.</string>
+
+    <string name="privacy_and_help">Privacy &amp; hulp</string>
+    <string name="privacy_summary">Gegevensverwerking, verwijdering en verbindingshulp</string>
+    <string name="privacy_and_deletion_info">Informatie over privacy en verwijdering</string>
+    <string name="privacy_explanation">Wedstrijdstappen worden lokaal op het horloge vastgelegd, opgenomen in de privégeschiedenis op de telefoon wanneer \'Wedstrijdgeschiedenis op telefoon\' is ingeschakeld, en nooit geëxporteerd naar Health Connect. Het verwijderen van een wedstrijd vraagt om verwijdering van de bijbehorende PadelScore-gegevens uit Health Connect. Kopieën in andere gezondheidsapps moeten mogelijk apart worden verwijderd.</string>
+    <string name="xiaomi_workaround">Openen horlogelinks niet? Sommige Xiaomi-, Redmi- en POCO-telefoons kunnen links blokkeren die door de horloge-plug-in worden geopend. Selecteer in Telefooninstellingen &gt; Apps je horloge-plug-in, open Overige machtigingen en sta pop-upvensters op de achtergrond toe als die optie bestaat.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">Wedstrijden &amp; statistieken</string>
+    <string name="tab_health_sync">Gezondheidssynchronisatie</string>
+    <string name="tab_watch_help">Horloge &amp; info</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">uitgeklapt</string>
+    <string name="collapsed">ingeklapt</string>
+    <string name="choose_watch_title">Kies horloge</string>
+    <string name="cancel">Annuleren</string>
+    <string name="back_to_matches">← Terug naar wedstrijden</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Machtiging verleend. Klaar om vastgelegde work-outs te synchroniseren.</string>
+    <string name="status_permission_denied">Vereiste machtigingen zijn niet verleend. Controleer de machtigingen van Health Connect.</string>
+    <string name="status_sync_off">Gezondheidssynchronisatie staat UIT. Wedstrijdverwijderingen blijven ingeschakeld.</string>
+    <string name="status_finding_watches">Verbonden horloges zoeken…</string>
+    <string name="status_no_watch">Geen verbonden Wear OS-horloge. Controleer de koppeling en Google Play-services.</string>
+    <string name="status_choose_watch">Kies het horloge om te installeren of bij te werken.</string>
+    <string name="status_watch_discovery_failed">Zoeken naar horloge mislukt (%s). Controleer de koppeling en Google Play-services.</string>
+    <string name="status_opening_play_store">Play Store openen op het horloge…</string>
+    <string name="status_store_request_sent">Store-verzoek verzonden. Ga verder op je horloge. Installatie en toegang tot het testkanaal worden niet bevestigd door dit verzoek.</string>
+    <string name="status_store_request_failed">Store-verzoek op horloge mislukt (%s). Ontgrendel het horloge en controleer de verbinding. Open anders de Play Store op het horloge en zoek naar Padel Score.</string>
+    <string name="status_no_app_for_action">Geen enkele app kan deze actie openen. Open Health Connect via de telefooninstellingen.</string>
+    <string name="status_hc_unavailable">Health Connect niet beschikbaar of moet worden geïnstalleerd/bijgewerkt (status %s).</string>
+    <string name="status_connected_ready">Verbonden. Klaar om work-outs te synchroniseren.</string>
+    <string name="status_hc_available_connect">Health Connect beschikbaar. Tik op Verbinden om schrijftoegang voor work-outs en hartslag te verlenen.</string>
+    <string name="status_connection_failed">Verbinding mislukt: %1$s: %2$s</string>
+    <string name="status_syncing">Synchroniseren…</string>
+    <string name="status_sync_failed">Synchronisatie mislukt: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Verwijderd uit Health Connect: %s. Controleer Samsung Health apart.</string>
+    <string name="status_hc_import_confirmed">Health Connect-import bevestigd: %1$s; hartslagmetingen: %2$d</string>
+    <string name="status_sync_off_phone">Gezondheidssynchronisatie staat UIT op deze telefoon. Expliciete wedstrijdverwijderingen worden nog steeds verwerkt.</string>
+    <string name="status_hc_unavailable_permissions">Health Connect niet beschikbaar of schrijfmachtiging voor Training / Hartslag ontbreekt.</string>
+    <string name="status_sync_progress">Bevestigde imports: %1$d\nGeïmporteerd/herhaald: %2$d\nVerzoeken in wachtrij: %3$d\nGezondheidssynchronisatie op horloge moet AAN staan.\nOpenstaande verwijderingen: %4$d\nEen verzoek in de wachtrij is geen importbevestiging.</string>
+    <string name="status_deletion_pending_permission">Verwijdering van work-out in behandeling: machtiging of beschikbaarheid van Health Connect vereist.</string>
+    <string name="status_deletion_pending_no_record_id">Verwijdering in behandeling voor %s: oude import heeft geen opgeslagen Health Connect-record-ID. Verwijder deze oudere work-out handmatig in Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Verwijdering in behandeling voor %s: oude hartslagmeting heeft geen opgeslagen UID. Verwijder deze handmatig in Health Connect.</string>
+    <string name="status_deletion_pending_error">Verwijdering uit Health Connect in behandeling voor %1$s: %2$s</string>
+    <string name="status_import_paused_consent">Import gepauzeerd: toestemming op horloge niet beschikbaar. Verbind het bijgewerkte horloge en schakel Gezondheidssynchronisatie in.</string>
+
+    <string name="listener_hc_unavailable">Health Connect niet beschikbaar. Open de telefoon-app.</string>
+    <string name="listener_hc_permissions_missing">Health Connect-machtigingen ontbreken. Open de telefoon-app.</string>
+    <string name="listener_sync_off">Telefoonsynchronisatie staat UIT. Schakel deze in via de begeleidende app.</string>
+    <string name="listener_phone_ready">Telefoon gereed. Import in Samsung Health wordt niet apart bevestigd.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Handmatige of automatische synchronisatie aangevraagd</string>
+    <string name="log_sync_failed">Synchronisatie mislukt</string>
+    <string name="log_data_items_visible">Zichtbare DataItems op telefoon=%d</string>
+    <string name="log_data_item_scan_unavailable">DataItem-scan niet beschikbaar; directe overdracht wordt aangevraagd</string>
+    <string name="log_workout_request_queue_failed">Work-outverzoek kon niet in de wachtrij worden geplaatst</string>
+    <string name="log_hr_write_completed">Schrijven van hartslag voltooid workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">Schrijven van trainingssessie voltooid</string>
+    <string name="log_import_confirmed">Health Connect-import bevestigd workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">Reeds geïmporteerd workout=%s; herhaling bevestigd zonder duplicaat</string>
+    <string name="log_import_succeeded_ack_deferred">Import geslaagd; bevestiging uitgesteld tot herhaling</string>
+    <string name="log_import_deferred">Import uitgesteld; bron-work-outs behouden</string>
+
+    <string name="permissions_rationale">PadelScore Sync vraagt pas toestemming om trainingssessies naar Health Connect te schrijven nadat je ervoor kiest om verbinding te maken. Wanneer synchronisatie op het horloge is ingeschakeld, kan de app ook vastgelegde hartslagmetingen wegschrijven. Je kunt de toegang op elk moment intrekken in de instellingen van Health Connect.\n\nHet horloge legt hartslagmetingen en wedstrijdstappen alleen lokaal vast wanneer Gezondheidsregistratie is ingeschakeld. Stappen worden niet geëxporteerd naar Health Connect, al worden stappensamenvattingen per wedstrijd wel opgenomen in de privégeschiedenis op de telefoon wanneer \'Wedstrijdgeschiedenis op telefoon\' is ingeschakeld. Trainingssessies en hartslagmetingen worden alleen via de gegevenslaag van gekoppelde apparaten overgedragen wanneer Gezondheidssynchronisatie op het horloge is ingeschakeld. Nieuwe imports vereisen daarnaast een ingeschakelde synchronisatieschakelaar op de telefoon, schrijfmachtigingen in Health Connect en een directe toestemmingscontrole bij het bronhorloge. Er wordt geen account of door de ontwikkelaar beheerde server gebruikt.\n\nHet verwijderen van een wedstrijd stuurt een blijvend verwijderingsverzoek voor de PadelScore-gegevens van die wedstrijd. Expliciete verwijderingsverzoeken worden zelfs verwerkt wanneer synchronisatie is uitgeschakeld. Reeds geïmporteerde kopieën in Samsung Health of andere apps moeten mogelijk apart worden verwijderd. Het uitschakelen van synchronisatie verwijdert geen bestaande gegevens. Als de horloge-app wordt verwijderd voordat openstaande verwijderingen zijn afgeleverd, kunnen die verzoeken verloren gaan. Onvolledige overdrachten blijven bewaard in de privéopslag van de telefoon voor een nieuwe poging. Dit is een fitnessfunctie, geen medisch hulpmiddel.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">Gespeelde wedstrijden</string>
+    <string name="match_history_summary">Tik op een wedstrijd voor grafieken, setstanden &amp; uitgebreide rallystatistieken</string>
+    <string name="overall_statistics_title">Algemene statistieken</string>
+    <string name="refresh_match_history">Wedstrijdgeschiedenis vernieuwen</string>
+    <string name="match_history_disabled">Synchronisatie van wedstrijdgeschiedenis is uitgeschakeld op het horloge. Schakel \"Wedstrijdgeschiedenis op telefoon\" in via de horloge-instellingen.</string>
+    <string name="no_matches_yet">Nog geen wedstrijden gesynchroniseerd.</string>
+    <string name="match_statistics">Wedstrijden: %1$d | Gewonnen: %2$d | Games: %3$d | Punten: %4$d</string>
+    <string name="stat_matches">WEDSTRIJDEN</string>
+    <string name="stat_wins_rate">GEWONNEN (%d%%)</string>
+    <string name="stat_total_time">SPEELTIJD</string>
+    <string name="stat_total_steps">TOTAAL STAPPEN</string>
+    <string name="match_won">GEWONNEN</string>
+    <string name="match_lost">VERLOREN</string>
+    <string name="won_at_stop">VOOR BIJ STOP</string>
+    <string name="lost_at_stop">ACHTER BIJ STOP</string>
+    <string name="tied_at_stop">GELIJK BIJ STOP</string>
+    <string name="ended_early">VROEGTIJDIG BEËINDIGD</string>
+    <string name="provisional_result">%s · voorlopige stand</string>
+    <string name="match_details">Games: %1$d | Punten: %2$d</string>
+    <string name="match_heart_rate">Gem. HS: %d bpm</string>
+    <string name="match_max_heart_rate">Max. HS: %d bpm</string>
+    <string name="match_steps">Stappen: %d</string>
+    <string name="steps_unavailable">Stappen niet beschikbaar</string>
+    <string name="hours_format">%1$d:%2$02d u</string>
+    <string name="minutes_format">%d min</string>
+    <string name="our_team">WIJ</string>
+    <string name="opponent_short">TEG</string>
+    <string name="sets_label">SETS</string>
+    <string name="sets_result">Sets %1$d:%2$d</string>
+    <string name="games_result">Games %1$d:%2$d</string>
+    <string name="tie_break">TIEBREAK</string>
+    <string name="tie_break_result">TB %1$d:%2$d</string>
+    <string name="match_tie_break_result">MTB %1$d:%2$d</string>
+    <string name="match_tie_break_full">MATCH-TIEBREAK</string>
+    <string name="set_number">SET %d</string>
+    <string name="current_set">HUIDIGE SET</string>
+    <string name="tie_break_points">TIEBREAK-PUNTEN</string>
+    <string name="points_at_stop">PUNTEN BIJ STOP</string>
+    <string name="duration">DUUR</string>
+    <string name="points_played">GESPEELDE PUNTEN</string>
+    <string name="games_played">GESPEELDE GAMES</string>
+    <string name="steps_label">STAPPEN</string>
+    <string name="avg_heart_rate_label">GEM. HARTSLAG</string>
+    <string name="max_heart_rate_label">MAX. HARTSLAG</string>
+    <string name="set_tie_break_title">SET %d · TIEBREAK</string>
+    <string name="set_game_title">SET %1$d · GAME %2$d</string>
+    <string name="chart_prev">Vorige</string>
+    <string name="chart_next">Volgende</string>
+    <string name="chart_tie_break_points">Tiebreak-punten</string>
+    <string name="chart_game_score">Gamescore</string>
+    <string name="chart_match_point_number">Puntnummer</string>
+    <string name="older_matches_no_point_history">Oudere wedstrijden hebben mogelijk geen puntengeschiedenis.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · stand na elke rally</string>
+    <string name="point_number_team">PUNT #%1$d · %2$s</string>
+    <string name="game_won_rallies">Game gewonnen · rally\'s %1$d:%2$d</string>
+    <string name="show_rally_list">Punten per rally tonen (%d)</string>
+    <string name="tap_for_details">Tik voor grafieken &amp; statistieken →</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">Gamescore na vastgelegde rally\'s. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">Gamescore na vastgelegde rally\'s. 0, 15, 30, 40, AD, GAME. %1$s</string>
+    <string name="chart_a11y_point">Punt %1$d: %2$s tegen %3$s</string>
+    <string name="adv_abbr">AD</string>
+    <string name="game_label">GAME</string>
+</resources>

@@ -80,14 +80,14 @@ fun ExitMatchScreen(
                         .padding(vertical = 3.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = stringResource(R.string.back_to_home_message),
                         color = Color.LightGray,
-                        fontSize = 9.sp,
-                        lineHeight = 10.sp,
+                        maxFontSize = 10.sp,
+                        minFontSize = 9.sp,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center,
-                        maxLines = 2
+                        maxLines = 5
                     )
                 }
             }

@@ -86,8 +86,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private val historyPreferences by lazy { PhoneMatchHistory.preferences(this) }
-    private val historyListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
-        runOnUiThread { renderMatchesSection() }
+    private val historyListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "entries" || key == "enabled" || key == null) {
+            runOnUiThread { renderMatchesSection() }
+        }
     }
 
     override fun onStart() {
@@ -206,6 +208,9 @@ class MainActivity : ComponentActivity() {
                 text = title
                 textSize = 13.5f
                 gravity = Gravity.CENTER
+                maxLines = 2
+                // Long translations shrink (and wrap) instead of being cut off.
+                setAutoSizeTextTypeUniformWithConfiguration(9, 14, 1, TypedValue.COMPLEX_UNIT_SP)
                 setPadding(dp(8), dp(10), dp(8), dp(10))
                 isClickable = true
                 isFocusable = true
@@ -214,7 +219,7 @@ class MainActivity : ComponentActivity() {
             tabButtons.add(tabView)
             bar.addView(
                 tabView,
-                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
             )
         }
         return bar
@@ -600,12 +605,17 @@ class MainActivity : ComponentActivity() {
             },
             LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         )
-        bottomRow.addView(TextView(this).apply {
-            text = getString(R.string.tap_for_details)
-            textSize = 12.5f
-            setTextColor(Color.rgb(1, 40, 83))
-            setTypeface(typeface, Typeface.BOLD)
-        })
+        // Weighted as well, so a long translation wraps instead of squeezing the steps text to 0 width.
+        bottomRow.addView(
+            TextView(this).apply {
+                text = getString(R.string.tap_for_details)
+                textSize = 12.5f
+                gravity = Gravity.END or Gravity.CENTER_VERTICAL
+                setTextColor(Color.rgb(1, 40, 83))
+                setTypeface(typeface, Typeface.BOLD)
+            },
+            LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+        )
         item.addView(bottomRow)
 
         return item
@@ -846,6 +856,8 @@ class MainActivity : ComponentActivity() {
             val prevBtn = Button(this).apply {
                 text = getString(R.string.chart_prev)
                 isAllCaps = false
+                maxLines = 2
+                setAutoSizeTextTypeUniformWithConfiguration(9, 14, 1, TypedValue.COMPLEX_UNIT_SP)
                 isEnabled = chartIndex > 0
                 setTextColor(if (isEnabled) Color.WHITE else Color.rgb(130, 142, 154))
                 backgroundTintList = ColorStateList.valueOf(
@@ -867,6 +879,8 @@ class MainActivity : ComponentActivity() {
             val nextBtn = Button(this).apply {
                 text = getString(R.string.chart_next)
                 isAllCaps = false
+                maxLines = 2
+                setAutoSizeTextTypeUniformWithConfiguration(9, 14, 1, TypedValue.COMPLEX_UNIT_SP)
                 isEnabled = chartIndex < gameGroups.lastIndex
                 setTextColor(if (isEnabled) Color.WHITE else Color.rgb(130, 142, 154))
                 backgroundTintList = ColorStateList.valueOf(
@@ -877,9 +891,9 @@ class MainActivity : ComponentActivity() {
                     renderMatchesSection()
                 }
             }
-            navRow.addView(prevBtn, LinearLayout.LayoutParams(0, dp(44), 1f))
+            navRow.addView(prevBtn, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
             navRow.addView(posLabel)
-            navRow.addView(nextBtn, LinearLayout.LayoutParams(0, dp(44), 1f))
+            navRow.addView(nextBtn, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
             chartCard.addView(navRow)
 
             container.addView(chartCard, spacedParams(dp(12)))

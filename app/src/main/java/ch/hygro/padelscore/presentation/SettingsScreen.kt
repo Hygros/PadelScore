@@ -50,10 +50,12 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val swipeGesturesEnabled by repository.swipeGesturesEnabled.collectAsState()
+    val wristGesturesEnabled by repository.wristGesturesEnabled.collectAsState()
+    val ambientModeEnabled by repository.ambientModeEnabled.collectAsState()
     val healthTrackingEnabled by repository.healthTrackingEnabled.collectAsState()
     val matchQuietModeEnabled by repository.matchQuietModeEnabled.collectAsState()
     val healthSyncEnabled by repository.healthSyncEnabled.collectAsState()
- val historySyncEnabled by repository.matchHistorySyncEnabled.collectAsState()
+    val historySyncEnabled by repository.matchHistorySyncEnabled.collectAsState()
     val syncScope = rememberCoroutineScope()
     val defaultCompanionStatus = stringResource(R.string.companion_status_optional)
     val checkingStatus = stringResource(R.string.companion_status_checking)
@@ -92,12 +94,14 @@ fun SettingsScreen(
                         .padding(top = 1.dp, bottom = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = stringResource(R.string.settings),
                         color = Color.White,
-                        fontSize = 12.sp,
+                        maxFontSize = 12.sp,
+                        minFontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
                     )
                 }
             }
@@ -115,6 +119,42 @@ fun SettingsScreen(
                         onCheckedChange = { repository.setSwipeGesturesEnabled(it) },
                         label = { SettingsLabel(stringResource(R.string.swipe_gestures)) },
                         secondaryLabel = { SettingsDescription(stringResource(R.string.swipe_gestures_desc)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            item {
+                val itemScope = this
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 2.dp)
+                ) {
+                    SwitchButton(
+                        checked = wristGesturesEnabled,
+                        onCheckedChange = { repository.setWristGesturesEnabled(it) },
+                        label = { SettingsLabel(stringResource(R.string.wrist_gestures)) },
+                        secondaryLabel = { SettingsDescription(stringResource(R.string.wrist_gestures_desc)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            item {
+                val itemScope = this
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 2.dp)
+                ) {
+                    SwitchButton(
+                        checked = ambientModeEnabled,
+                        onCheckedChange = { repository.setAmbientModeEnabled(it) },
+                        label = { SettingsLabel(stringResource(R.string.ambient_mode)) },
+                        secondaryLabel = { SettingsDescription(stringResource(R.string.ambient_mode_desc)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -234,12 +274,22 @@ fun SettingsScreen(
                     AutoSizeText(
                         text = stringResource(R.string.check_phone_setup),
                         maxFontSize = 12.sp,
-                        minFontSize = 8.5.sp,
+                        minFontSize = 9.sp,
                         maxLines = 2
                     )
                 }
             }
-            item { Text(companionStatus, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f)) }
+            item {
+                AutoSizeText(
+                    text = companionStatus,
+                    maxFontSize = 10.sp,
+                    minFontSize = 9.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    maxLines = 6,
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                )
+            }
             item {
                 Button(
                     onClick = {
@@ -262,14 +312,21 @@ fun SettingsScreen(
                     AutoSizeText(
                         text = stringResource(R.string.install_phone_companion),
                         maxFontSize = 12.sp,
-                        minFontSize = 8.5.sp,
+                        minFontSize = 9.sp,
                         maxLines = 2
                     )
                 }
             }
             item {
-                Text(stringResource(R.string.companion_sync_info),
-                    fontSize = 10.sp, modifier = Modifier.fillMaxWidth(0.85f))
+                AutoSizeText(
+                    text = stringResource(R.string.companion_sync_info),
+                    maxFontSize = 10.sp,
+                    minFontSize = 9.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    maxLines = 20,
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                )
             }
             item {
                 val itemScope = this
@@ -286,7 +343,7 @@ fun SettingsScreen(
                         AutoSizeText(
                             text = stringResource(R.string.configure_quiet_mode),
                             maxFontSize = 12.sp,
-                            minFontSize = 8.5.sp,
+                            minFontSize = 9.sp,
                             maxLines = 2
                         )
                     }
@@ -316,7 +373,7 @@ fun SettingsScreen(
                         AutoSizeText(
                             text = stringResource(R.string.back),
                             maxFontSize = 12.sp,
-                            minFontSize = 8.sp,
+                            minFontSize = 8.5.sp,
                             maxLines = 1
                         )
                     }
@@ -327,22 +384,26 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SettingsLabel(text: String) {
- Text(
- text = text,
- fontSize = 11.sp,
- lineHeight = 13.sp,
- maxLines = 2
- )
+internal fun SettingsLabel(text: String) {
+    AutoSizeText(
+        text = text,
+        maxFontSize = 12.sp,
+        minFontSize = 9.5.sp,
+        fontWeight = null,
+        textAlign = TextAlign.Start,
+        maxLines = 3
+    )
 }
 
 @Composable
-private fun SettingsDescription(text: String) {
-    Text(
-    text = text,
-    fontSize = 9.sp,
-    lineHeight = 11.sp,
-    color = Color.Gray,
-    maxLines = 4
+internal fun SettingsDescription(text: String) {
+    AutoSizeText(
+        text = text,
+        maxFontSize = 10.sp,
+        minFontSize = 9.sp,
+        color = Color.Gray,
+        fontWeight = null,
+        textAlign = TextAlign.Start,
+        maxLines = 12
     )
 }

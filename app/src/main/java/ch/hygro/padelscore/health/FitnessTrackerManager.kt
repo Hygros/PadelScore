@@ -4,6 +4,9 @@ import android.content.Context
 import android.os.SystemClock
 import android.util.Log
 import androidx.concurrent.futures.await
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.health.services.client.ExerciseClient
 import androidx.health.services.client.ExerciseUpdateCallback
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.data.Availability
@@ -12,8 +15,6 @@ import androidx.health.services.client.data.ExerciseConfig
 import androidx.health.services.client.data.ExerciseLapSummary
 import androidx.health.services.client.data.ExerciseType
 import androidx.health.services.client.data.ExerciseUpdate
-import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
@@ -23,15 +24,22 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.milliseconds
 
-class FitnessTrackerManager(private val context: Context) {
-    private val healthClient = HealthServices.getClient(context)
-    private val exerciseClient = healthClient.exerciseClient
-    private val workoutRepository = LocalWorkoutRepository(context)
+class FitnessTrackerManager internal constructor(
+    private val context: Context,
+    private val exerciseClient: ExerciseClient = HealthServices.getClient(context).exerciseClient,
+    private val workoutRepository: LocalWorkoutRepository = LocalWorkoutRepository(context),
+    private val recoveryState: android.content.SharedPreferences =
+        context.getSharedPreferences("workout_tracking_recovery", Context.MODE_PRIVATE)
+) {
+    constructor(context: Context) : this(
+        context = context,
+        exerciseClient = HealthServices.getClient(context).exerciseClient
+    )
+
     private val stepSensor = MatchStepSensor(context)
     private var acceptUpdates = false
     private var resumedSegment = false
     private var endingRequested = false
-    private val recoveryState = context.getSharedPreferences("workout_tracking_recovery", Context.MODE_PRIVATE)
     private var healthStepsOffset = 0L
 
     internal fun releaseCallback() {
@@ -93,19 +101,38 @@ class FitnessTrackerManager(private val context: Context) {
         finalUpdate = CompletableDeferred()
         endingRequested = false
         resumedSegment = false
-        healthStepsOffset = if (recoveryState.getLong("match_id", 0L) == workoutRepository.activeMatchId()) {
+        val activeMatchId = workoutRepository.activeMatchId()
+        healthStepsOffset = if (recoveryState.getLong("match_id", 0L) == activeMatchId) {
             recoveryState.getLong("steps_offset", 0L)
         } else 0L
-        averageHeartRate = workoutRepository.averageHeartRateForMatch(workoutRepository.activeMatchId())
+        averageHeartRate = workoutRepository.averageHeartRateForMatch(activeMatchId)
         FitnessTrackingService.publishAverage(averageHeartRate)
         try {
-            // The tracked-status constants are library-restricted in Health Services 1.0.0.
-            // Let the public startExerciseAsync API decide whether a new exercise can start.
+            val existingInfo = withTimeoutOrNull(5_000L.milliseconds) {
+                runCatching { exerciseClient.getCurrentExerciseInfoAsync().await() }.getOrNull()
+            }
+            if (existingInfo != null &&
+                existingInfo.exerciseTrackedStatus == OWNED_EXERCISE_IN_PROGRESS &&
+                recoveryState.getBoolean("owned_active", false) &&
+                recoveryState.getLong("match_id", 0L) == activeMatchId &&
+                activeMatchId > 0L
+            ) {
+                // Re-attach to the already running exercise owned by this app without adding a new step offset.
+                resumedSegment = workoutRepository.recordedSampleAverage() != null
+                acceptUpdates = true
+                exerciseClient.setUpdateCallback(ContextCompat.getMainExecutor(context), callback)
+                tracking = true
+                stepSensor.start()
+                Log.d("FitnessTracker", "Reattached to owned in-progress workout for match $activeMatchId")
+                return@withLock
+            }
+
             resumedSegment = workoutRepository.recordedSampleAverage() != null
-            healthStepsOffset = workoutRepository.stepsForMatch(workoutRepository.activeMatchId()) ?: 0L
-            recoveryState.edit {
-                putLong("match_id", workoutRepository.activeMatchId())
+            healthStepsOffset = workoutRepository.stepsForMatch(activeMatchId) ?: 0L
+            recoveryState.edit(commit = true) {
+                putLong("match_id", activeMatchId)
                 putLong("steps_offset", healthStepsOffset)
+                putBoolean("owned_active", true)
             }
             val capabilities = withTimeoutOrNull(10_000L.milliseconds) { exerciseClient.getCapabilitiesAsync().await() }
                 ?: error("Health Services capabilities unavailable")
@@ -148,9 +175,33 @@ class FitnessTrackerManager(private val context: Context) {
 
     suspend fun recoverForStop() = lifecycleMutex.withLock {
         if (tracking) return@withLock
-        // No public ownership check is available in this library version.
-        // Never end an exercise that might belong to another application.
-        Log.w("FitnessTracker", "Cannot safely reattach after process recreation")
+        val activeMatchId = workoutRepository.activeMatchId()
+        if (activeMatchId <= 0L) return@withLock
+        try {
+            val info = withTimeoutOrNull(5_000L.milliseconds) {
+                exerciseClient.getCurrentExerciseInfoAsync().await()
+            }
+            if (info != null && info.exerciseTrackedStatus == OWNED_EXERCISE_IN_PROGRESS) {
+                val savedMatchId = recoveryState.getLong("match_id", 0L)
+                val isSameMatch = savedMatchId == activeMatchId && recoveryState.getBoolean("owned_active", false)
+                healthStepsOffset = if (isSameMatch) {
+                    recoveryState.getLong("steps_offset", 0L)
+                } else 0L
+                resumedSegment = workoutRepository.recordedSampleAverage() != null
+                finalUpdate = CompletableDeferred()
+                endingRequested = false
+                acceptUpdates = isSameMatch
+                exerciseClient.setUpdateCallback(ContextCompat.getMainExecutor(context), callback)
+                tracking = true
+                Log.d("FitnessTracker", "Recovered owned active exercise for stop")
+            } else {
+                Log.d("FitnessTracker", "No owned active exercise in progress during recoverForStop")
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w("FitnessTracker", "Could not query current exercise info during recoverForStop", e)
+        }
     }
 
     suspend fun stopWorkout() = lifecycleMutex.withLock {
@@ -180,10 +231,16 @@ class FitnessTrackerManager(private val context: Context) {
             tracking = false
             acceptUpdates = false
             stepSensor.stop()
+            recoveryState.edit { putBoolean("owned_active", false) }
             withContext(NonCancellable) {
                 runCatching { kotlinx.coroutines.withTimeout(5_000L.milliseconds) { exerciseClient.clearUpdateCallbackAsync(callback).await() } }
                     .onFailure { Log.w("FitnessTracker", "Callback cleanup failed", it) }
             }
         }
+    }
+
+    companion object {
+        // ExerciseTrackedStatus.OWNED_EXERCISE_IN_PROGRESS (companion constant is @RestrictTo(LIBRARY)).
+        private const val OWNED_EXERCISE_IN_PROGRESS = 1
     }
 }

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">Statistiques de match, graphiques et synchro Santé Connect</string>
+    <string name="current_status">ÉTAT ACTUEL</string>
+    <string name="checking_health_connect">Vérification de Santé Connect…</string>
+    <string name="health_connect">Santé Connect</string>
+    <string name="health_connect_summary">Autorisations, importations d\'entraînements et synchronisation manuelle</string>
+    <string name="allow_workout_imports">Autoriser l\'importation d\'entraînements sur ce téléphone</string>
+    <string name="connect_health_connect">Connecter Santé Connect</string>
+    <string name="sync_watch_workouts_now">Synchroniser les entraînements de la montre</string>
+    <string name="manage_health_connect_access">Gérer l\'accès à Santé Connect</string>
+    <string name="install_or_update_health_connect">Installer ou mettre à jour Santé Connect</string>
+    <string name="health_sync_explanation">La synchronisation santé doit également être activée sur votre montre. Votre montre reste utilisable sans cette application compagnon.</string>
+    <string name="health_connect_advanced">Paramètres et appli Santé Connect</string>
+    <string name="health_connect_advanced_summary">Gérer les autorisations ou ouvrir Santé Connect dans le Play Store</string>
+
+    <string name="watch_app">Application montre</string>
+    <string name="watch_app_summary">Installer ou mettre à jour PadelScore sur une montre connectée</string>
+    <string name="install_or_update_on_watch">Installer / mettre à jour sur la montre</string>
+    <string name="watch_install_explanation">Ouvre le Play Store sur votre montre Wear OS connectée. Confirmez l\'installation sur la montre. L\'accès au canal de test reste requis.</string>
+
+    <string name="privacy_and_help">Confidentialité et aide</string>
+    <string name="privacy_summary">Traitement des données, suppression et aide à la connexion</string>
+    <string name="privacy_and_deletion_info">Informations sur la confidentialité et la suppression</string>
+    <string name="privacy_explanation">Les pas du match sont enregistrés localement sur la montre, inclus dans l\'historique privé sur le téléphone lorsque « Historique des matchs sur le téléphone » est activé, et ne sont jamais exportés vers Santé Connect. La suppression d\'un match demande la suppression de ses enregistrements PadelScore dans Santé Connect. Les copies dans d\'autres applications de santé peuvent nécessiter une suppression séparée.</string>
+    <string name="xiaomi_workaround">Les liens de la montre ne s\'ouvrent pas ? Certains téléphones Xiaomi, Redmi et POCO peuvent bloquer les liens ouverts par le plug-in de la montre. Dans Paramètres &gt; Applications du téléphone, sélectionnez le plug-in de votre montre, ouvrez Autres autorisations et autorisez les fenêtres contextuelles en arrière-plan si cette option existe.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">Matchs et stats</string>
+    <string name="tab_health_sync">Synchro santé</string>
+    <string name="tab_watch_help">Montre et infos</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">développé</string>
+    <string name="collapsed">réduit</string>
+    <string name="choose_watch_title">Choisir la montre</string>
+    <string name="cancel">Annuler</string>
+    <string name="back_to_matches">← Retour aux matchs</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Autorisation accordée. Prêt à synchroniser les entraînements enregistrés.</string>
+    <string name="status_permission_denied">Les autorisations requises n\'ont pas été accordées. Vérifiez les autorisations de Santé Connect.</string>
+    <string name="status_sync_off">La synchro santé est DÉSACTIVÉE. Les suppressions de matchs restent activées.</string>
+    <string name="status_finding_watches">Recherche de montres connectées…</string>
+    <string name="status_no_watch">Aucune montre Wear OS connectée. Vérifiez l\'association et les services Google Play.</string>
+    <string name="status_choose_watch">Choisissez la montre pour installer ou mettre à jour.</string>
+    <string name="status_watch_discovery_failed">Échec de la recherche de montre (%s). Vérifiez l\'association et les services Google Play.</string>
+    <string name="status_opening_play_store">Ouverture du Play Store sur la montre…</string>
+    <string name="status_store_request_sent">Demande envoyée au Play Store. Continuez sur votre montre. L\'installation et l\'accès au canal de test ne sont pas confirmés par cette demande.</string>
+    <string name="status_store_request_failed">Échec de la demande au Play Store sur la montre (%s). Déverrouillez la montre et vérifiez sa connexion. Sinon, ouvrez le Play Store sur la montre et recherchez Padel Score.</string>
+    <string name="status_no_app_for_action">Aucune application ne peut ouvrir cette action. Ouvrez Santé Connect depuis les Paramètres du téléphone.</string>
+    <string name="status_hc_unavailable">Santé Connect est indisponible ou doit être installé/mis à jour (état %s).</string>
+    <string name="status_connected_ready">Connecté. Prêt à synchroniser les entraînements.</string>
+    <string name="status_hc_available_connect">Santé Connect est disponible. Appuyez sur Connecter pour accorder l\'accès en écriture aux entraînements et à la fréquence cardiaque.</string>
+    <string name="status_connection_failed">Échec de la connexion : %1$s : %2$s</string>
+    <string name="status_syncing">Synchronisation…</string>
+    <string name="status_sync_failed">Échec de la synchronisation : %1$s : %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Supprimé de Santé Connect : %s. Vérifiez Samsung Health séparément.</string>
+    <string name="status_hc_import_confirmed">Importation Santé Connect confirmée : %1$s ; échantillons FC : %2$d</string>
+    <string name="status_sync_off_phone">La synchro santé est DÉSACTIVÉE sur ce téléphone. Les suppressions explicites de matchs sont toujours traitées.</string>
+    <string name="status_hc_unavailable_permissions">Santé Connect indisponible ou autorisation d\'écriture Exercice / Fréquence cardiaque manquante.</string>
+    <string name="status_sync_progress">Importations confirmées : %1$d\nImportées/rejouées : %2$d\nDemandes en file d\'attente : %3$d\nLa synchro santé sur la montre doit être ACTIVÉE.\nSuppressions en attente : %4$d\nUne demande en file d\'attente n\'est pas une confirmation d\'importation.</string>
+    <string name="status_deletion_pending_permission">Suppression d\'entraînement en attente : autorisation ou disponibilité de Santé Connect requise.</string>
+    <string name="status_deletion_pending_no_record_id">Suppression en attente pour %s : l\'ancienne importation n\'a pas d\'ID d\'enregistrement Santé Connect sauvegardé. Supprimez cet ancien entraînement manuellement dans Santé Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Suppression en attente pour %s : l\'ancien enregistrement de fréquence cardiaque n\'a pas d\'UID sauvegardé. Supprimez-le manuellement dans Santé Connect.</string>
+    <string name="status_deletion_pending_error">Suppression Santé Connect en attente pour %1$s : %2$s</string>
+    <string name="status_import_paused_consent">Importation en pause : consentement de la montre indisponible. Connectez la montre mise à jour et activez la synchro santé.</string>
+
+    <string name="listener_hc_unavailable">Santé Connect indisponible. Ouvrez l\'application sur le téléphone.</string>
+    <string name="listener_hc_permissions_missing">Autorisations Santé Connect manquantes. Ouvrez l\'application sur le téléphone.</string>
+    <string name="listener_sync_off">La synchro téléphone est DÉSACTIVÉE. Activez-la dans l\'application compagnon.</string>
+    <string name="listener_phone_ready">Téléphone prêt. L\'importation dans Samsung Health n\'est pas confirmée séparément.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Synchronisation manuelle ou automatique demandée</string>
+    <string name="log_sync_failed">Échec de la synchronisation</string>
+    <string name="log_data_items_visible">DataItems visibles sur le téléphone=%d</string>
+    <string name="log_data_item_scan_unavailable">Analyse DataItem indisponible ; demande de transfert direct</string>
+    <string name="log_workout_request_queue_failed">La demande d\'entraînement n\'a pas pu être mise en file d\'attente</string>
+    <string name="log_hr_write_completed">Écriture de la fréquence cardiaque terminée workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">Écriture de la séance d\'exercice terminée</string>
+    <string name="log_import_confirmed">Importation Santé Connect confirmée workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">Déjà importé workout=%s ; confirmation sans doublon</string>
+    <string name="log_import_succeeded_ack_deferred">Importation réussie ; accusé de réception différé</string>
+    <string name="log_import_deferred">Importation différée ; entraînements sources conservés</string>
+
+    <string name="permissions_rationale">PadelScore Sync demande l\'autorisation d\'écrire des séances d\'exercice dans Santé Connect uniquement après que vous avez choisi de vous connecter. Lorsque la synchronisation est activée sur la montre, l\'application peut également enregistrer les mesures de fréquence cardiaque. Vous pouvez révoquer l\'accès à tout moment dans les paramètres de Santé Connect.\n\nLa montre enregistre localement les échantillons de fréquence cardiaque et les pas du match uniquement lorsque le Suivi santé est activé. Les pas ne sont pas exportés vers Santé Connect, bien que les résumés de pas par match soient inclus dans l\'historique privé du téléphone lorsque « Historique des matchs sur le téléphone » est activé. Les séances d\'entraînement et les échantillons de fréquence cardiaque sont transférés via la couche de données des appareils associés uniquement lorsque la Synchronisation santé est activée sur la montre. Les nouvelles importations nécessitent également l\'activation de la synchronisation sur le téléphone, les autorisations d\'écriture dans Santé Connect et une vérification en direct du consentement avec la montre source. Aucun compte ni serveur géré par le développeur n\'est utilisé.\n\nLa suppression d\'un match envoie une demande de suppression durable pour les enregistrements PadelScore de ce match. Les demandes de suppression explicites sont traitées même lorsque la synchronisation est désactivée. Les copies déjà importées dans Samsung Health ou d\'autres applications peuvent nécessiter une suppression séparée. La désactivation de la synchronisation ne supprime pas les données existantes. La désinstallation de l\'application de la montre avant la remise des suppressions en attente peut entraîner la perte de ces demandes. Les transferts incomplets restent dans le stockage privé du téléphone pour une nouvelle tentative. Il s\'agit d\'une fonctionnalité de fitness et non d\'un dispositif médical.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">Matchs joués</string>
+    <string name="match_history_summary">Appuyez sur un match pour voir les graphiques, les scores des sets et le détail des échanges</string>
+    <string name="overall_statistics_title">Statistiques globales</string>
+    <string name="refresh_match_history">Actualiser l\'historique des matchs</string>
+    <string name="match_history_disabled">La synchronisation de l\'historique des matchs est désactivée sur la montre. Activez « Historique des matchs sur le téléphone » dans les paramètres de la montre.</string>
+    <string name="no_matches_yet">Aucun match synchronisé pour le moment.</string>
+    <string name="match_statistics">Matchs : %1$d | Victoires : %2$d | Jeux : %3$d | Points : %4$d</string>
+    <string name="stat_matches">MATCHS</string>
+    <string name="stat_wins_rate">VICTOIRES (%d%%)</string>
+    <string name="stat_total_time">TEMPS DE JEU</string>
+    <string name="stat_total_steps">TOTAL DES PAS</string>
+    <string name="match_won">GAGNÉ</string>
+    <string name="match_lost">PERDU</string>
+    <string name="won_at_stop">EN TÊTE À L\'ARRÊT</string>
+    <string name="lost_at_stop">MENÉ À L\'ARRÊT</string>
+    <string name="tied_at_stop">ÉGALITÉ À L\'ARRÊT</string>
+    <string name="ended_early">TERMINÉ PRÉMATURÉMENT</string>
+    <string name="provisional_result">%s · résultat provisoire</string>
+    <string name="match_details">Jeux : %1$d | Points : %2$d</string>
+    <string name="match_heart_rate">FC moy. : %d bpm</string>
+    <string name="match_max_heart_rate">FC max. : %d bpm</string>
+    <string name="match_steps">Pas : %d</string>
+    <string name="steps_unavailable">Pas indisponibles</string>
+    <string name="hours_format">%1$d:%2$02d h</string>
+    <string name="minutes_format">%d min</string>
+    <string name="our_team">NOUS</string>
+    <string name="opponent_short">ADV</string>
+    <string name="sets_label">SETS</string>
+    <string name="sets_result">Sets %1$d:%2$d</string>
+    <string name="games_result">Jeux %1$d:%2$d</string>
+    <string name="tie_break">TIE-BREAK</string>
+    <string name="tie_break_result">TB %1$d:%2$d</string>
+    <string name="match_tie_break_result">STB %1$d:%2$d</string>
+    <string name="match_tie_break_full">SUPER TIE-BREAK</string>
+    <string name="set_number">SET %d</string>
+    <string name="current_set">SET ACTUEL</string>
+    <string name="tie_break_points">POINTS DU TIE-BREAK</string>
+    <string name="points_at_stop">POINTS À L\'ARRÊT</string>
+    <string name="duration">DURÉE</string>
+    <string name="points_played">POINTS JOUÉS</string>
+    <string name="games_played">JEUX JOUÉS</string>
+    <string name="steps_label">PAS</string>
+    <string name="avg_heart_rate_label">FC MOYENNE</string>
+    <string name="max_heart_rate_label">FC MAX</string>
+    <string name="set_tie_break_title">SET %d · TIE-BREAK</string>
+    <string name="set_game_title">SET %1$d · JEU %2$d</string>
+    <string name="chart_prev">Préc.</string>
+    <string name="chart_next">Suiv.</string>
+    <string name="chart_tie_break_points">Points du tie-break</string>
+    <string name="chart_game_score">Score du jeu</string>
+    <string name="chart_match_point_number">Numéro du point</string>
+    <string name="older_matches_no_point_history">Les anciens matchs peuvent ne pas avoir d\'historique des points.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · score après chaque échange</string>
+    <string name="point_number_team">POINT #%1$d · %2$s</string>
+    <string name="game_won_rallies">Jeu gagné · échanges %1$d:%2$d</string>
+    <string name="show_rally_list">Afficher les points échange par échange (%d)</string>
+    <string name="tap_for_details">Appuyer pour les graphiques et stats →</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">Score du jeu après les échanges enregistrés. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">Score du jeu après les échanges enregistrés. 0, 15, 30, 40, AV, JEU. %1$s</string>
+    <string name="chart_a11y_point">Point %1$d : %2$s à %3$s</string>
+    <string name="adv_abbr">AV</string>
+    <string name="game_label">JEU</string>
+</resources>

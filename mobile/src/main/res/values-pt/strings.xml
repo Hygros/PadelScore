@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">Estatísticas da partida, gráficos e sincronização Health Connect</string>
+    <string name="current_status">ESTADO ATUAL</string>
+    <string name="checking_health_connect">A verificar o Health Connect…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">Permissões, importação de treinos e sincronização manual</string>
+    <string name="allow_workout_imports">Permitir importação de treinos neste telemóvel</string>
+    <string name="connect_health_connect">Ligar ao Health Connect</string>
+    <string name="sync_watch_workouts_now">Sincronizar treinos do relógio agora</string>
+    <string name="manage_health_connect_access">Gerir acesso ao Health Connect</string>
+    <string name="install_or_update_health_connect">Instalar ou atualizar o Health Connect</string>
+    <string name="health_sync_explanation">A Sincronização de saúde também deve estar ativada no teu relógio. O relógio continua utilizável sem esta aplicação complementar.</string>
+    <string name="health_connect_advanced">Definições e aplicação Health Connect</string>
+    <string name="health_connect_advanced_summary">Gerir permissões ou abrir o Health Connect na Play Store</string>
+
+    <string name="watch_app">Aplicação do relógio</string>
+    <string name="watch_app_summary">Instalar ou atualizar o PadelScore num relógio ligado</string>
+    <string name="install_or_update_on_watch">Instalar / atualizar aplicação do relógio</string>
+    <string name="watch_install_explanation">Abre a Play Store no teu relógio Wear OS ligado. Confirma a instalação no relógio. O acesso à faixa de testes continua a ser necessário.</string>
+
+    <string name="privacy_and_help">Privacidade e ajuda</string>
+    <string name="privacy_summary">Tratamento de dados, eliminação e ajuda de ligação</string>
+    <string name="privacy_and_deletion_info">Informações de privacidade e eliminação</string>
+    <string name="privacy_explanation">Os passos da partida são registados localmente no relógio, incluídos no histórico privado do telemóvel quando «Histórico de partidas no telemóvel» está ativado e nunca são exportados para o Health Connect. Eliminar uma partida solicita a eliminação dos respetivos registos do PadelScore no Health Connect. Cópias noutras aplicações de saúde podem ter de ser eliminadas separadamente.</string>
+    <string name="xiaomi_workaround">As ligações do relógio não abrem? Alguns telemóveis Xiaomi, Redmi e POCO podem bloquear ligações abertas pelo plug-in do relógio. Nas Definições do telemóvel &gt; Aplicações, seleciona o plug-in do teu relógio, abre Outras permissões e permite janelas pop-up em segundo plano, se essa opção existir.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">Partidas e estatísticas</string>
+    <string name="tab_health_sync">Sincronização de saúde</string>
+    <string name="tab_watch_help">Relógio e info</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">expandido</string>
+    <string name="collapsed">recolhido</string>
+    <string name="choose_watch_title">Escolher relógio</string>
+    <string name="cancel">Cancelar</string>
+    <string name="back_to_matches">← Voltar às partidas</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Permissão concedida. Pronto para sincronizar os treinos registados.</string>
+    <string name="status_permission_denied">As permissões necessárias não foram concedidas. Verifica as permissões do Health Connect.</string>
+    <string name="status_sync_off">A Sincronização de saúde está DESATIVADA. As eliminações de partidas permanecem ativas.</string>
+    <string name="status_finding_watches">A procurar relógios ligados…</string>
+    <string name="status_no_watch">Nenhum relógio Wear OS ligado. Verifica o emparelhamento e os serviços do Google Play.</string>
+    <string name="status_choose_watch">Escolhe o relógio para instalar ou atualizar.</string>
+    <string name="status_watch_discovery_failed">Falha na procura do relógio (%s). Verifica o emparelhamento e os serviços do Google Play.</string>
+    <string name="status_opening_play_store">A abrir a Play Store no relógio…</string>
+    <string name="status_store_request_sent">Pedido enviado para a loja. Continua no teu relógio. A instalação e o acesso à faixa de testes não são confirmados por este pedido.</string>
+    <string name="status_store_request_failed">Falha no pedido à loja no relógio (%s). Desbloqueia o relógio e verifica a ligação. Em alternativa, abre a Play Store no relógio e procura Padel Score.</string>
+    <string name="status_no_app_for_action">Nenhuma aplicação pode abrir esta ação. Abre o Health Connect a partir das Definições do telemóvel.</string>
+    <string name="status_hc_unavailable">Health Connect indisponível ou precisa de instalação/atualização (estado %s).</string>
+    <string name="status_connected_ready">Ligado. Pronto para sincronizar treinos.</string>
+    <string name="status_hc_available_connect">Health Connect disponível. Toca em Ligar para conceder acesso de escrita a treinos e frequência cardíaca.</string>
+    <string name="status_connection_failed">Falha na ligação: %1$s: %2$s</string>
+    <string name="status_syncing">A sincronizar…</string>
+    <string name="status_sync_failed">Falha na sincronização: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Eliminado do Health Connect: %s. Verifica o Samsung Health separadamente.</string>
+    <string name="status_hc_import_confirmed">Importação no Health Connect confirmada: %1$s; amostras de FC: %2$d</string>
+    <string name="status_sync_off_phone">A Sincronização de saúde está DESATIVADA neste telemóvel. As eliminações explícitas de partidas continuam a ser processadas.</string>
+    <string name="status_hc_unavailable_permissions">Health Connect indisponível ou falta permissão de escrita de Exercício / Frequência cardíaca.</string>
+    <string name="status_sync_progress">Importações confirmadas: %1$d\nImportadas/repetidas: %2$d\nPedidos em fila: %3$d\nA Sincronização de saúde no relógio deve estar ATIVADA.\nEliminações pendentes: %4$d\nUm pedido em fila não é uma confirmação de importação.</string>
+    <string name="status_deletion_pending_permission">Eliminação de treino pendente: é necessária permissão ou disponibilidade do Health Connect.</string>
+    <string name="status_deletion_pending_no_record_id">Eliminação pendente para %s: a importação antiga não tem ID de registo guardado no Health Connect. Elimina este treino antigo manualmente no Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Eliminação pendente para %s: o registo antigo de frequência cardíaca não tem UID guardado. Elimina-o manualmente no Health Connect.</string>
+    <string name="status_deletion_pending_error">Eliminação no Health Connect pendente para %1$s: %2$s</string>
+    <string name="status_import_paused_consent">Importação em pausa: consentimento do relógio indisponível. Liga o relógio atualizado e ativa a Sincronização de saúde.</string>
+
+    <string name="listener_hc_unavailable">Health Connect indisponível. Abre a aplicação no telemóvel.</string>
+    <string name="listener_hc_permissions_missing">Faltam permissões do Health Connect. Abre a aplicação no telemóvel.</string>
+    <string name="listener_sync_off">A sincronização no telemóvel está DESATIVADA. Ativa-a na aplicação complementar.</string>
+    <string name="listener_phone_ready">Telemóvel pronto. A importação no Samsung Health não é confirmada separadamente.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Sincronização manual ou automática solicitada</string>
+    <string name="log_sync_failed">Falha na sincronização</string>
+    <string name="log_data_items_visible">DataItems visíveis no telemóvel=%d</string>
+    <string name="log_data_item_scan_unavailable">Análise de DataItem indisponível; a solicitar transferência direta</string>
+    <string name="log_workout_request_queue_failed">Não foi possível colocar o pedido de treino em fila</string>
+    <string name="log_hr_write_completed">Escrita de frequência cardíaca concluída workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">Escrita da sessão de exercício concluída</string>
+    <string name="log_import_confirmed">Importação no Health Connect confirmada workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">Já importado workout=%s; a confirmar repetição sem duplicado</string>
+    <string name="log_import_succeeded_ack_deferred">Importação concluída; confirmação adiada até repetição</string>
+    <string name="log_import_deferred">Importação adiada; treinos de origem mantidos</string>
+
+    <string name="permissions_rationale">O PadelScore Sync solicita permissão para guardar sessões de exercício no Health Connect apenas depois de optares por ligar. Quando a sincronização está ativada no relógio, a aplicação também pode guardar medições de frequência cardíaca registadas. Podes revogar o acesso a qualquer momento nas definições do Health Connect.\n\nO relógio regista localmente amostras de frequência cardíaca e passos da partida apenas quando a Monitorização de saúde está ativada. Os passos não são exportados para o Health Connect, embora os resumos de passos por partida sejam incluídos no histórico privado do telemóvel quando «Histórico de partidas no telemóvel» está ativado. As sessões de treino e as amostras de frequência cardíaca são transferidas através da camada de dados dos dispositivos emparelhados apenas com a Sincronização de saúde ativada no relógio. Novas importações requerem também o interruptor de sincronização no telemóvel, permissões de escrita no Health Connect e uma verificação de consentimento ativa com o relógio de origem. Não é utilizada qualquer conta nem servidor operado pelo programador.\n\nEliminar uma partida envia um pedido de eliminação permanente para os registos do PadelScore dessa partida. Os pedidos de eliminação explícitos são processados mesmo quando a sincronização está desativada. As cópias já importadas no Samsung Health ou noutras aplicações podem exigir eliminação separada. Desativar a sincronização não elimina os dados existentes. Desinstalar a aplicação do relógio antes de as eliminações pendentes terem sido entregues pode fazer perder esses pedidos. As transferências incompletas permanecem no armazenamento privado do telemóvel para nova tentativa. Esta é uma funcionalidade de fitness e não um dispositivo médico.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">Partidas jogadas</string>
+    <string name="match_history_summary">Toca numa partida para veres gráficos, resultados dos sets e estatísticas detalhadas das jogadas</string>
+    <string name="overall_statistics_title">Estatísticas gerais</string>
+    <string name="refresh_match_history">Atualizar histórico de partidas</string>
+    <string name="match_history_disabled">A sincronização do histórico de partidas está desativada no relógio. Ativa \"Histórico de partidas no telemóvel\" nas definições do relógio.</string>
+    <string name="no_matches_yet">Ainda não há partidas sincronizadas.</string>
+    <string name="match_statistics">Partidas: %1$d | Vitórias: %2$d | Jogos: %3$d | Pontos: %4$d</string>
+    <string name="stat_matches">PARTIDAS</string>
+    <string name="stat_wins_rate">VITÓRIAS (%d%%)</string>
+    <string name="stat_total_time">TEMPO DE JOGO</string>
+    <string name="stat_total_steps">TOTAL DE PASSOS</string>
+    <string name="match_won">GANHA</string>
+    <string name="match_lost">PERDIDA</string>
+    <string name="won_at_stop">EM VANTAGEM NA PARAGEM</string>
+    <string name="lost_at_stop">EM DESVANTAGEM NA PARAGEM</string>
+    <string name="tied_at_stop">EMPATADO NA PARAGEM</string>
+    <string name="ended_early">TERMINADA MAIS CEDO</string>
+    <string name="provisional_result">%s · resultado provisório</string>
+    <string name="match_details">Jogos: %1$d | Pontos: %2$d</string>
+    <string name="match_heart_rate">FC média: %d bpm</string>
+    <string name="match_max_heart_rate">FC máx.: %d bpm</string>
+    <string name="match_steps">Passos: %d</string>
+    <string name="steps_unavailable">Passos indisponíveis</string>
+    <string name="hours_format">%1$d:%2$02d h</string>
+    <string name="minutes_format">%d min</string>
+    <string name="our_team">NÓS</string>
+    <string name="opponent_short">ADV</string>
+    <string name="sets_label">SETS</string>
+    <string name="sets_result">Sets %1$d:%2$d</string>
+    <string name="games_result">Jogos %1$d:%2$d</string>
+    <string name="tie_break">TIE-BREAK</string>
+    <string name="tie_break_result">TB %1$d:%2$d</string>
+    <string name="match_tie_break_result">STB %1$d:%2$d</string>
+    <string name="match_tie_break_full">SUPER TIE-BREAK</string>
+    <string name="set_number">SET %d</string>
+    <string name="current_set">SET ATUAL</string>
+    <string name="tie_break_points">PONTOS DO TIE-BREAK</string>
+    <string name="points_at_stop">PONTOS NA PARAGEM</string>
+    <string name="duration">DURAÇÃO</string>
+    <string name="points_played">PONTOS JOGADOS</string>
+    <string name="games_played">JOGOS DISPUTADOS</string>
+    <string name="steps_label">PASSOS</string>
+    <string name="avg_heart_rate_label">FC MÉDIA</string>
+    <string name="max_heart_rate_label">FC MÁX.</string>
+    <string name="set_tie_break_title">SET %d · TIE-BREAK</string>
+    <string name="set_game_title">SET %1$d · JOGO %2$d</string>
+    <string name="chart_prev">Ant.</string>
+    <string name="chart_next">Seg.</string>
+    <string name="chart_tie_break_points">Pontos do tie-break</string>
+    <string name="chart_game_score">Pontuação do jogo</string>
+    <string name="chart_match_point_number">Número do ponto</string>
+    <string name="older_matches_no_point_history">Partidas mais antigas podem não ter histórico de pontos.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · pontuação após cada jogada</string>
+    <string name="point_number_team">PONTO #%1$d · %2$s</string>
+    <string name="game_won_rallies">Jogo ganho · jogadas %1$d:%2$d</string>
+    <string name="show_rally_list">Mostrar pontos jogada a jogada (%d)</string>
+    <string name="tap_for_details">Toca para gráficos e estatísticas →</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">Pontuação do jogo após as jogadas registadas. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">Pontuação do jogo após as jogadas registadas. 0, 15, 30, 40, AD, JOGO. %1$s</string>
+    <string name="chart_a11y_point">Ponto %1$d: %2$s a %3$s</string>
+    <string name="adv_abbr">AD</string>
+    <string name="game_label">JOGO</string>
+</resources>

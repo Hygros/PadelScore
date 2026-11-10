@@ -25,9 +25,7 @@ val hasUploadSigningConfiguration =
 
 android {
     namespace = "ch.hygro.padelscore.sync"
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
     defaultConfig {
         applicationId = "ch.hygro.padelscore"
         minSdk = 28

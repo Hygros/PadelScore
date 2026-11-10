@@ -101,7 +101,7 @@ fun PadelScoreContent(
 
     var matchState by remember { mutableStateOf(initialState) }
     var showResumePrompt by remember {
-        mutableStateOf(hasRunningSavedMatch(initialState))
+        mutableStateOf(!resumeFromOngoing && hasRunningSavedMatch(initialState))
     }
     var showConfiguration by remember {
         mutableStateOf(
@@ -263,15 +263,41 @@ fun PadelScoreContent(
         showConfiguration = true
     }
 
+    val swipeGesturesEnabled by settingsRepository.swipeGesturesEnabled.collectAsState()
+    val wristGesturesEnabled by settingsRepository.wristGesturesEnabled.collectAsState()
+    val ambientModeEnabled by settingsRepository.ambientModeEnabled.collectAsState()
+    val healthTrackingEnabled by settingsRepository.healthTrackingEnabled.collectAsState()
+
     val isActiveMatch = !showConfiguration && !showResumePrompt &&
             !showMatchHistory && !showSupporter && !showSettings && !showPadelPong && !matchFinished
-    val isReducedDisplay = isAmbientMode ||
-            (isActiveMatch && (activity as? MainActivity)?.wristLowered?.value == true)
+    val isReducedDisplay = ambientModeEnabled && (
+            isAmbientMode ||
+                    (isActiveMatch && (activity as? MainActivity)?.wristLowered?.value == true)
+            )
 
-    DisposableEffect(activity, isActiveMatch, isAmbientMode) {
-        (activity as? MainActivity)?.setWristDetectionEnabled(isActiveMatch && !isAmbientMode)
-        onDispose { (activity as? MainActivity)?.setWristDetectionEnabled(false) }
+    DisposableEffect(activity, isActiveMatch, isAmbientMode, ambientModeEnabled) {
+        val mainActivity = activity as? MainActivity
+        mainActivity?.setWristDetectionEnabled(isActiveMatch && ambientModeEnabled && !isAmbientMode)
+        mainActivity?.setKeepMatchScreenOn(isActiveMatch && !ambientModeEnabled)
+        onDispose {
+            mainActivity?.setWristDetectionEnabled(false)
+            mainActivity?.setKeepMatchScreenOn(false)
+        }
     }
+
+    val currentAddPoint by androidx.compose.runtime.rememberUpdatedState(::addPoint)
+    DisposableEffect(activity, isActiveMatch, isAmbientMode, wristGesturesEnabled, ambientModeEnabled) {
+        val mainActivity = activity as? MainActivity
+        val gesturesActive = isActiveMatch && wristGesturesEnabled && (!isAmbientMode || !ambientModeEnabled)
+        mainActivity?.setWristGestureHandler(
+            enabled = gesturesActive,
+            onPoint = { team -> currentAddPoint(team) }
+        )
+        onDispose {
+            mainActivity?.setWristGestureHandler(enabled = false, onPoint = null)
+        }
+    }
+
     LaunchedEffect(resumeFromOngoing) {
         if (resumeFromOngoing) {
             if (hasRunningSavedMatch(matchState)) {
@@ -301,10 +327,8 @@ fun PadelScoreContent(
         (activity as? MainActivity)?.updateOngoingMatch(hasOngoingMatch, matchState)
     }
 
-    val swipeGesturesEnabled by settingsRepository.swipeGesturesEnabled.collectAsState()
-    val healthTrackingEnabled by settingsRepository.healthTrackingEnabled.collectAsState()
     val isMatchRunning = !showConfiguration && !showResumePrompt && !matchFinished && matchState.startedAtEpochMillis > 0L
-    LaunchedEffect(isMatchRunning, healthTrackingEnabled) {
+    LaunchedEffect(isMatchRunning, showResumePrompt, healthTrackingEnabled) {
         if (isMatchRunning && healthTrackingEnabled) {
             val missingPermissions = missingFitnessPermissions(context)
             if (missingPermissions.isEmpty()) {
@@ -312,7 +336,7 @@ fun PadelScoreContent(
             } else {
                 bodySensorPermissionsLauncher.launch(missingPermissions.toTypedArray())
             }
-        } else {
+        } else if (!showResumePrompt || !healthTrackingEnabled) {
             FitnessTrackingService.stop(context)
         }
     }
@@ -524,7 +548,7 @@ fun PadelScoreContent(
 
         ScoreArea(
             modifier = Modifier.fillMaxWidth().weight(1f),
-            teamName = stringResource(R.string.opponent_team),
+            teamName = stringResource(R.string.opponent_short),
             pointText = pointText(matchState, Team.OPPONENT),
             games = matchState.opponentGames,
             sets = matchState.opponentSets,

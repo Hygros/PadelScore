@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">إحصائيات المباريات والرسوم البيانية ومزامنة Health Connect</string>
+    <string name="current_status">الحالة الحالية</string>
+    <string name="checking_health_connect">جارٍ التحقق من Health Connect…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">الأذونات واستيراد التمارين والمزامنة اليدوية</string>
+    <string name="allow_workout_imports">السماح باستيراد التمارين على هذا الهاتف</string>
+    <string name="connect_health_connect">الاتصال بـ Health Connect</string>
+    <string name="sync_watch_workouts_now">مزامنة تمارين الساعة الآن</string>
+    <string name="manage_health_connect_access">إدارة الوصول إلى Health Connect</string>
+    <string name="install_or_update_health_connect">تثبيت أو تحديث Health Connect</string>
+    <string name="health_sync_explanation">يجب أيضاً تفعيل مزامنة الصحة على ساعتك. تظل ساعتك قابلة للاستخدام بدون هذا التطبيق المرافق.</string>
+    <string name="health_connect_advanced">إعدادات وتطبيق Health Connect</string>
+    <string name="health_connect_advanced_summary">إدارة الأذونات أو فتح Health Connect في متجر Play</string>
+
+    <string name="watch_app">تطبيق الساعة</string>
+    <string name="watch_app_summary">تثبيت أو تحديث PadelScore على ساعة متصلة</string>
+    <string name="install_or_update_on_watch">تثبيت / تحديث تطبيق الساعة</string>
+    <string name="watch_install_explanation">يفتح متجر Play على ساعتك المتصلة بنظام Wear OS. أكّد التثبيت على الساعة. لا يزال الوصول إلى مسار الاختبار مطلوباً.</string>
+
+    <string name="privacy_and_help">الخصوصية والمساعدة</string>
+    <string name="privacy_summary">معالجة البيانات والحذف ومساعدة الاتصال</string>
+    <string name="privacy_and_deletion_info">معلومات الخصوصية والحذف</string>
+    <string name="privacy_explanation">يتم تسجيل خطوات المباراة محلياً على الساعة، وتضمينها في سجل المباريات الخاص على الهاتف عند تفعيل \"سجل المباريات على الهاتف\"، ولا يتم تصديرها أبداً إلى Health Connect. يؤدي حذف مباراة إلى طلب حذف سجلات PadelScore الخاصة بها من Health Connect. قد يلزم حذف النسخ الموجودة في تطبيقات الصحة الأخرى بشكل منفصل.</string>
+    <string name="xiaomi_workaround">روابط الساعة لا تفتح؟ قد تحظر بعض هواتف Xiaomi وRedmi وPOCO الروابط التي يفتحها المكون الإضافي للساعة. في إعدادات الهاتف &gt; التطبيقات، اختر المكون الإضافي لساعتك، وافتح أذونات أخرى واسمح بالنوافذ المنبثقة في الخلفية إذا كان هذا الخيار موجوداً.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">المباريات والإحصائيات</string>
+    <string name="tab_health_sync">مزامنة الصحة</string>
+    <string name="tab_watch_help">الساعة ومعلومات</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">موسّع</string>
+    <string name="collapsed">مطوي</string>
+    <string name="choose_watch_title">اختر الساعة</string>
+    <string name="cancel">إلغاء</string>
+    <string name="back_to_matches">→ العودة إلى المباريات</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">تم منح الإذن. جاهز لمزامنة التمارين المسجلة.</string>
+    <string name="status_permission_denied">لم يتم منح الأذونات المطلوبة. تحقق من أذونات Health Connect.</string>
+    <string name="status_sync_off">مزامنة الصحة متوقفة. يظل حذف المباريات مفعلاً.</string>
+    <string name="status_finding_watches">جارٍ البحث عن ساعات متصلة…</string>
+    <string name="status_no_watch">لا توجد ساعة Wear OS متصلة. تحقق من الاقتران وخدمات Google Play.</string>
+    <string name="status_choose_watch">اختر الساعة للتثبيت أو التحديث.</string>
+    <string name="status_watch_discovery_failed">فشل العثور على الساعة (%s). تحقق من الاقتران وخدمات Google Play.</string>
+    <string name="status_opening_play_store">جارٍ فتح متجر Play على الساعة…</string>
+    <string name="status_store_request_sent">تم إرسال طلب المتجر. تابع على ساعتك. لا يؤكد هذا الطلب التثبيت أو الوصول إلى مسار الاختبار.</string>
+    <string name="status_store_request_failed">فشل طلب المتجر على الساعة (%s). افتح قفل الساعة وتحقق من اتصالها. بدلاً من ذلك، افتح متجر Play على الساعة وابحث عن Padel Score.</string>
+    <string name="status_no_app_for_action">لا يوجد تطبيق يمكنه فتح هذا الإجراء. افتح Health Connect من إعدادات الهاتف.</string>
+    <string name="status_hc_unavailable">خدمة Health Connect غير متاحة أو تحتاج إلى تثبيت/تحديث (الحالة %s).</string>
+    <string name="status_connected_ready">متصل. جاهز لمزامنة التمارين.</string>
+    <string name="status_hc_available_connect">خدمة Health Connect متاحة. انقر على اتصال لمنح إذن كتابة التمارين ومعدل ضربات القلب.</string>
+    <string name="status_connection_failed">فشل الاتصال: %1$s: %2$s</string>
+    <string name="status_syncing">جارٍ المزامنة…</string>
+    <string name="status_sync_failed">فشلت المزامنة: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">تم الحذف من Health Connect: %s. تحقق من Samsung Health بشكل منفصل.</string>
+    <string name="status_hc_import_confirmed">تم تأكيد الاستيراد في Health Connect: %1$s؛ عينات النبض: %2$d</string>
+    <string name="status_sync_off_phone">مزامنة الصحة متوقفة على هذا الهاتف. لا تزال طلبات الحذف الصريحة للمباريات قيد المعالجة.</string>
+    <string name="status_hc_unavailable_permissions">خدمة Health Connect غير متاحة أو إذن كتابة التمارين / معدل ضربات القلب مفقود.</string>
+    <string name="status_sync_progress">عمليات الاستيراد المؤكدة: %1$d\nالمستوردة/المعادة: %2$d\nالطلبات في قائمة الانتظار: %3$d\nيجب أن تكون مزامنة الصحة على الساعة مفعلة.\nعمليات الحذف المعلقة: %4$d\nالطلب الموجود في قائمة الانتظار ليس تأكيداً للاستيراد.</string>
+    <string name="status_deletion_pending_permission">حذف التمرين معلق: مطلوب إذن أو توفر Health Connect.</string>
+    <string name="status_deletion_pending_no_record_id">الحذف معلق لـ %s: الاستيراد القديم لا يحتوي على معرّف سجل محفوظ في Health Connect. احذف هذا التمرين الأقدم يدوياً في Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">الحذف معلق لـ %s: سجل نبض القلب القديم لا يحتوي على UID محفوظ. احذفه يدوياً في Health Connect.</string>
+    <string name="status_deletion_pending_error">حذف Health Connect معلق لـ %1$s: %2$s</string>
+    <string name="status_import_paused_consent">الاستيراد متوقف مؤقتاً: موافقة الساعة غير متاحة. قم بتوصيل الساعة المحدثة وتفعيل مزامنة الصحة.</string>
+
+    <string name="listener_hc_unavailable">خدمة Health Connect غير متاحة. افتح تطبيق الهاتف.</string>
+    <string name="listener_hc_permissions_missing">أذونات Health Connect مفقودة. افتح تطبيق الهاتف.</string>
+    <string name="listener_sync_off">مزامنة الهاتف متوقفة. فعّلها في التطبيق المرافق.</string>
+    <string name="listener_phone_ready">الهاتف جاهز. لا يتم تأكيد الاستيراد في Samsung Health بشكل منفصل.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">تم طلب مزامنة يدوية أو تلقائية</string>
+    <string name="log_sync_failed">فشلت المزامنة</string>
+    <string name="log_data_items_visible">عناصر DataItems المرئية على الهاتف=%d</string>
+    <string name="log_data_item_scan_unavailable">فحص DataItem غير متاح؛ جارٍ طلب النقل المباشر</string>
+    <string name="log_workout_request_queue_failed">تعذر وضع طلب التمرين في قائمة الانتظار</string>
+    <string name="log_hr_write_completed">اكتملت كتابة معدل ضربات القلب workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">اكتملت كتابة جلسة التمرين</string>
+    <string name="log_import_confirmed">تم تأكيد استيراد Health Connect لـ workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">تم استيراده مسبقاً workout=%s؛ تأكيد الإعادة دون تكرار</string>
+    <string name="log_import_succeeded_ack_deferred">نجح الاستيراد؛ تم تأجيل التأكيد حتى الإعادة</string>
+    <string name="log_import_deferred">تم تأجيل الاستيراد؛ تم الاحتفاظ بتمارين المصدر</string>
+
+    <string name="permissions_rationale">يطلب PadelScore Sync الإذن لكتابة جلسات التمرين في Health Connect فقط بعد أن تختار الاتصال. عند تفعيل المزامنة على الساعة، يمكن للتطبيق أيضاً حفظ قياسات معدل ضربات القلب المسجلة. يمكنك إلغاء الوصول في أي وقت من إعدادات Health Connect.\n\nتسجل الساعة عينات معدل ضربات القلب وخطوات المباراة محلياً فقط عند تفعيل \"تتبع الصحة\". لا يتم تصدير الخطوات إلى Health Connect، على الرغم من تضمين ملخصات الخطوات لكل مباراة في سجل المباريات الخاص على الهاتف عند تفعيل \"سجل المباريات على الهاتف\". يتم نقل جلسات التمرين وعينات نبض القلب عبر طبقة بيانات الأجهزة المقترنة فقط عند تفعيل \"مزامنة الصحة\" على الساعة. تتطلب عمليات الاستيراد الجديدة أيضاً تفعيل مفتاح المزامنة على الهاتف، وأذونات الكتابة في Health Connect، والتحقق المباشر من الموافقة مع الساعة المصدر. لا يتم استخدام أي حساب أو خادم يديره المطور.\n\nيرسل حذف المباراة طلب حذف دائم لسجلات PadelScore الخاصة بتلك المباراة. تتم معالجة طلبات الحذف الصريحة حتى عندما تكون المزامنة متوقفة. قد تتطلب النسخ المستوردة مسبقاً في Samsung Health أو التطبيقات الأخرى الحذف بشكل منفصل. لا يؤدي إيقاف المزامنة إلى حذف البيانات الموجودة. قد يؤدي إلغاء تثبيت تطبيق الساعة قبل تسليم طلبات الحذف المعلقة إلى فقدان تلك الطلبات. تظل عمليات النقل غير المكتملة في وحدة التخزين الخاصة بالهاتف لإعادة المحاولة. هذه ميزة للياقة البدنية وليست جهازاً طبياً.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">المباريات الملعوبة</string>
+    <string name="match_history_summary">انقر على مباراة لعرض الرسوم البيانية ونتائج المجموعات وإحصائيات التبادلات المفصلة</string>
+    <string name="overall_statistics_title">الإحصائيات الإجمالية</string>
+    <string name="refresh_match_history">تحديث سجل المباريات</string>
+    <string name="match_history_disabled">مزامنة سجل المباريات معطلة على الساعة. فعّل \"سجل المباريات على الهاتف\" في إعدادات الساعة.</string>
+    <string name="no_matches_yet">لم تتم مزامنة أي مباريات بعد.</string>
+    <string name="match_statistics">المباريات: %1$d | الانتصارات: %2$d | الأشواط: %3$d | النقاط: %4$d</string>
+    <string name="stat_matches">المباريات</string>
+    <string name="stat_wins_rate">الانتصارات (%d%%)</string>
+    <string name="stat_total_time">وقت اللعب</string>
+    <string name="stat_total_steps">إجمالي الخطوات</string>
+    <string name="match_won">فوز</string>
+    <string name="match_lost">خسارة</string>
+    <string name="won_at_stop">متقدم عند التوقف</string>
+    <string name="lost_at_stop">متأخر عند التوقف</string>
+    <string name="tied_at_stop">متعادل عند التوقف</string>
+    <string name="ended_early">انتهت مبكراً</string>
+    <string name="provisional_result">%s · نتيجة مؤقتة</string>
+    <string name="match_details">الأشواط: %1$d | النقاط: %2$d</string>
+    <string name="match_heart_rate">متوسط النبض: %d ن/د</string>
+    <string name="match_max_heart_rate">أقصى نبض: %d ن/د</string>
+    <string name="match_steps">الخطوات: %d</string>
+    <string name="steps_unavailable">الخطوات غير متاحة</string>
+    <string name="hours_format">%1$d:%2$02d س</string>
+    <string name="minutes_format">%d د</string>
+    <string name="our_team">نحن</string>
+    <string name="opponent_short">خصم</string>
+    <string name="sets_label">المجموعات</string>
+    <string name="sets_result">المجموعات %1$d:%2$d</string>
+    <string name="games_result">الأشواط %1$d:%2$d</string>
+    <string name="tie_break">تاي بريك</string>
+    <string name="tie_break_result">ت.ب %1$d:%2$d</string>
+    <string name="match_tie_break_result">ش.ف %1$d:%2$d</string>
+    <string name="match_tie_break_full">شوط كسر التعادل للمباراة</string>
+    <string name="set_number">المجموعة %d</string>
+    <string name="current_set">المجموعة الحالية</string>
+    <string name="tie_break_points">نقاط التاي بريك</string>
+    <string name="points_at_stop">النقاط عند التوقف</string>
+    <string name="duration">المدة</string>
+    <string name="points_played">النقاط الملعوبة</string>
+    <string name="games_played">الأشواط الملعوبة</string>
+    <string name="steps_label">الخطوات</string>
+    <string name="avg_heart_rate_label">متوسط النبض</string>
+    <string name="max_heart_rate_label">أقصى نبض</string>
+    <string name="set_tie_break_title">المجموعة %d · تاي بريك</string>
+    <string name="set_game_title">المجموعة %1$d · الشوط %2$d</string>
+    <string name="chart_prev">السابق</string>
+    <string name="chart_next">التالي</string>
+    <string name="chart_tie_break_points">نقاط التاي بريك</string>
+    <string name="chart_game_score">نتيجة الشوط</string>
+    <string name="chart_match_point_number">رقم النقطة</string>
+    <string name="older_matches_no_point_history">قد لا تحتوي المباريات الأقدم على سجل للنقاط.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · النتيجة بعد كل تبادل</string>
+    <string name="point_number_team">النقطة #%1$d · %2$s</string>
+    <string name="game_won_rallies">فوز بالشوط · التبادلات %1$d:%2$d</string>
+    <string name="show_rally_list">عرض النقاط تبادلاً بتبادل (%d)</string>
+    <string name="tap_for_details">انقر للرسوم البيانية والإحصائيات ←</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">نتيجة الشوط بعد التبادلات المسجلة. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">نتيجة الشوط بعد التبادلات المسجلة. 0، 15، 30، 40، أفضلية، شوط. %1$s</string>
+    <string name="chart_a11y_point">النقطة %1$d: %2$s إلى %3$s</string>
+    <string name="adv_abbr">أف</string>
+    <string name="game_label">شوط</string>
+</resources>

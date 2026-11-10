@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -41,6 +42,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.wear.compose.material3.Text
 import ch.hygro.padelscore.R
+import ch.hygro.padelscore.presentation.AutoSizeText
 import kotlinx.coroutines.delay
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -187,15 +189,17 @@ fun PadelPongScreen(onExit: () -> Unit) {
 
         // Score unter dem Court. Padding statt absoluter Y-Koordinate.
         Column(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 21.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(0.7f).padding(bottom = 21.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("SCORE $displayedScore  |  BEST $highScore", color = Color.White, fontSize = 10.sp)
+            AutoSizeText("SCORE $displayedScore  |  BEST $highScore", color = Color.White,
+                maxFontSize = 10.sp, fontWeight = FontWeight.Normal, fallbackLines = 1)
         }
         if (gameOver) {
-            Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.game_over), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text(stringResource(R.string.tap_to_retry), color = Color(0xFF70FF80), fontSize = 10.sp)
+            Column(modifier = Modifier.align(Alignment.Center).fillMaxWidth(0.8f), horizontalAlignment = Alignment.CenterHorizontally) {
+                AutoSizeText(stringResource(R.string.game_over), color = Color.White, maxFontSize = 16.sp)
+                AutoSizeText(stringResource(R.string.tap_to_retry), color = Color(0xFF70FF80), maxFontSize = 10.sp,
+                    fontWeight = FontWeight.Normal)
             }
         }
     }

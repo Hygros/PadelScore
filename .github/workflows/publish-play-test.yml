@@ -16,15 +16,14 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: padelscore-google-play-publishing
-  cancel-in-progress: false
-
 jobs:
   publish-closed-tests:
     name: Publish Wear OS and mobile closed tests
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    concurrency:
+      group: padelscore-google-play-edit
+      cancel-in-progress: false
 
     env:
       PACKAGE_NAME: ch.hygro.padelscore

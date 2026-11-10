@@ -401,6 +401,34 @@ class MatchPersistenceErrorTest {
     }
 
     @Test
+    fun silentPurgeCommitFailureRetainsDataUntilReconciliation() {
+        val env = TestEnvironment()
+        val matchId = 1700000920000L
+        val hash = env.recordCompletedMatch(matchId = matchId, bpm = 147, steps = 2100L)
+
+        env.stepPrefs.commitShouldFail = true
+        env.workoutPrefs.commitShouldFail = true
+        env.historyRepository.removeByMatchId(matchId, deleteHealthData = true)
+
+        assertTrue(env.deletionPrefs.getBoolean(matchId.toString(), false))
+        assertTrue(env.stepPrefs.contains(matchId.toString()))
+        assertEquals(1, JSONArray(env.workoutPrefs.getString("completed_workouts", "[]")).length())
+
+        val consent = env.queryConsent(matchId, hash)
+        assertTrue(consent.getBoolean("deleted"))
+        assertFalse(consent.getBoolean("allowed"))
+
+        env.stepPrefs.commitShouldFail = false
+        env.workoutPrefs.commitShouldFail = false
+        val restarted = env.newWorkoutsInstance()
+        restarted.reconcilePendingDeletions()
+
+        assertFalse(env.stepPrefs.contains(matchId.toString()))
+        assertEquals(0, JSONArray(env.workoutPrefs.getString("completed_workouts", "[]")).length())
+        assertTrue(env.deletionPrefs.getBoolean(matchId.toString(), false))
+    }
+
+    @Test
     fun retryAfterInterruptedDeletionIsIdempotentAndPublishesDeletionReliably() {
         val env = TestEnvironment()
         val matchId = 1700000950000L
@@ -553,6 +581,91 @@ class MatchPersistenceErrorTest {
         assertEquals(1, entries.size)
         assertEquals(matchId, entries.single().matchId)
         assertEquals(150, entries.single().averageHeartRate)
+    }
+
+    @Test
+    fun corruptMatchSnapshotIsPreservedAndNotOverwrittenWithDefaultOnLoad() {
+        val matchPrefs = FakeSharedPreferences()
+        val rawCorruptJson = """{"schemaVersion":1,"currentState":{"configuration":{"gamesRequiredToWinSet":0},"ourGames":5}}"""
+        matchPrefs.edit().putString(MatchRepository.KEY_SNAPSHOT_JSON, rawCorruptJson).commit()
+
+        val repo = MatchRepository(matchPrefs)
+        val snapshot = repo.loadSnapshot()
+
+        assertTrue(snapshot.corruptSnapshotDetected)
+        assertEquals(rawCorruptJson, matchPrefs.getString(MatchRepository.KEY_SNAPSHOT_JSON, null))
+        assertEquals(rawCorruptJson, matchPrefs.getString(MatchRepository.KEY_CORRUPT_SNAPSHOT_BACKUP, null))
+    }
+
+    @Test
+    fun corruptHistoryJsonRefusesSaveCompletedMatchAndExportForSyncWithoutOverwriting() {
+        val env = TestEnvironment()
+        env.historyPrefs.edit().putString(MatchHistoryRepository.KEY_HISTORY_JSON, "{corrupt-history").commit()
+
+        assertThrows(Exception::class.java) {
+            env.historyRepository.exportForSync()
+        }
+        assertThrows(Exception::class.java) {
+            env.historyRepository.saveCompletedMatch(
+                finishedMatchState(startedAt = 1700002000000L, finishedAt = 1700002060000L),
+                averageHeartRate = 140
+            )
+        }
+        assertEquals(
+            "{corrupt-history",
+            env.historyPrefs.getString(MatchHistoryRepository.KEY_HISTORY_JSON, null)
+        )
+    }
+
+    @Test
+    fun concurrentPurgeAndFinishAcrossRepositoryInstancesRetainsNewlyCompletedWorkout() {
+        val env = TestEnvironment()
+        val deletedMatchId = 1700003000000L
+        val activeMatchId = 1700003100000L
+
+        env.recordCompletedMatch(matchId = deletedMatchId, bpm = 142, steps = 1800L)
+        val instanceA = env.newWorkoutsInstance()
+        val instanceB = env.newWorkoutsInstance()
+
+        instanceB.begin(activeMatchId)
+        instanceB.addSamples(listOf(activeMatchId + 2_000L to 155))
+
+        // Confirm deletion in deletionPrefs while leaving raw workout in workoutPrefs to trigger purge.
+        env.deletionPrefs.edit().putBoolean(deletedMatchId.toString(), true).commit()
+
+        val purgeReachedCommit = java.util.concurrent.CountDownLatch(1)
+        val finishCompleted = java.util.concurrent.CountDownLatch(1)
+        var hookArmed = true
+        env.workoutPrefs.onBeforeCommit = {
+            if (hookArmed) {
+                hookArmed = false
+                purgeReachedCommit.countDown()
+                // Without a shared lock across instances, instanceB.finish() would run while
+                // instanceA is paused here, and instanceA's stale updated array would overwrite it.
+                // With the shared repositoryLock, instanceB waits until instanceA's purge finishes.
+                finishCompleted.await(200, java.util.concurrent.TimeUnit.MILLISECONDS)
+            }
+        }
+
+        val purgeThread = Thread {
+            instanceA.reconcilePendingDeletions()
+        }.apply { start() }
+
+        assertTrue(purgeReachedCommit.await(2, java.util.concurrent.TimeUnit.SECONDS))
+        val finishThread = Thread {
+            instanceB.finish(activeMatchId + 60_000L)
+            finishCompleted.countDown()
+        }.apply { start() }
+
+        purgeThread.join(5_000)
+        finishThread.join(5_000)
+        env.workoutPrefs.onBeforeCommit = null
+
+        val completed = JSONArray(instanceB.completedWorkoutsJson())
+        assertEquals(1, completed.length())
+        assertEquals(activeMatchId, completed.getJSONObject(0).getLong("startTimeMillis"))
+        assertEquals(155, instanceB.averageHeartRateForMatch(activeMatchId))
+        assertNull(instanceB.averageHeartRateForMatch(deletedMatchId))
     }
 
     private class SimulatedProcessCrash(message: String) : Error(message)

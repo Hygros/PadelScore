@@ -15,15 +15,14 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: padelscore-github-only-release
-  cancel-in-progress: false
-
 jobs:
   create-github-release:
     name: Build APKs and create GitHub release
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    concurrency:
+      group: padelscore-google-play-edit
+      cancel-in-progress: false
 
     env:
       PACKAGE_NAME: ch.hygro.padelscore

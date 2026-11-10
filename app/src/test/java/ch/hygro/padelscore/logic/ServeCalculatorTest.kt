@@ -86,4 +86,37 @@ class ServeCalculatorTest {
         org.junit.Assert.assertTrue(ServeCalculator.isDeuceCourtServe(2))
         org.junit.Assert.assertFalse(ServeCalculator.isDeuceCourtServe(3))
     }
+
+    @Test
+    fun courtChangeTriggeredOnCompletedSevenSixSetTieBreakWhenMatchContinues() {
+        val beforePoint = ch.hygro.padelscore.model.MatchState(
+            opponentGames = 6,
+            ourGames = 6,
+            isTieBreak = true,
+            phase = ch.hygro.padelscore.model.MatchPhase.TIE_BREAK,
+            opponentTieBreakPoints = 4,
+            ourTieBreakPoints = 6,
+            totalGamesPlayed = 12
+        )
+        val afterPoint = PadelScoreEngine.awardPoint(beforePoint, Team.US)
+        assertEquals(13, afterPoint.totalGamesPlayed)
+        org.junit.Assert.assertTrue(ServeCalculator.isCourtChange(beforePoint, afterPoint))
+    }
+
+    @Test
+    fun courtChangeSuppressedWhenTieBreakFinishesMatch() {
+        val beforePoint = ch.hygro.padelscore.model.MatchState(
+            ourSets = 1,
+            opponentGames = 6,
+            ourGames = 6,
+            isTieBreak = true,
+            phase = ch.hygro.padelscore.model.MatchPhase.TIE_BREAK,
+            opponentTieBreakPoints = 4,
+            ourTieBreakPoints = 6,
+            totalGamesPlayed = 22
+        )
+        val afterPoint = PadelScoreEngine.awardPoint(beforePoint, Team.US)
+        assertEquals(ch.hygro.padelscore.model.MatchPhase.MATCH_FINISHED, afterPoint.phase)
+        org.junit.Assert.assertFalse(ServeCalculator.isCourtChange(beforePoint, afterPoint))
+    }
 }

@@ -289,14 +289,46 @@ class PadelScoreEngineTest {
 
     @Test
     fun tieBreakAtSevenThree_isWon() {
+        val initialState = tieBreakState(opponentPoints = 6, ourPoints = 3).copy(
+            totalGamesPlayed = 12
+        )
         val result = PadelScoreEngine.awardPoint(
-            tieBreakState(opponentPoints = 6, ourPoints = 3),
+            initialState,
             Team.OPPONENT
         )
         assertEquals(1, result.opponentSets)
         assertFalse(result.isTieBreak)
+        assertEquals(13, result.totalGamesPlayed)
         assertEquals(7, result.completedSets.first().opponentTieBreakPoints)
         assertEquals(3, result.completedSets.first().ourTieBreakPoints)
+        val nextPointState = PadelScoreEngine.awardPoint(result, Team.US)
+        assertEquals(2, nextPointState.pointHistory.last().setNumber)
+        assertEquals(14, nextPointState.pointHistory.last().gameNumber)
+    }
+
+    @Test
+    fun shortSetTieBreakAtFourFour_incrementsTotalGamesPlayedOnCompletion() {
+        val config = ch.hygro.padelscore.model.MatchConfiguration(
+            gamesRequiredToWinSet = 4,
+            tieBreakEnabled = true,
+            tieBreakAtGames = 4,
+            tieBreakPointsToWin = 7
+        )
+        val initialState = MatchState(
+            configuration = config,
+            opponentGames = 4,
+            ourGames = 4,
+            isTieBreak = true,
+            phase = MatchPhase.TIE_BREAK,
+            opponentTieBreakPoints = 4,
+            ourTieBreakPoints = 6,
+            totalGamesPlayed = 8
+        )
+        val result = PadelScoreEngine.awardPoint(initialState, Team.US)
+        assertEquals(1, result.ourSets)
+        assertEquals(9, result.totalGamesPlayed)
+        assertEquals(4, result.completedSets.single().opponentGames)
+        assertEquals(5, result.completedSets.single().ourGames)
     }
 
     @Test

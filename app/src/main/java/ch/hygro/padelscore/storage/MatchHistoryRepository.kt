@@ -34,11 +34,11 @@ class MatchHistoryRepository internal constructor(
         preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE),
         workouts = LocalWorkoutRepository(context),
         scheduleDeletionSync = {
- WorkoutDataSender(context).scheduleDeletionSync()
- },
- scheduleHistorySync = {
- ch.hygro.padelscore.health.MatchHistorySync.schedule(context)
- },
+            WorkoutDataSender(context).scheduleDeletionSync()
+        },
+        scheduleHistorySync = {
+            ch.hygro.padelscore.health.MatchHistorySync.schedule(context)
+        },
         encodeStoppedState = { MatchRepository(context).encodeState(it) },
         decodeStoppedState = { MatchRepository(context).decodeState(it) }
     )
@@ -89,6 +89,7 @@ class MatchHistoryRepository internal constructor(
         val finishedAt = state.finishedAtEpochMillis ?: return
         reconcileDeletions()
         if (state.startedAtEpochMillis <= 0L || workouts.isDeleted(state.startedAtEpochMillis)) return
+        val existingEntries = loadEntriesOrThrow()
         val entry = MatchHistoryEntry(
             matchId = state.startedAtEpochMillis,
             startedAtEpochMillis = state.startedAtEpochMillis,
@@ -107,7 +108,7 @@ class MatchHistoryRepository internal constructor(
             steps = workouts.stepsForMatch(state.startedAtEpochMillis),
             stoppedState = if (endedEarly) state else null
         )
-        val updated = loadEntries()
+        val updated = existingEntries
             .filterNot { it.matchId == entry.matchId }
             .plus(entry)
             .sortedByDescending { it.finishedAtEpochMillis }
@@ -168,13 +169,13 @@ class MatchHistoryRepository internal constructor(
     }
 
     fun exportForSync(): String =
- JSONArray().apply { loadEntries().forEach { put(encodeEntry(it)) } }.toString()
+        JSONArray().apply { loadEntriesOrThrow().forEach { put(encodeEntry(it)) } }.toString()
 
- private fun saveEntries(entries: List<MatchHistoryEntry>) {
+    private fun saveEntries(entries: List<MatchHistoryEntry>) {
         val array = JSONArray().apply { entries.forEach { put(encodeEntry(it)) } }
         val result = preferences.edit().putString(KEY_HISTORY_JSON, array.toString()).commit()
         check(result) { "Could not persist match history" }
- scheduleHistorySync()
+        scheduleHistorySync()
     }
 
     private fun encodeEntry(entry: MatchHistoryEntry) = JSONObject()

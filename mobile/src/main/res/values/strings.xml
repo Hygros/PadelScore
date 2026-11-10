@@ -23,7 +23,7 @@
     <string name="privacy_and_help">Privacy &amp; help</string>
     <string name="privacy_summary">Data handling, deletion and connection help</string>
     <string name="privacy_and_deletion_info">Privacy and deletion information</string>
-    <string name="privacy_explanation">Match steps stay on the watch and are not exported. Deleting a match requests deletion of its PadelScore records from Health Connect. Copies in other health apps may need to be deleted separately.</string>
+    <string name="privacy_explanation">Match steps are recorded locally on the watch, included in private phone match history when Match history on phone is enabled, and never exported to Health Connect. Deleting a match requests deletion of its PadelScore records from Health Connect. Copies in other health apps may need to be deleted separately.</string>
     <string name="xiaomi_workaround">Watch links not opening? Some Xiaomi, Redmi and POCO phones can block links opened by the watch plugin. In phone Settings &gt; Apps, select your watch plugin, open Other permissions and allow background pop-up windows if that option exists.</string>
 
     <!-- Tabs / Register -->
@@ -87,7 +87,7 @@
     <string name="log_import_succeeded_ack_deferred">Import succeeded; ACK deferred until replay</string>
     <string name="log_import_deferred">Import deferred; source workouts retained</string>
 
-    <string name="permissions_rationale">PadelScore Sync requests permission to write exercise sessions to Health Connect only after you choose to connect. When sync is enabled on the watch, the app can also write recorded heart-rate measurements. You can revoke access at any time in Health Connect settings.\n\nThe watch records heart-rate samples and match steps locally only when Health Tracking is enabled. Steps are not exported. Workout sessions and heart-rate samples are transferred through the paired-device data layer only with Health Sync enabled on the watch. New imports also require the phone sync switch, Health Connect write permissions, and a live consent check with the source watch. No account or developer-operated server is used.\n\nDeleting a match sends a durable deletion request for that match\'s PadelScore records. Explicit deletion requests are processed even when sync is off. Already imported copies in Samsung Health or other apps may require separate deletion. Turning sync off does not delete existing data. Uninstalling the watch app before pending deletions have been delivered can lose those deletion requests. Incomplete transfers remain in private phone storage for retry. This is a fitness feature, not a medical device.</string>
+    <string name="permissions_rationale">PadelScore Sync requests permission to write exercise sessions to Health Connect only after you choose to connect. When sync is enabled on the watch, the app can also write recorded heart-rate measurements. You can revoke access at any time in Health Connect settings.\n\nThe watch records heart-rate samples and match steps locally only when Health Tracking is enabled. Steps are not exported to Health Connect, though per-match step summaries are included in private phone match history when Match history on phone is enabled. Workout sessions and heart-rate samples are transferred through the paired-device data layer only with Health Sync enabled on the watch. New imports also require the phone sync switch, Health Connect write permissions, and a live consent check with the source watch. No account or developer-operated server is used.\n\nDeleting a match sends a durable deletion request for that match\'s PadelScore records. Explicit deletion requests are processed even when sync is off. Already imported copies in Samsung Health or other apps may require separate deletion. Turning sync off does not delete existing data. Uninstalling the watch app before pending deletions have been delivered can lose those deletion requests. Incomplete transfers remain in private phone storage for retry. This is a fitness feature, not a medical device.</string>
 
     <!-- Match history, statistics & charts -->
     <string name="match_history">Played matches</string>
@@ -151,6 +151,9 @@
     <string name="score_pair_text">%1$s : %2$s</string>
     <string name="team_legend_dot">%s ●</string>
     <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">Game score after recorded rallies. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">Game score after recorded rallies. 0, 15, 30, 40, AD, GAME. %1$s</string>
+    <string name="chart_a11y_point">Point %1$d: %2$s to %3$s</string>
     <string name="adv_abbr">AD</string>
     <string name="game_label">GAME</string>
 </resources>

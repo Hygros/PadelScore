@@ -78,7 +78,10 @@ class SupporterBillingManager(
                     )
                     connectionStarted = false
 
-                    if (closed) return
+                    if (closed) {
+                        runCatching { billingClient.endConnection() }
+                        return
+                    }
 
                     if (
                         billingResult.responseCode ==
@@ -229,9 +232,7 @@ class SupporterBillingManager(
         purchaseFlowInProgress = false
         productDetails = null
 
-        if (billingClient.isReady) {
-            billingClient.endConnection()
-        }
+        runCatching { billingClient.endConnection() }
     }
 
     override fun onPurchasesUpdated(

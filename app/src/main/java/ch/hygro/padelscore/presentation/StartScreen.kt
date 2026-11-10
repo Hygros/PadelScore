@@ -135,13 +135,15 @@ fun StartScreen(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = stringResource(R.string.new_match),
                         color = Color.White,
-                        fontSize = 12.sp,
-                        lineHeight = 13.sp,
+                        maxFontSize = 12.sp,
+                        minFontSize = AbsoluteMinFontSize,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        fallbackLines = 1
                     )
                 }
             }
@@ -383,17 +385,18 @@ private fun ConfigurationField(
             AutoSizeText(
                 text = title,
                 color = Color.LightGray,
-                maxFontSize = 8.sp,
-                minFontSize = 6.5.sp,
+                maxFontSize = 8.5.sp,
+                minFontSize = 7.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 1
+                maxLines = 1,
+                fallbackLines = 1
             )
 
             AutoSizeText(
                 text = value,
                 color = Color(0xFFFFD54F),
                 maxFontSize = 11.sp,
-                minFontSize = 8.sp,
+                minFontSize = 8.5.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2
             )

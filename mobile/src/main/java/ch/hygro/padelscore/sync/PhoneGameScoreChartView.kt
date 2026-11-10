@@ -16,13 +16,27 @@ class PhoneGameScoreChartView(context: Context) : View(context) {
 
     private val density = resources.displayMetrics.density
 
+    private val baseLabelTextSize = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_SP,
+        11f,
+        resources.displayMetrics
+    )
+
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            11f,
-            resources.displayMetrics
-        )
+        textSize = baseLabelTextSize
         color = Color.rgb(64, 78, 92)
+    }
+
+    /** Draws [text] at the given anchor, shrinking the font so it never exceeds [maxWidth]. */
+    private fun drawFittedText(canvas: Canvas, text: String, x: Float, y: Float, maxWidth: Float) {
+        labelPaint.textSize = baseLabelTextSize
+        val textWidth = labelPaint.measureText(text)
+        if (textWidth > maxWidth && maxWidth > 0f) {
+            val minSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 6f, resources.displayMetrics)
+            labelPaint.textSize = max(baseLabelTextSize * maxWidth / textWidth, minSize)
+        }
+        canvas.drawText(text, x, y, labelPaint)
+        labelPaint.textSize = baseLabelTextSize
     }
 
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -87,9 +101,21 @@ class PhoneGameScoreChartView(context: Context) : View(context) {
             return
         }
         val numeric = points.first().numeric
-        contentDescription = "Game score after recorded rallies. " +
-            (if (numeric) "tie-break points." else "0, 15, 30, 40, AD, GAME.") +
-            " " + points.joinToString("; ") { "Point ${it.number}: ${it.ourScore} to ${it.opponentScore}" }
+        val pointsDescription = points.joinToString("; ") { point ->
+            context.getString(R.string.chart_a11y_point, point.number, point.ourScore, point.opponentScore)
+        }
+        contentDescription = if (numeric) {
+            context.getString(
+                R.string.chart_a11y_header_numeric,
+                context.getString(R.string.chart_tie_break_points),
+                pointsDescription
+            )
+        } else {
+            context.getString(
+                R.string.chart_a11y_header_regular,
+                pointsDescription
+            )
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -119,8 +145,13 @@ class PhoneGameScoreChartView(context: Context) : View(context) {
             5
         }
         val yTicks = if (numeric) listOf(0, maximum / 2, maximum).distinct() else (0..5).toList()
+        val levelsList = listOf("0", "15", "30", "40", context.getString(R.string.adv_abbr), context.getString(R.string.game_label))
+        fun tickText(tick: Int) = if (numeric) tick.toString() else levelsList[tick]
 
-        val left = 58f * density
+        // Make room for the widest y tick label (e.g. translated "game") instead of cutting it off.
+        labelPaint.textSize = baseLabelTextSize
+        val widestTick = yTicks.maxOf { labelPaint.measureText(tickText(it)) }
+        val left = max(58f * density, 32f * density + widestTick)
         val right = width - 18f * density
         val top = 12f * density
         val bottom = height - 40f * density
@@ -150,32 +181,32 @@ class PhoneGameScoreChartView(context: Context) : View(context) {
             val centerY = (top + bottom) / 2f
             canvas.rotate(-90f, 12f * density, centerY)
             labelPaint.textAlign = Paint.Align.CENTER
-            canvas.drawText(
+            drawFittedText(
+                canvas,
                 yAxisLabel,
                 12f * density,
                 centerY - (labelPaint.ascent() + labelPaint.descent()) / 2f,
-                labelPaint
+                bottom - top
             )
         } finally {
             canvas.restoreToCount(saved)
         }
 
         labelPaint.textAlign = Paint.Align.CENTER
-        canvas.drawText(
+        drawFittedText(
+            canvas,
             xAxisLabel,
             (left + right) / 2f,
             bottom + 34f * density,
-            labelPaint
+            width - 16f * density
         )
 
-        val levelsList = listOf("0", "15", "30", "40", context.getString(R.string.adv_abbr), context.getString(R.string.game_label))
         yTicks.forEach { tick ->
             val yPos = y(tick)
             canvas.drawLine(left, yPos, right, yPos, gridPaint)
             labelPaint.textAlign = Paint.Align.RIGHT
-            val tickLabel = if (numeric) tick.toString() else levelsList[tick]
             canvas.drawText(
-                tickLabel,
+                tickText(tick),
                 left - 8f * density,
                 yPos - (labelPaint.ascent() + labelPaint.descent()) / 2f,
                 labelPaint

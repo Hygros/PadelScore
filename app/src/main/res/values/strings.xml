@@ -112,9 +112,13 @@
   <string name="check_phone_setup">Check phone setup</string>
   <string name="companion_status_opening_store">Opening store on phone</string>
   <string name="install_phone_companion">Install phone companion</string>
-  <string name="companion_sync_info">Sync requires consent on both devices. Steps stay on the watch. Explicit deletions are sent even with sync OFF; Samsung Health copies may need separate deletion.</string>
+  <string name="companion_sync_info">Sync requires consent on both devices. Steps are recorded locally, included in private phone match history when Match history on phone is enabled, and never exported to Health Connect. Explicit deletions are sent even with sync OFF; Samsung Health copies may need separate deletion.</string>
   <string name="swipe_gestures">Swipe Gestures</string>
   <string name="swipe_gestures_desc">Swipe up/down to score</string>
+  <string name="wrist_gestures">Wrist Gestures</string>
+  <string name="wrist_gestures_desc">While looking at watch: flick wrist away &amp; back 1x for US, 2x for OPPONENT</string>
+  <string name="ambient_mode">Ambient Mode</string>
+  <string name="ambient_mode_desc">Low-power display during matches. When disabled, the match screen stays active continuously.</string>
   <string name="health_tracking">Health Tracking</string>
   <string name="health_tracking_desc">Record match heart rate and steps locally</string>
   <string name="health_sync">Health Sync</string>
@@ -159,9 +163,6 @@
   <string name="older_matches_no_point_history">Older matches may have no point history.</string>
   <string name="set_tie_break_title">SET %d · TIE-BREAK</string>
   <string name="set_game_title">SET %1$d · GAME %2$d</string>
-  <string name="score_after_each_rally">%1$s : %2$s · score after each rally</string>
-  <string name="point_number_team">POINT #%1$d · %2$s</string>
-  <string name="game_won_rallies">Game won · rallies %1$d:%2$d</string>
   <string name="steps_count">Steps: %d</string>
   <string name="steps_unavailable">Steps unavailable</string>
   <string name="chart_prev">Prev</string>
@@ -169,6 +170,9 @@
   <string name="chart_tie_break_points">Tie-break points</string>
   <string name="chart_game_score">Game score</string>
   <string name="chart_match_point_number">Match point number</string>
+  <string name="chart_a11y_header_numeric">Game score after recorded rallies. %1$s. %2$s. %3$s solid circles; %4$s solid circles. %5$s</string>
+  <string name="chart_a11y_header_regular">Game score after recorded rallies. %1$s. 0, 15, 30, 40, AD, GAME. Equal score categories. %2$s solid circles; %3$s solid circles. %4$s</string>
+  <string name="chart_a11y_point">Point %1$d: %2$s to %3$s</string>
   <string name="dnd_already_granted_message">Do Not Disturb access is already granted. Quiet mode activates only during matches when this setting is toggled on.</string>
   <string name="dnd_allow_now_message">Allow Do Not Disturb access now so Padel Score can silence interruptions during matches. This setting toggles on automatically.</string>
   <string name="open_settings">Open settings</string>

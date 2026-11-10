@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_title">PadelScore</string>
+    <string name="app_subtitle">Matchstatistik, diagram &amp; Health Connect-synkronisering</string>
+    <string name="current_status">AKTUELL STATUS</string>
+    <string name="checking_health_connect">Kontrollerar Health Connect…</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="health_connect_summary">Behörigheter, träningsimporter och manuell synkronisering</string>
+    <string name="allow_workout_imports">Tillåt träningsimporter på den här telefonen</string>
+    <string name="connect_health_connect">Anslut till Health Connect</string>
+    <string name="sync_watch_workouts_now">Synkronisera klockans träningspass nu</string>
+    <string name="manage_health_connect_access">Hantera åtkomst till Health Connect</string>
+    <string name="install_or_update_health_connect">Installera eller uppdatera Health Connect</string>
+    <string name="health_sync_explanation">Hälsosynkronisering måste även vara aktiverad på din klocka. Klockan kan användas även utan den här telefonappen.</string>
+    <string name="health_connect_advanced">Health Connect-inställningar &amp; app</string>
+    <string name="health_connect_advanced_summary">Hantera behörigheter eller öppna Health Connect i Play Butik</string>
+
+    <string name="watch_app">Klockapp</string>
+    <string name="watch_app_summary">Installera eller uppdatera PadelScore på en ansluten klocka</string>
+    <string name="install_or_update_on_watch">Installera / uppdatera klockapp</string>
+    <string name="watch_install_explanation">Öppnar Play Butik på din anslutna Wear OS-klocka. Bekräfta installationen på klockan. Åtkomst till testkanalen krävs fortfarande.</string>
+
+    <string name="privacy_and_help">Integritet &amp; hjälp</string>
+    <string name="privacy_summary">Datahantering, radering och anslutningshjälp</string>
+    <string name="privacy_and_deletion_info">Information om integritet och radering</string>
+    <string name="privacy_explanation">Matchsteg registreras lokalt på klockan, inkluderas i den privata matchhistoriken på telefonen när \"Matchhistorik på telefon\" är aktiverat och exporteras aldrig till Health Connect. Om du raderar en match begärs radering av dess PadelScore-poster i Health Connect. Kopior i andra hälsoappar kan behöva raderas separat.</string>
+    <string name="xiaomi_workaround">Öppnas inte klocklänkar? Vissa Xiaomi-, Redmi- och POCO-telefoner kan blockera länkar som öppnas av klockans insticksprogram. Gå till telefonens Inställningar &gt; Appar, välj klockans insticksprogram, öppna Andra behörigheter och tillåt popup-fönster i bakgrunden om alternativet finns.</string>
+
+    <!-- Tabs / Register -->
+    <string name="tab_matches_stats">Matcher &amp; statistik</string>
+    <string name="tab_health_sync">Hälsosynk</string>
+    <string name="tab_watch_help">Klocka &amp; info</string>
+
+    <!-- UI State & Accessibility -->
+    <string name="expanded">expanderad</string>
+    <string name="collapsed">minimerad</string>
+    <string name="choose_watch_title">Välj klocka</string>
+    <string name="cancel">Avbryt</string>
+    <string name="back_to_matches">← Tillbaka till matcher</string>
+
+    <!-- Status messages -->
+    <string name="status_permission_granted">Behörighet beviljad. Redo att synkronisera registrerade träningspass.</string>
+    <string name="status_permission_denied">Nödvändiga behörigheter beviljades inte. Kontrollera behörigheterna i Health Connect.</string>
+    <string name="status_sync_off">Hälsosynkronisering är AV. Radering av matcher är fortfarande aktiverad.</string>
+    <string name="status_finding_watches">Söker efter anslutna klockor…</string>
+    <string name="status_no_watch">Ingen ansluten Wear OS-klocka. Kontrollera parkopplingen och Google Play-tjänster.</string>
+    <string name="status_choose_watch">Välj vilken klocka som ska installeras eller uppdateras.</string>
+    <string name="status_watch_discovery_failed">Klocksökning misslyckades (%s). Kontrollera parkopplingen och Google Play-tjänster.</string>
+    <string name="status_opening_play_store">Öppnar Play Butik på klockan…</string>
+    <string name="status_store_request_sent">Butiksförfrågan har skickats. Fortsätt på din klocka. Installation och åtkomst till testkanalen bekräftas inte av denna förfrågan.</string>
+    <string name="status_store_request_failed">Butiksförfrågan till klockan misslyckades (%s). Lås upp klockan och kontrollera anslutningen. Alternativt kan du öppna Play Butik på klockan och söka efter Padel Score.</string>
+    <string name="status_no_app_for_action">Ingen app kan öppna den här åtgärden. Öppna Health Connect från telefonens inställningar.</string>
+    <string name="status_hc_unavailable">Health Connect är inte tillgängligt eller behöver installeras/uppdateras (status %s).</string>
+    <string name="status_connected_ready">Ansluten. Redo att synkronisera träningspass.</string>
+    <string name="status_hc_available_connect">Health Connect är tillgängligt. Tryck på Anslut för att ge skrivbehörighet för träningspass och puls.</string>
+    <string name="status_connection_failed">Anslutning misslyckades: %1$s: %2$s</string>
+    <string name="status_syncing">Synkroniserar…</string>
+    <string name="status_sync_failed">Synkronisering misslyckades: %1$s: %2$s</string>
+
+    <!-- Exporter & Listener strings -->
+    <string name="status_deleted_from_hc">Raderat från Health Connect: %s. Kontrollera Samsung Health separat.</string>
+    <string name="status_hc_import_confirmed">Health Connect-import bekräftad: %1$s; pulsmätningar: %2$d</string>
+    <string name="status_sync_off_phone">Hälsosynkronisering är AV på den här telefonen. Explicita matchraderingar behandlas fortfarande.</string>
+    <string name="status_hc_unavailable_permissions">Health Connect är inte tillgängligt eller saknar skrivbehörighet för Träning / Puls.</string>
+    <string name="status_sync_progress">Bekräftade importer: %1$d\nImporterade/upprepade: %2$d\nFörfrågningar i kö: %3$d\nHälsosynkronisering på klockan måste vara PÅ.\nVäntande raderingar: %4$d\nEn köad förfrågan är inte en importbekräftelse.</string>
+    <string name="status_deletion_pending_permission">Träningsradering väntar: behörighet eller tillgänglighet i Health Connect krävs.</string>
+    <string name="status_deletion_pending_no_record_id">Radering väntar för %s: äldre import saknar sparat post-ID i Health Connect. Radera detta äldre träningspass manuellt i Health Connect.</string>
+    <string name="status_deletion_pending_no_hr_id">Radering väntar för %s: äldre pulspost saknar sparat UID. Radera den manuellt i Health Connect.</string>
+    <string name="status_deletion_pending_error">Radering i Health Connect väntar för %1$s: %2$s</string>
+    <string name="status_import_paused_consent">Import pausad: samtycke från klockan saknas. Anslut den uppdaterade klockan och aktivera Hälsosynkronisering.</string>
+
+    <string name="listener_hc_unavailable">Health Connect är inte tillgängligt. Öppna telefonappen.</string>
+    <string name="listener_hc_permissions_missing">Health Connect-behörigheter saknas. Öppna telefonappen.</string>
+    <string name="listener_sync_off">Telefonsynk är AV. Aktivera den i telefonappen.</string>
+    <string name="listener_phone_ready">Telefonen är redo. Import till Samsung Health bekräftas inte separat.</string>
+
+    <!-- Log messages -->
+    <string name="log_sync_requested">Manuell eller automatisk synkronisering begärd</string>
+    <string name="log_sync_failed">Synkronisering misslyckades</string>
+    <string name="log_data_items_visible">Synliga DataItems på telefonen=%d</string>
+    <string name="log_data_item_scan_unavailable">DataItem-skanning ej tillgänglig; begär direktöverföring</string>
+    <string name="log_workout_request_queue_failed">Träningsförfrågan kunde inte köas</string>
+    <string name="log_hr_write_completed">Pulsskrivning slutförd workout=%1$s records=%2$d</string>
+    <string name="log_exercise_session_write_completed">Skrivning av träningspass slutförd</string>
+    <string name="log_import_confirmed">Health Connect-import bekräftad workout=%1$s HR samples=%2$d</string>
+    <string name="log_already_imported">Redan importerat workout=%s; bekräftar upprepning utan dubblett</string>
+    <string name="log_import_succeeded_ack_deferred">Import lyckades; bekräftelse uppskjuten till upprepning</string>
+    <string name="log_import_deferred">Import uppskjuten; källträningspass behålls</string>
+
+    <string name="permissions_rationale">PadelScore Sync begär behörighet att skriva träningspass till Health Connect först efter att du har valt att ansluta. När synkronisering är aktiverad på klockan kan appen även spara registrerade pulsmätningar. Du kan när som helst återkalla åtkomsten i inställningarna för Health Connect.\n\nKlockan registrerar pulsmätningar och matchsteg lokalt endast när Hälsospårning är aktiverat. Steg exporteras inte till Health Connect, men stegsammanfattningar per match inkluderas i den privata matchhistoriken på telefonen när \"Matchhistorik på telefon\" är aktiverat. Träningspass och pulsmätningar överförs via datalagret för parkopplade enheter endast när Hälsosynkronisering är aktiverat på klockan. Nya importer kräver dessutom att synkroniseringsknappen på telefonen är påslagen, skrivbehörighet i Health Connect samt en aktiv samtyckeskontroll med källklockan. Inget användarkonto eller utvecklarstyrd server används.\n\nNär du raderar en match skickas en beständig raderingsbegäran för matchens PadelScore-poster. Explicita raderingsförfrågningar behandlas även när synkronisering är avstängd. Redan importerade kopior i Samsung Health eller andra appar kan behöva raderas separat. Att stänga av synkronisering raderar inte befintliga data. Om klockappen avinstalleras innan väntande raderingar har levererats kan dessa raderingsförfrågningar gå förlorade. Ofullständiga överföringar sparas i telefonens privata lagring för nya försök. Detta är en träningsfunktion, inte en medicinteknisk produkt.</string>
+
+    <!-- Match history, statistics & charts -->
+    <string name="match_history">Spelade matcher</string>
+    <string name="match_history_summary">Tryck på en match för diagram, setresultat &amp; detaljerad bollduellstatistik</string>
+    <string name="overall_statistics_title">Total statistik</string>
+    <string name="refresh_match_history">Uppdatera matchhistorik</string>
+    <string name="match_history_disabled">Synkronisering av matchhistorik är inaktiverad på klockan. Aktivera \"Matchhistorik på telefon\" i klockans inställningar.</string>
+    <string name="no_matches_yet">Inga matcher synkroniserade ännu.</string>
+    <string name="match_statistics">Matcher: %1$d | Vinster: %2$d | Gem: %3$d | Poäng: %4$d</string>
+    <string name="stat_matches">MATCHER</string>
+    <string name="stat_wins_rate">VINSTER (%d%%)</string>
+    <string name="stat_total_time">SPELTID</string>
+    <string name="stat_total_steps">TOTALA STEG</string>
+    <string name="match_won">VUNNEN</string>
+    <string name="match_lost">FÖRLORAD</string>
+    <string name="won_at_stop">LEDNING VID STOPP</string>
+    <string name="lost_at_stop">UNDERLÄGE VID STOPP</string>
+    <string name="tied_at_stop">OAVGJORT VID STOPP</string>
+    <string name="ended_early">AVBRUTEN I FÖRTID</string>
+    <string name="provisional_result">%s · preliminärt resultat</string>
+    <string name="match_details">Gem: %1$d | Poäng: %2$d</string>
+    <string name="match_heart_rate">Snittpuls: %d bpm</string>
+    <string name="match_max_heart_rate">Maxpuls: %d bpm</string>
+    <string name="match_steps">Steg: %d</string>
+    <string name="steps_unavailable">Steg ej tillgängliga</string>
+    <string name="hours_format">%1$d:%2$02d tim</string>
+    <string name="minutes_format">%d min</string>
+    <string name="our_team">VI</string>
+    <string name="opponent_short">MOT</string>
+    <string name="sets_label">SET</string>
+    <string name="sets_result">Set %1$d:%2$d</string>
+    <string name="games_result">Gem %1$d:%2$d</string>
+    <string name="tie_break">TIEBREAK</string>
+    <string name="tie_break_result">TB %1$d:%2$d</string>
+    <string name="match_tie_break_result">MTB %1$d:%2$d</string>
+    <string name="match_tie_break_full">MATCHTIEBREAK</string>
+    <string name="set_number">SET %d</string>
+    <string name="current_set">AKTUELLT SET</string>
+    <string name="tie_break_points">TIEBREAK-POÄNG</string>
+    <string name="points_at_stop">POÄNG VID STOPP</string>
+    <string name="duration">TID</string>
+    <string name="points_played">SPELADE POÄNG</string>
+    <string name="games_played">SPELADE GEM</string>
+    <string name="steps_label">STEG</string>
+    <string name="avg_heart_rate_label">SNITTPULS</string>
+    <string name="max_heart_rate_label">MAXPULS</string>
+    <string name="set_tie_break_title">SET %d · TIEBREAK</string>
+    <string name="set_game_title">SET %1$d · GEM %2$d</string>
+    <string name="chart_prev">Föreg.</string>
+    <string name="chart_next">Nästa</string>
+    <string name="chart_tie_break_points">Tiebreak-poäng</string>
+    <string name="chart_game_score">Gemställning</string>
+    <string name="chart_match_point_number">Poängnummer</string>
+    <string name="older_matches_no_point_history">Äldre matcher kan sakna poänghistorik.</string>
+    <string name="score_after_each_rally">%1$s : %2$s · ställning efter varje bollduell</string>
+    <string name="point_number_team">POÄNG #%1$d · %2$s</string>
+    <string name="game_won_rallies">Gem vunnet · bolldueller %1$d:%2$d</string>
+    <string name="show_rally_list">Visa poäng för varje bollduell (%d)</string>
+    <string name="tap_for_details">Tryck för diagram &amp; statistik →</string>
+    <string name="score_pair_int">%1$d : %2$d</string>
+    <string name="score_pair_text">%1$s : %2$s</string>
+    <string name="team_legend_dot">%s ●</string>
+    <string name="chart_page_indicator">%1$d / %2$d</string>
+    <string name="chart_a11y_header_numeric">Gemställning efter registrerade bolldueller. %1$s. %2$s</string>
+    <string name="chart_a11y_header_regular">Gemställning efter registrerade bolldueller. 0, 15, 30, 40, AD, GEM. %1$s</string>
+    <string name="chart_a11y_point">Poäng %1$d: %2$s mot %3$s</string>
+    <string name="adv_abbr">AD</string>
+    <string name="game_label">GEM</string>
+</resources>

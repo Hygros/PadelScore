@@ -16,6 +16,16 @@ class SettingsRepository(context: Context) {
     )
     val swipeGesturesEnabled: StateFlow<Boolean> = _swipeGesturesEnabled.asStateFlow()
 
+    private val _wristGesturesEnabled = MutableStateFlow(
+        prefs.getBoolean(KEY_WRIST_GESTURES, false)
+    )
+    val wristGesturesEnabled: StateFlow<Boolean> = _wristGesturesEnabled.asStateFlow()
+
+    private val _ambientModeEnabled = MutableStateFlow(
+        prefs.getBoolean(KEY_AMBIENT_MODE, true)
+    )
+    val ambientModeEnabled: StateFlow<Boolean> = _ambientModeEnabled.asStateFlow()
+
     private val _healthTrackingEnabled = MutableStateFlow(
         prefs.getBoolean(KEY_HEALTH_TRACKING, false)
     )
@@ -34,6 +44,16 @@ class SettingsRepository(context: Context) {
     fun setSwipeGesturesEnabled(enabled: Boolean) {
         prefs.edit { putBoolean(KEY_SWIPE_GESTURES, enabled) }
         _swipeGesturesEnabled.value = enabled
+    }
+
+    fun setWristGesturesEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_WRIST_GESTURES, enabled) }
+        _wristGesturesEnabled.value = enabled
+    }
+
+    fun setAmbientModeEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_AMBIENT_MODE, enabled) }
+        _ambientModeEnabled.value = enabled
     }
 
     private val _matchHistorySyncEnabled = MutableStateFlow(
@@ -63,6 +83,8 @@ class SettingsRepository(context: Context) {
 
     companion object {
         private const val KEY_SWIPE_GESTURES = "swipe_gestures_enabled"
+        private const val KEY_WRIST_GESTURES = "wrist_gestures_enabled"
+        private const val KEY_AMBIENT_MODE = "ambient_mode_enabled"
         private const val KEY_HEALTH_TRACKING = "health_tracking_enabled"
         private const val KEY_HEALTH_SYNC = "health_sync_enabled"
         private const val KEY_MATCH_QUIET_MODE = "match_quiet_mode_enabled"

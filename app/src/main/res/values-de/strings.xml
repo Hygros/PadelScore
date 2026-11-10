@@ -112,9 +112,13 @@
     <string name="check_phone_setup">Smartphone-Verbindung prüfen</string>
     <string name="companion_status_opening_store">Play Store auf Smartphone wird geöffnet…</string>
     <string name="install_phone_companion">Companion auf Smartphone installieren</string>
-    <string name="companion_sync_info">Synchronisierung erfordert Zustimmung auf beiden Geräten. Schritte bleiben auf der Uhr. Explizite Löschungen werden auch bei ausgeschalteter Synchronisierung gesendet; Kopien in Samsung Health müssen eventuell separat gelöscht werden.</string>
+    <string name="companion_sync_info">Synchronisierung erfordert Zustimmung auf beiden Geräten. Schritte werden lokal aufgezeichnet, bei aktiviertem „Match-Verlauf auf Smartphone“ im privaten Smartphone-Verlauf angezeigt und nicht in Health Connect exportiert. Explizite Löschungen werden auch bei ausgeschalteter Synchronisierung gesendet; Kopien in Samsung Health müssen eventuell separat gelöscht werden.</string>
     <string name="swipe_gestures">Wischgesten</string>
     <string name="swipe_gestures_desc">Nach oben/unten wischen für Punkte</string>
+    <string name="wrist_gestures">Handgelenk-Gesten</string>
+    <string name="wrist_gestures_desc">Beim Blick auf die Uhr: Handgelenk 1x kurz wegdrehen &amp; zurück für WIR, 2x für GEGNER</string>
+    <string name="ambient_mode">Ambient-Modus</string>
+    <string name="ambient_mode_desc">Energiesparende Anzeige im Match. Wenn deaktiviert, bleibt der Match-Screen dauerhaft aktiv.</string>
     <string name="health_tracking">Fitness-Tracking</string>
     <string name="health_tracking_desc">Puls und Schritte während des Matches lokal aufzeichnen</string>
     <string name="health_sync">Health-Synchronisierung</string>
@@ -159,9 +163,6 @@
     <string name="older_matches_no_point_history">Ältere Matches haben evtl. keinen Punktverlauf.</string>
     <string name="set_tie_break_title">SATZ %d · TIE-BREAK</string>
     <string name="set_game_title">SATZ %1$d · GAME %2$d</string>
-    <string name="score_after_each_rally">%1$s : %2$s · Stand nach jedem Ballwechsel</string>
-    <string name="point_number_team">PUNKT #%1$d · %2$s</string>
-    <string name="game_won_rallies">Game gewonnen · Ballwechsel %1$d:%2$d</string>
     <string name="steps_count">Schritte: %d</string>
     <string name="steps_unavailable">Schritte nicht verfügbar</string>
     <string name="chart_prev">Zurück</string>
@@ -169,6 +170,9 @@
     <string name="chart_tie_break_points">Tie-Break-Punkte</string>
     <string name="chart_game_score">Spielstand</string>
     <string name="chart_match_point_number">Punktnummer</string>
+    <string name="chart_a11y_header_numeric">Spielstand nach aufgezeichneten Ballwechseln. %1$s. %2$s. %3$s ausgefüllte Kreise; %4$s ausgefüllte Kreise. %5$s</string>
+    <string name="chart_a11y_header_regular">Spielstand nach aufgezeichneten Ballwechseln. %1$s. 0, 15, 30, 40, AD, GAME. Gleichmäßige Spielstandstufen. %2$s ausgefüllte Kreise; %3$s ausgefüllte Kreise. %4$s</string>
+    <string name="chart_a11y_point">Punkt %1$d: %2$s zu %3$s</string>
     <string name="dnd_already_granted_message">Nicht stören ist bereits aktiviert. Der Ruhemodus wird nur während Matches aktiviert, wenn diese Einstellung eingeschaltet ist.</string>
     <string name="dnd_allow_now_message">Erlaube Nicht stören jetzt, damit Padel Score Unterbrechungen während Matches stummschalten kann. Diese Einstellung wird automatisch aktiviert.</string>
     <string name="open_settings">Einstellungen öffnen</string>

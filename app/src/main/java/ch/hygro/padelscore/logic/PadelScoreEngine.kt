@@ -319,7 +319,7 @@ object PadelScoreEngine {
             nextServingTeam = ServeCalculator.servingTeamForNextSetAfterTieBreak(
                 state.tieBreakFirstServingTeam ?: state.servingTeam
             ),
-            totalGamesPlayed = state.totalGamesPlayed
+            totalGamesPlayed = state.totalGamesPlayed + 1
         )
     }
 

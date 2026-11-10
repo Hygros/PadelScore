@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,7 @@ import ch.hygro.padelscore.billing.SupporterBillingManager
 import ch.hygro.padelscore.billing.SupporterBillingState
 import ch.hygro.padelscore.health.WorkoutDataSender
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 import java.util.concurrent.Executors
 
@@ -36,10 +38,29 @@ class MainActivity : ComponentActivity() {
     private lateinit var matchQuietMode: MatchQuietModeController
     private lateinit var ongoingMatch: OngoingMatchController
     private lateinit var wristDisplayController: WristDisplayController
+    private lateinit var wristGestureController: WristGestureController
+    private var onWristGesturePoint: ((Team) -> Unit)? = null
     val wristLowered = mutableStateOf(false)
 
     fun setWristDetectionEnabled(enabled: Boolean) {
-        wristDisplayController.setEnabled(enabled)
+        if (::wristDisplayController.isInitialized) {
+            wristDisplayController.setEnabled(enabled)
+        }
+    }
+
+    fun setWristGestureHandler(enabled: Boolean, onPoint: ((Team) -> Unit)?) {
+        onWristGesturePoint = onPoint
+        if (::wristGestureController.isInitialized) {
+            wristGestureController.setEnabled(enabled && onPoint != null)
+        }
+    }
+
+    fun setKeepMatchScreenOn(keepOn: Boolean) {
+        if (keepOn) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
     }
 
     private val resumeFromOngoing = mutableStateOf(false)
@@ -118,6 +139,12 @@ class MainActivity : ComponentActivity() {
         matchQuietMode = MatchQuietModeController(this)
         ongoingMatch = OngoingMatchController(this)
         wristDisplayController = WristDisplayController(this, wristLowered::value::set)
+        wristGestureController = WristGestureController(this) { team ->
+            if (::wristDisplayController.isInitialized) {
+                wristDisplayController.onInteraction()
+            }
+            onWristGesturePoint?.invoke(team)
+        }
         resumeFromOngoing.value = intent.getBooleanExtra(
             OngoingMatchController.EXTRA_RESUME_MATCH, false
         )
@@ -157,6 +184,7 @@ class MainActivity : ComponentActivity() {
         matchQuietMode.onResume()
         ongoingMatch.refresh()
         wristDisplayController.onResume()
+        wristGestureController.onResume()
         syncExecutor.execute {
             try { WorkoutDataSender(applicationContext).publishAll() }
             catch (e: Exception) { Log.w("PadelScoreSync", "Pending sync deferred", e) }
@@ -164,12 +192,14 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onPause() {
+        wristGestureController.onPause()
         wristDisplayController.onPause()
         matchQuietMode.onPause()
         super.onPause()
     }
 
     override fun onDestroy() {
+        wristGestureController.close()
         wristDisplayController.close()
         matchQuietMode.close()
         supporterBillingManager.close()

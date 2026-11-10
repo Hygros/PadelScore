@@ -84,22 +84,23 @@ fun MatchFinishedScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = completedSetsText(matchState),
                         color = Color.White,
-                        fontSize = 20.sp,
-                        lineHeight = 22.sp,
+                        maxFontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         maxLines = 2
                     )
 
                     if (matchState.averageHeartRate != null) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.average_heart_rate, matchState.averageHeartRate),
                             color = Color.LightGray,
-                            fontSize = 13.sp,
-                            textAlign = TextAlign.Center
+                            maxFontSize = 13.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
                         )
                     }
                     Row(
@@ -107,14 +108,17 @@ fun MatchFinishedScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Statistic(
+                            modifier = Modifier.weight(1f),
                             label = stringResource(R.string.duration),
                             value = matchDurationText(matchState)
                         )
                         Statistic(
+                            modifier = Modifier.weight(1f),
                             label = stringResource(R.string.points),
                             value = matchState.totalPointsPlayed.toString()
                         )
                         Statistic(
+                            modifier = Modifier.weight(1f),
                             label = stringResource(R.string.games),
                             value = matchState.totalGamesPlayed.toString()
                         )
@@ -154,27 +158,30 @@ fun MatchFinishedScreen(
 @Composable
 private fun Statistic(
     label: String,
-    value: String
+    value: String,
+    modifier: Modifier = Modifier
 ) {
     Column(
+        modifier = modifier.padding(horizontal = 1.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AutoSizeText(
             text = label,
-            fillMaxWidth = false,
             color = Color.LightGray,
             maxFontSize = 10.sp,
             minFontSize = 7.5.sp,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 1
+            maxLines = 1,
+            fallbackLines = 1
         )
-        Text(
+        AutoSizeText(
             text = value,
             color = Color.White,
-            fontSize = 15.sp,
-            lineHeight = 18.sp,
+            maxFontSize = 15.sp,
+            minFontSize = AbsoluteMinFontSize,
             fontWeight = FontWeight.Bold,
-            maxLines = 1
+            maxLines = 1,
+            fallbackLines = 1
         )
     }
 }

@@ -135,19 +135,23 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                 ) {
                     AutoSizeText(status, color = accent, maxFontSize = 11.sp, minFontSize = 8.sp, maxLines = 1)
                     if (entry.stoppedState != null) {
-                        Text(stringResource(R.string.provisional_result, stringResource(R.string.ended_early)), color = Color.LightGray,
-                            fontSize = 9.sp, textAlign = TextAlign.Center)
+                        AutoSizeText(stringResource(R.string.provisional_result, stringResource(R.string.ended_early)), color = Color.LightGray,
+                            maxFontSize = 9.5.sp, minFontSize = 8.5.sp, fontWeight = FontWeight.Normal, maxLines = 3)
                     }
-                    Text(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray, fontSize = 9.sp, textAlign = TextAlign.Center)
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Text(stringResource(R.string.our_team), color = ColorTeamUsText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.sets_label), color = Color.LightGray, fontSize = 9.sp)
-                        Text(stringResource(R.string.opponent_short), color = ColorTeamOpponentText, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    AutoSizeText(historyDateText(entry.finishedAtEpochMillis), color = Color.LightGray, maxFontSize = 9.sp,
+                        fontWeight = FontWeight.Normal)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        AutoSizeText(stringResource(R.string.our_team), modifier = Modifier.weight(1f), color = ColorTeamUsText,
+                            maxFontSize = 10.sp, fallbackLines = 1)
+                        AutoSizeText(stringResource(R.string.sets_label), modifier = Modifier.weight(1f), color = Color.LightGray,
+                            maxFontSize = 9.sp, fontWeight = FontWeight.Normal, fallbackLines = 1)
+                        AutoSizeText(stringResource(R.string.opponent_short), modifier = Modifier.weight(1f), color = ColorTeamOpponentText,
+                            maxFontSize = 10.sp, fallbackLines = 1)
                     }
                     Text("${entry.ourSets} : ${entry.opponentSets}", color = Color.White,
                         fontSize = 34.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     if (pointScore != null) {
-                        Text(stringResource(R.string.points_at_stop), color = accent, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        AutoSizeText(stringResource(R.string.points_at_stop), color = accent, maxFontSize = 9.sp)
                         Text(pointScore, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                 }
@@ -161,7 +165,7 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(score.first, color = Color.LightGray, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    AutoSizeText(score.first, color = Color.LightGray, maxFontSize = 9.sp)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         Text(score.second, color = ColorTeamUsText, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                         Text(":", color = Color.Gray, fontSize = 20.sp)
@@ -177,8 +181,8 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     if (gameGroups.isNotEmpty()) {
-                        Text(gameTitle(gameGroups[chartIndex].first()), color = Color.White,
-                            fontSize = 10.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        AutoSizeText(gameTitle(gameGroups[chartIndex].first()), color = Color.White,
+                            maxFontSize = 10.sp, maxLines = 2)
                     }
                 }
             }
@@ -215,10 +219,11 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                             AutoSizeText(
                                 text = metric.first,
                                 color = Color(0xFF9AAFC1),
-                                maxFontSize = 8.sp,
-                                minFontSize = 6.5.sp,
+                                maxFontSize = 9.sp,
+                                minFontSize = 7.5.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                maxLines = 1
+                                maxLines = 1,
+                                fallbackLines = 2
                             )
                             AutoSizeText(
                                 text = metric.second,
@@ -240,7 +245,8 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     if (gameGroups.isEmpty() && stopped == null) {
-                        Text(stringResource(R.string.older_matches_no_point_history), color = Color.Gray, fontSize = 9.sp, textAlign = TextAlign.Center)
+                        AutoSizeText(stringResource(R.string.older_matches_no_point_history), color = Color.Gray,
+                            maxFontSize = 10.sp, minFontSize = 9.sp, fontWeight = FontWeight.Normal, maxLines = 6)
                     }
                 }
             }

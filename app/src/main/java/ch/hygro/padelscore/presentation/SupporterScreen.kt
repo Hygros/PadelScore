@@ -72,16 +72,19 @@ fun SupporterScreen(
                         .transformedHeight(itemScope, transformationSpec),
                     transformation = with(itemScope) { SurfaceTransformation(transformationSpec) }
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = if (state.isSupporterActive) {
                             stringResource(R.string.supporter_thanks_title)
                         } else {
                             stringResource(R.string.support_padel_score_title)
                         },
                         color = if (state.isSupporterActive) Color(0xFF66E59A) else Color.White,
-                        fontSize = 13.sp,
+                        maxFontSize = 13.sp,
+                        minFontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        fallbackLines = 2
                     )
                 }
             }
@@ -97,12 +100,14 @@ fun SupporterScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.supporter_active_message),
                             color = Color.White,
-                            fontSize = 9.sp,
-                            lineHeight = 10.sp,
-                            textAlign = TextAlign.Center
+                            maxFontSize = 10.5.sp,
+                            minFontSize = 9.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center,
+                            maxLines = 10
                         )
 
                         Box(
@@ -115,13 +120,14 @@ fun SupporterScreen(
                                 .padding(horizontal = 10.dp, vertical = 6.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
+                            AutoSizeText(
                                 text = stringResource(R.string.supporter_active_status),
                                 color = Color(0xFF66E59A),
-                                fontSize = 9.sp,
-                                lineHeight = 10.sp,
+                                maxFontSize = 10.5.sp,
+                                minFontSize = 9.sp,
                                 fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                maxLines = 3
                             )
                         }
                     }
@@ -137,21 +143,24 @@ fun SupporterScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.support_message),
                             color = Color.White,
-                            fontSize = 8.sp,
-                            lineHeight = 9.sp,
-                            textAlign = TextAlign.Center
+                            maxFontSize = 10.5.sp,
+                            minFontSize = 9.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center,
+                            maxLines = 12
                         )
 
-                        Text(
+                        AutoSizeText(
                             text = stringResource(R.string.support_info),
                             color = Color.LightGray,
-                            fontSize = 7.sp,
-                            lineHeight = 8.sp,
+                            maxFontSize = 9.5.sp,
+                            minFontSize = 8.5.sp,
                             fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            maxLines = 6
                         )
                     }
                 }
@@ -344,21 +353,24 @@ private fun PendingPurchaseMessage() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Text(
+        AutoSizeText(
             text = stringResource(R.string.purchase_pending_title),
             color = Color(0xFFFFD54F),
-            fontSize = 9.sp,
-            lineHeight = 10.sp,
+            maxFontSize = 10.sp,
+            minFontSize = 9.sp,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            maxLines = 3
         )
 
-        Text(
+        AutoSizeText(
             text = stringResource(R.string.purchase_pending_message),
             color = Color.White,
-            fontSize = 8.sp,
-            lineHeight = 10.sp,
-            textAlign = TextAlign.Center
+            maxFontSize = 9.5.sp,
+            minFontSize = 8.5.sp,
+            fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Center,
+            maxLines = 8
         )
     }
 }
@@ -373,12 +385,14 @@ private fun PurchaseInProgressMessage() {
 
 @Composable
 private fun UserMessage(text: String) {
-    Text(
+    AutoSizeText(
         text = text,
         color = Color(0xFFFFD54F),
-        fontSize = 8.sp,
-        lineHeight = 10.sp,
-        textAlign = TextAlign.Center
+        maxFontSize = 9.5.sp,
+        minFontSize = 8.5.sp,
+        fontWeight = FontWeight.Normal,
+        textAlign = TextAlign.Center,
+        maxLines = 8
     )
 }
 
@@ -400,13 +414,14 @@ private fun StatusMessage(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        AutoSizeText(
             text = text,
             color = color,
-            fontSize = 9.sp,
-            lineHeight = 10.sp,
+            maxFontSize = 10.sp,
+            minFontSize = 9.sp,
             fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            maxLines = 5
         )
     }
 }

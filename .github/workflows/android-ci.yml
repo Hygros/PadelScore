@@ -12,15 +12,14 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: android-ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   test-and-build:
     name: Test and build PadelScore
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    concurrency:
+      group: android-ci-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Check out repository
@@ -199,6 +198,9 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: padelscore-google-play-edit
+      cancel-in-progress: false
     permissions:
       contents: read
 

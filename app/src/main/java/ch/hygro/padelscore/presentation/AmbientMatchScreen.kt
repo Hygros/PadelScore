@@ -57,11 +57,10 @@ fun AmbientMatchScreen(
             onClick = onAddPointOpponent
         )
 
-        Text(
+        AutoSizeText(
             text = ambientStatusText(matchState),
             color = Color(0xFFBDBDBD),
-            fontSize = 8.sp,
-            lineHeight = 9.sp,
+            maxFontSize = 8.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             maxLines = 2
@@ -104,22 +103,27 @@ private fun AmbientTeamScore(
         )
 
         Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            AutoSizeText(
                 text = stringResource(R.string.games_abbr, games),
+                modifier = Modifier.weight(1f),
                 color = Color(0xFF8A8A8A),
-                fontSize = 8.sp,
-                lineHeight = 9.sp,
-                fontWeight = FontWeight.SemiBold
+                maxFontSize = 8.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.End,
+                fallbackLines = 1
             )
-            Text(
+            AutoSizeText(
                 text = stringResource(R.string.sets_abbr, sets),
+                modifier = Modifier.weight(1f),
                 color = Color(0xFF8A8A8A),
-                fontSize = 8.sp,
-                lineHeight = 9.sp,
-                fontWeight = FontWeight.SemiBold
+                maxFontSize = 8.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Start,
+                fallbackLines = 1
             )
         }
     }

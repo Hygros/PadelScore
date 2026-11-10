@@ -1,6 +1,7 @@
 package ch.hygro.padelscore.storage
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
@@ -14,11 +15,14 @@ import org.json.JSONObject
  * If no JSON snapshot exists yet, [loadSnapshot] falls back once to the legacy flat-key format
  * and immediately migrates it into the current JSON snapshot key.
  */
-class MatchRepository(context: Context) {
-
-    private val preferences = context.getSharedPreferences(
-        PREFERENCES_NAME,
-        Context.MODE_PRIVATE
+class MatchRepository internal constructor(
+    private val preferences: SharedPreferences
+) {
+    constructor(context: Context) : this(
+        preferences = context.getSharedPreferences(
+            PREFERENCES_NAME,
+            Context.MODE_PRIVATE
+        )
     )
 
     fun loadSnapshot(): MatchSnapshot {
@@ -28,6 +32,16 @@ class MatchRepository(context: Context) {
             runCatching {
                 return decodeSnapshot(JSONObject(snapshotJson))
             }
+            // Existing snapshot could not be decoded. Preserve the raw JSON under a backup key
+            // and do not overwrite KEY_SNAPSHOT_JSON with legacy/default state on load.
+            preferences.edit {
+                putString(KEY_CORRUPT_SNAPSHOT_BACKUP, snapshotJson)
+            }
+            return MatchSnapshot(
+                currentState = MatchState(),
+                undoHistory = emptyList(),
+                corruptSnapshotDetected = true
+            )
         }
 
         val legacyState = loadLegacyState()
@@ -61,6 +75,10 @@ class MatchRepository(context: Context) {
     }
 
     private fun decodeSnapshot(json: JSONObject): MatchSnapshot {
+        val schemaVersion = json.optInt(KEY_SCHEMA_VERSION, SCHEMA_VERSION)
+        require(schemaVersion == SCHEMA_VERSION) {
+            "Unsupported match snapshot schema version: $schemaVersion"
+        }
         val currentState = decodeState(json.getJSONObject(KEY_CURRENT_STATE))
         val historyJson = json.optJSONArray(KEY_UNDO_HISTORY) ?: JSONArray()
         val history = buildList {
@@ -215,11 +233,12 @@ class MatchRepository(context: Context) {
     }
 
     companion object {
-        private const val PREFERENCES_NAME = "padel_score_match"
-        private const val KEY_SNAPSHOT_JSON = "match_snapshot_json"
-        private const val KEY_SCHEMA_VERSION = "schemaVersion"
-        private const val KEY_CURRENT_STATE = "currentState"
-        private const val KEY_UNDO_HISTORY = "undoHistory"
+        internal const val PREFERENCES_NAME = "padel_score_match"
+        internal const val KEY_SNAPSHOT_JSON = "match_snapshot_json"
+        internal const val KEY_CORRUPT_SNAPSHOT_BACKUP = "match_snapshot_corrupt_backup_json"
+        internal const val KEY_SCHEMA_VERSION = "schemaVersion"
+        internal const val KEY_CURRENT_STATE = "currentState"
+        internal const val KEY_UNDO_HISTORY = "undoHistory"
         private const val SCHEMA_VERSION = 1
         private const val MAX_PERSISTED_HISTORY = 100
     }
@@ -227,5 +246,6 @@ class MatchRepository(context: Context) {
 
 data class MatchSnapshot(
     val currentState: MatchState,
-    val undoHistory: List<MatchState>
+    val undoHistory: List<MatchState>,
+    val corruptSnapshotDetected: Boolean = false
 )

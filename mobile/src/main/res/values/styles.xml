@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Programmatically created TextViews/Buttons pick up these styles. Hyphenation and balanced
+        line breaking keep long words (German, Dutch, Swedish ...) from being cut off.
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:textViewStyle">@style/AppTextView</item>
+        <item name="android:buttonStyle">@style/AppButton</item>
+    </style>
+
+    <style name="AppTextView" parent="@android:style/Widget.Material.TextView">
+        <item name="android:hyphenationFrequency">normal</item>
+        <item name="android:breakStrategy">high_quality</item>
+    </style>
+
+    <style name="AppButton" parent="@android:style/Widget.Material.Button">
+        <item name="android:hyphenationFrequency">normal</item>
+        <item name="android:breakStrategy">balanced</item>
+    </style>
+</resources>

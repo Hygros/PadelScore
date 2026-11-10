@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,10 +98,28 @@ internal fun GameScoreChart(
     val xAxisLabel = stringResource(R.string.chart_match_point_number)
     val usShort = stringResource(R.string.our_team)
     val oppShort = stringResource(R.string.opponent_short)
-    val description = "Game score after recorded rallies. match point number. " +
-            (if (numeric) "tie-break points." else "0, 15, 30, 40, AD, GAME. Equal score categories.") +
-            " US solid circles; OPP solid circles. " +
-            points.joinToString("; ") { "Point ${it.number}: ${it.ourScore} to ${it.opponentScore}" }
+    val pointDescriptions = points.map { point ->
+        stringResource(R.string.chart_a11y_point, point.number, point.ourScore, point.opponentScore)
+    }
+    val pointsDescription = pointDescriptions.joinToString("; ")
+    val description = if (numeric) {
+        stringResource(
+            R.string.chart_a11y_header_numeric,
+            xAxisLabel,
+            yAxisLabel,
+            usShort,
+            oppShort,
+            pointsDescription
+        )
+    } else {
+        stringResource(
+            R.string.chart_a11y_header_regular,
+            xAxisLabel,
+            usShort,
+            oppShort,
+            pointsDescription
+        )
+    }
     Column(
         modifier = Modifier.fillMaxWidth().background(Color(0xFF14232C), RoundedCornerShape(16.dp))
             .padding(horizontal = 6.dp, vertical = 4.dp),
@@ -268,9 +287,11 @@ internal fun GameScoreChart(
             }
         }
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text("$usShort ●", color = ColorTeamUsText, fontSize = 8.sp)
-            Text("$oppShort ●", color = ColorTeamOpponentText, fontSize = 8.sp)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            AutoSizeText("$usShort ●", modifier = Modifier.weight(1f), color = ColorTeamUsText,
+                maxFontSize = 8.sp, fontWeight = FontWeight.Normal, fallbackLines = 1)
+            AutoSizeText("$oppShort ●", modifier = Modifier.weight(1f), color = ColorTeamOpponentText,
+                maxFontSize = 8.sp, fontWeight = FontWeight.Normal, fallbackLines = 1)
         }
         if (gamePosition != null) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp),

@@ -28,9 +28,7 @@ val hasUploadSigningConfiguration =
 android {
     namespace = "ch.hygro.padelscore"
 
-    compileSdk {
-        version = release(37)
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "ch.hygro.padelscore"
@@ -78,6 +76,18 @@ android {
 
     buildFeatures {
         compose = true
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+}
+
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        (variant as com.android.build.api.variant.HasUnitTestBuilder).enableUnitTest = true
     }
 }
 

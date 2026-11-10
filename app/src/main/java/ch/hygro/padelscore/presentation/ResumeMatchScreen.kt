@@ -83,11 +83,10 @@ fun ResumeMatchScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = matchSummary(matchState),
                         color = Color(0xFFFFD54F),
-                        fontSize = 11.sp,
-                        lineHeight = 12.sp,
+                        maxFontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         maxLines = 2

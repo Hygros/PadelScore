@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
@@ -207,14 +208,16 @@ fun ScoreArea(
                     modifier = Modifier.width(46.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = teamName,
+                        modifier = Modifier.padding(horizontal = 3.dp),
                         color = if (ambient) Color.White else Color.White.copy(alpha = 0.55f),
-                        fontSize = 8.sp,
+                        maxFontSize = 8.sp,
+                        minFontSize = AbsoluteMinFontSize,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        softWrap = false
+                        fallbackLines = 1
                     )
                 }
             }
@@ -230,26 +233,37 @@ fun ScoreStatistics(
     isRound: Boolean = false
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(13.dp),
+        // On round screens the top/bottom edge is narrow, so keep the row inside the circle.
+        modifier = Modifier.fillMaxWidth(if (isRound) 0.5f else 1f).height(13.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        val statsFontSize = if (ambient) 9.sp else if (isRound) 10.sp else 12.sp
+        val statsColor = if (ambient) Color.White else Color.White.copy(alpha = 0.9f)
+        AutoSizeText(
             text = stringResource(R.string.games_with_count, games),
-            color = if (ambient) Color.White else Color.White.copy(alpha = 0.9f),
-            fontSize = if (ambient) 9.sp else if (isRound) 10.sp else 12.sp,
+            modifier = Modifier.weight(1f),
+            color = statsColor,
+            maxFontSize = statsFontSize,
+            minFontSize = AbsoluteMinFontSize,
             lineHeight = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 1
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            fallbackLines = 1
         )
         Spacer(modifier = Modifier.width(10.dp))
-        Text(
+        AutoSizeText(
             text = stringResource(R.string.sets_with_count, sets),
-            color = if (ambient) Color.White else Color.White.copy(alpha = 0.9f),
-            fontSize = if (ambient) 9.sp else if (isRound) 10.sp else 12.sp,
+            modifier = Modifier.weight(1f),
+            color = statsColor,
+            maxFontSize = statsFontSize,
+            minFontSize = AbsoluteMinFontSize,
             lineHeight = 12.sp,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 1
+            textAlign = TextAlign.Start,
+            maxLines = 1,
+            fallbackLines = 1
         )
     }
 }
@@ -320,20 +334,18 @@ fun CenterScoreArea(
         ) {
             val labelText = centerLabel(matchState, showCourtChange)
             val baseFontSize = centerLabelFontSize(matchState)
-            // The label shares one line with the games, so shrink it with its length.
-            val adjustedFontSize = minOf(baseFontSize.value, 66f / labelText.length)
-                .coerceAtLeast(7f).sp
             val started = matchHasStarted(matchState)
 
-            Text(
+            AutoSizeText(
                 text = clockText,
                 color = Color.White.copy(alpha = 0.7f),
-                fontSize = 10.sp,
+                maxFontSize = 10.sp,
+                minFontSize = AbsoluteMinFontSize,
                 lineHeight = 11.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
-                softWrap = false
+                fallbackLines = 1
             )
             Spacer(modifier = Modifier.height(4.dp))
             Row(
@@ -345,33 +357,36 @@ fun CenterScoreArea(
                     modifier = Modifier.weight(1f).padding(end = 3.dp),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    Text(
+                    // Shrinks, then wraps (never inside a word) instead of being cut off.
+                    AutoSizeText(
                         text = labelText,
                         color = if (showCourtChange) ColorCourtChange else centerLabelColor(matchState),
-                        fontSize = adjustedFontSize,
-                        lineHeight = adjustedFontSize,
+                        maxFontSize = baseFontSize,
+                        minFontSize = 7.sp,
+                        lineHeight = 1.1.em,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
                         maxLines = 1,
-                        softWrap = false
+                        fallbackLines = 2
                     )
                 }
                 Box(
                     modifier = Modifier.weight(1f).padding(start = 3.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    Text(
+                    AutoSizeText(
                         text = if (started) {
                             "${matchState.ourGames} : ${matchState.opponentGames}"
                         } else {
                             scoringModeLabel(matchState.configuration.scoringMode)
                         },
                         color = Color.White,
-                        fontSize = if (started) 15.sp else 11.sp,
+                        maxFontSize = if (started) 15.sp else 11.sp,
+                        minFontSize = AbsoluteMinFontSize,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Start,
                         maxLines = 1,
-                        softWrap = false
+                        fallbackLines = 1
                     )
                 }
             }
@@ -408,12 +423,16 @@ fun CenterScoreArea(
                     strokeWidth = 3.dp
                 )
             }
-            Text(
+            AutoSizeText(
                 text = stringResource(R.string.reset),
+                modifier = Modifier.padding(horizontal = 4.dp),
                 color = Color.White,
-                fontSize = 8.sp,
+                maxFontSize = 8.sp,
+                minFontSize = AbsoluteMinFontSize,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                fallbackLines = 1
             )
         }
     }
