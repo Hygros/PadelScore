@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       release_name:
-        description: Optional release label shown in Google Play
+        description: Optional Google Play release label, truncated to 50 characters
         required: false
         default: PadelScore automated test release
         type: string
@@ -21,6 +21,7 @@ jobs:
     name: Publish Wear OS and mobile closed tests
     runs-on: ubuntu-latest
     timeout-minutes: 45
+
     concurrency:
       group: padelscore-google-play-edit
       cancel-in-progress: false
@@ -52,7 +53,7 @@ jobs:
       - name: Set up Java 25
         uses: actions/setup-java@v6
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: "25"
 
       - name: Validate Gradle Wrapper
@@ -138,7 +139,10 @@ jobs:
               )
 
               try:
-                  with urllib.request.urlopen(request, timeout=120) as response:
+                  with urllib.request.urlopen(
+                      request,
+                      timeout=120,
+                  ) as response:
                       response_body = response.read().decode("utf-8")
 
                       if not response_body:
@@ -151,7 +155,8 @@ jobs:
                       errors="replace",
                   )
                   print(
-                      f"Google Play API request failed with HTTP {error.code}.",
+                      f"Google Play API request failed with HTTP "
+                      f"{error.code}.",
                       file=sys.stderr,
                   )
                   print(error_body, file=sys.stderr)
@@ -181,10 +186,14 @@ jobs:
           mobile_version_code = highest_existing_code + 2
 
           if wear_version_code == mobile_version_code:
-              raise RuntimeError("Calculated version codes are not unique.")
+              raise RuntimeError(
+                  "Calculated version codes are not unique."
+              )
 
           if wear_version_code <= highest_existing_code:
-              raise RuntimeError("Wear version code is not increasing.")
+              raise RuntimeError(
+                  "Wear version code is not increasing."
+              )
 
           if mobile_version_code <= wear_version_code:
               raise RuntimeError(
@@ -207,8 +216,14 @@ jobs:
               "Highest existing Google Play version code: "
               f"{highest_existing_code}"
           )
-          print(f"Calculated Wear OS version code: {wear_version_code}")
-          print(f"Calculated mobile version code: {mobile_version_code}")
+          print(
+              f"Calculated Wear OS version code: "
+              f"{wear_version_code}"
+          )
+          print(
+              f"Calculated mobile version code: "
+              f"{mobile_version_code}"
+          )
           print("A transactional Google Play edit was created.")
           print("No release has been committed yet.")
           PYTHON
@@ -302,10 +317,12 @@ jobs:
               os.environ["EXPECTED_MOBILE_VERSION_CODE"]
           )
 
-          release_name = os.environ.get(
-              "RELEASE_NAME",
-              "PadelScore automated test release",
-          ).strip()
+          release_name = " ".join(
+              os.environ.get(
+                  "RELEASE_NAME",
+                  "PadelScore automated test release",
+              ).split()
+          )
 
           if not release_name:
               release_name = "PadelScore automated test release"
@@ -355,7 +372,10 @@ jobs:
               )
 
               try:
-                  with urllib.request.urlopen(request, timeout=120) as response:
+                  with urllib.request.urlopen(
+                      request,
+                      timeout=120,
+                  ) as response:
                       response_body = response.read().decode("utf-8")
 
                       if not response_body:
@@ -368,7 +388,8 @@ jobs:
                       errors="replace",
                   )
                   print(
-                      f"Google Play API request failed with HTTP {error.code}.",
+                      f"Google Play API request failed with HTTP "
+                      f"{error.code}.",
                       file=sys.stderr,
                   )
                   print(error_body, file=sys.stderr)
@@ -389,7 +410,10 @@ jobs:
               )
 
               try:
-                  with urllib.request.urlopen(request, timeout=300) as response:
+                  with urllib.request.urlopen(
+                      request,
+                      timeout=300,
+                  ) as response:
                       return json.loads(
                           response.read().decode("utf-8")
                       )
@@ -399,11 +423,38 @@ jobs:
                       errors="replace",
                   )
                   print(
-                      f"Bundle upload failed with HTTP {error.code}.",
+                      f"Bundle upload failed with HTTP "
+                      f"{error.code}.",
                       file=sys.stderr,
                   )
                   print(error_body, file=sys.stderr)
                   raise
+
+          def create_track_release_name(label):
+              suffix = f" - {label}"
+              maximum_length = 50
+              maximum_base_length = maximum_length - len(suffix)
+
+              if maximum_base_length <= 0:
+                  raise RuntimeError(
+                      f"Release label is too long: {label!r}"
+                  )
+
+              base_name = release_name[:maximum_base_length].rstrip()
+
+              if not base_name:
+                  base_name = "PadelScore"[:maximum_base_length]
+
+              track_release_name = f"{base_name}{suffix}"
+
+              if len(track_release_name) > maximum_length:
+                  raise RuntimeError(
+                      "Generated Google Play release name exceeds "
+                      f"{maximum_length} characters: "
+                      f"{track_release_name!r}"
+                  )
+
+              return track_release_name
 
           def update_track(track_id, version_code, label):
               encoded_track = urllib.parse.quote(
@@ -411,11 +462,19 @@ jobs:
                   safe="",
               )
 
+              track_release_name = create_track_release_name(label)
+
+              print(
+                  f"Preparing Google Play release "
+                  f"{track_release_name!r} "
+                  f"({len(track_release_name)} characters)."
+              )
+
               body = {
                   "track": track_id,
                   "releases": [
                       {
-                          "name": f"{release_name} - {label}",
+                          "name": track_release_name,
                           "versionCodes": [str(version_code)],
                           "status": "completed",
                       }
@@ -492,7 +551,6 @@ jobs:
           set -o pipefail
 
           python3 - <<'PYTHON'
-          import json
           import os
           import pathlib
           import sys
@@ -531,7 +589,10 @@ jobs:
           )
 
           try:
-              with urllib.request.urlopen(request, timeout=120) as response:
+              with urllib.request.urlopen(
+                  request,
+                  timeout=120,
+              ) as response:
                   response.read()
           except urllib.error.HTTPError as error:
               error_body = error.read().decode(
@@ -539,14 +600,20 @@ jobs:
                   errors="replace",
               )
               print(
-                  f"Google Play edit commit failed with HTTP {error.code}.",
+                  f"Google Play edit commit failed with HTTP "
+                  f"{error.code}.",
                   file=sys.stderr,
               )
               print(error_body, file=sys.stderr)
               raise
 
-          committed_marker = runner_temp / "padelscore-play-edit-committed"
-          committed_marker.write_text("committed", encoding="utf-8")
+          committed_marker = (
+              runner_temp / "padelscore-play-edit-committed"
+          )
+          committed_marker.write_text(
+              "committed",
+              encoding="utf-8",
+          )
 
           print("Google Play edit committed successfully.")
           print("Wear OS closed-test release was published.")
@@ -584,7 +651,9 @@ jobs:
           test -s "${mobile_metadata}"
 
           version_name="$(
-            python3 - "${wear_metadata}" "${mobile_metadata}" <<'PYTHON'
+            python3 - \
+              "${wear_metadata}" \
+              "${mobile_metadata}" <<'PYTHON'
           import json
           import pathlib
           import sys
@@ -592,14 +661,20 @@ jobs:
           wear_path = pathlib.Path(sys.argv[1])
           mobile_path = pathlib.Path(sys.argv[2])
 
-          wear_data = json.loads(wear_path.read_text(encoding="utf-8"))
-          mobile_data = json.loads(mobile_path.read_text(encoding="utf-8"))
+          wear_data = json.loads(
+              wear_path.read_text(encoding="utf-8")
+          )
+          mobile_data = json.loads(
+              mobile_path.read_text(encoding="utf-8")
+          )
 
           wear_elements = wear_data.get("elements", [])
           mobile_elements = mobile_data.get("elements", [])
 
           if not wear_elements or not mobile_elements:
-              raise RuntimeError("APK output metadata contains no elements.")
+              raise RuntimeError(
+                  "APK output metadata contains no elements."
+              )
 
           wear_name = str(wear_elements[0]["versionName"])
           mobile_name = str(mobile_elements[0]["versionName"])
@@ -630,10 +705,21 @@ jobs:
           wear_aab_name="PadelScore-Wear-${version_name}-vc${WEAR_VERSION_CODE}.aab"
           mobile_aab_name="PadelScore-Mobile-${version_name}-vc${MOBILE_VERSION_CODE}.aab"
 
-          cp "${wear_apk}" "${release_directory}/${wear_apk_name}"
-          cp "${mobile_apk}" "${release_directory}/${mobile_apk_name}"
-          cp "${wear_aab}" "${release_directory}/${wear_aab_name}"
-          cp "${mobile_aab}" "${release_directory}/${mobile_aab_name}"
+          cp \
+            "${wear_apk}" \
+            "${release_directory}/${wear_apk_name}"
+
+          cp \
+            "${mobile_apk}" \
+            "${release_directory}/${mobile_apk_name}"
+
+          cp \
+            "${wear_aab}" \
+            "${release_directory}/${wear_aab_name}"
+
+          cp \
+            "${mobile_aab}" \
+            "${release_directory}/${mobile_aab_name}"
 
           notes_file="${release_directory}/release-notes.md"
 
@@ -660,7 +746,11 @@ jobs:
           This is a prerelease build for testing.
           EOF
 
-          if gh release view "${tag}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+          if gh release view \
+            "${tag}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            >/dev/null 2>&1
+          then
             echo "A GitHub release already exists for ${tag}."
             exit 1
           fi
@@ -683,6 +773,7 @@ jobs:
 
           echo "GitHub prerelease created successfully."
           echo "Tag: ${tag}"
+
       - name: Upload published bundles as workflow artifacts
         uses: actions/upload-artifact@v7
         with:
@@ -754,7 +845,10 @@ jobs:
           )
 
           try:
-              with urllib.request.urlopen(request, timeout=120) as response:
+              with urllib.request.urlopen(
+                  request,
+                  timeout=120,
+              ) as response:
                   response.read()
 
               print("The uncommitted Google Play edit was deleted.")
@@ -770,7 +864,8 @@ jobs:
                       errors="replace",
                   )
                   print(
-                      f"Edit cleanup failed with HTTP {error.code}.",
+                      f"Edit cleanup failed with HTTP "
+                      f"{error.code}.",
                       file=sys.stderr,
                   )
                   print(error_body, file=sys.stderr)
