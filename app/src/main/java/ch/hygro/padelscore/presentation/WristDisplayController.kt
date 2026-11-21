@@ -10,6 +10,8 @@ import android.util.Log
 import kotlin.math.exp
 import kotlin.math.sqrt
 
+private const val WRIST_DISPLAY_LOG_TAG = "PadelWrist"
+
 /**
  * Relative-orientation heuristic, not a system wrist-down event.
  * A touch establishes the viewing orientation. Rotation away from that pose
@@ -74,8 +76,8 @@ class WristDisplayController(
             previousTimestamp = 0L
             candidate = null
             registered = manager.registerListener(this, sensor, 50_000)
-            if (Log.isLoggable("PadelWrist", Log.DEBUG)) {
-                Log.d("PadelWrist", "sensor=${sensor.name} registered=$registered")
+            if (Log.isLoggable(WRIST_DISPLAY_LOG_TAG, Log.DEBUG)) {
+                Log.d(WRIST_DISPLAY_LOG_TAG, "sensor=${sensor.name} registered=$registered")
             }
         } else if (!shouldRegister && registered) {
             manager.unregisterListener(this)
@@ -85,7 +87,7 @@ class WristDisplayController(
             candidate = null
         }
         if (enabled && resumed && sensor == null) {
-            Log.w("PadelWrist", "No gravity or accelerometer sensor; using system ambient only")
+            Log.w(WRIST_DISPLAY_LOG_TAG, "No gravity or accelerometer sensor; using system ambient only")
         }
     }
 
@@ -141,8 +143,8 @@ class WristDisplayController(
             return
         }
         if (event.timestamp - candidateSince >= STABLE_NANOS) {
-            if (Log.isLoggable("PadelWrist", Log.DEBUG)) {
-                Log.d("PadelWrist", "lowered=$desired cosine=$cosine")
+            if (Log.isLoggable(WRIST_DISPLAY_LOG_TAG, Log.DEBUG)) {
+                Log.d(WRIST_DISPLAY_LOG_TAG, "lowered=$desired cosine=$cosine")
             }
             publish(desired)
             candidate = null

@@ -64,6 +64,8 @@ import kotlinx.coroutines.withContext
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 
+private const val PADEL_INPUT_LOG_TAG = "PadelInput"
+
 /**
  * Root composable of the watch UI. It owns the match state and the undo history and decides
  * which screen is shown.
@@ -162,13 +164,13 @@ fun PadelScoreContent(
 
         val now = SystemClock.elapsedRealtime()
         if (now - lastAcceptedPointAtMillis < POINT_INPUT_LOCK_MILLIS) {
-            if (Log.isLoggable("PadelInput", Log.DEBUG)) {
-                Log.d("PadelInput", "point rejected: debounce team=$team")
+            if (Log.isLoggable(PADEL_INPUT_LOG_TAG, Log.DEBUG)) {
+                Log.d(PADEL_INPUT_LOG_TAG, "point rejected: debounce team=$team")
             }
             return
         }
-        if (Log.isLoggable("PadelInput", Log.DEBUG)) {
-            Log.d("PadelInput", "point accepted team=$team ambient=$isAmbientMode")
+        if (Log.isLoggable(PADEL_INPUT_LOG_TAG, Log.DEBUG)) {
+            Log.d(PADEL_INPUT_LOG_TAG, "point accepted team=$team ambient=$isAmbientMode")
         }
 
         val previousState = matchState
@@ -361,8 +363,8 @@ fun PadelScoreContent(
     }
     // Keep the clock current in interactive mode, aligned to full minutes.
     LaunchedEffect(isAmbientMode) {
-        if (Log.isLoggable("PadelInput", Log.DEBUG)) {
-            Log.d("PadelInput", "ambient=$isAmbientMode activeMatch=$isActiveMatch")
+        if (Log.isLoggable(PADEL_INPUT_LOG_TAG, Log.DEBUG)) {
+            Log.d(PADEL_INPUT_LOG_TAG, "ambient=$isAmbientMode activeMatch=$isActiveMatch")
         }
         ambientClock = formatClock(context)
         while (!isAmbientMode) {

@@ -16,6 +16,8 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
+private const val WRIST_GESTURE_LOG_TAG = "PadelGesture"
+
 /**
  * Recognizes outward wrist-turn gestures (turning the wrist away from the body and back
  * to the viewing pose) while looking at the watch:
@@ -85,9 +87,9 @@ class WristGestureController(
                     SensorManager.SENSOR_DELAY_GAME
                 )
             }
-            if (Log.isLoggable("PadelGesture", Log.DEBUG)) {
+            if (Log.isLoggable(WRIST_GESTURE_LOG_TAG, Log.DEBUG)) {
                 Log.d(
-                    "PadelGesture",
+                    WRIST_GESTURE_LOG_TAG,
                     "gravity=${gravitySensor.name} gyro=${gyroSensor?.name ?: "none"} registered=$registered"
                 )
             }
@@ -143,8 +145,8 @@ class WristGestureController(
                     isAccelerometer = isAccelerometer
                 )
                 if (triggeredTeam != null) {
-                    if (Log.isLoggable("PadelGesture", Log.DEBUG)) {
-                        Log.d("PadelGesture", "gesture scored team=$triggeredTeam")
+                    if (Log.isLoggable(WRIST_GESTURE_LOG_TAG, Log.DEBUG)) {
+                        Log.d(WRIST_GESTURE_LOG_TAG, "gesture scored team=$triggeredTeam")
                     }
                     onGesturePoint(triggeredTeam)
                 }
@@ -180,7 +182,7 @@ class WristGestureController(
 
 internal class WristGestureDetector {
     private val debugLoggingEnabled = runCatching {
-        Log.isLoggable("PadelGesture", Log.DEBUG)
+        Log.isLoggable(WRIST_GESTURE_LOG_TAG, Log.DEBUG)
     }.getOrDefault(false)
 
     private sealed interface State {
@@ -430,7 +432,7 @@ internal class WristGestureDetector {
 
     private fun logDebug(message: String) {
         if (debugLoggingEnabled) {
-            Log.d("PadelGesture", message)
+            Log.d(WRIST_GESTURE_LOG_TAG, message)
         }
     }
 
