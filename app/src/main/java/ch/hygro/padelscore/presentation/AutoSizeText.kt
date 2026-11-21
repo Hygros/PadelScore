@@ -46,6 +46,7 @@ val CompactButtonContentPadding = PaddingValues(horizontal = 10.dp, vertical = 4
 val AbsoluteMinFontSize: TextUnit = 6.sp
 
 private data class TextFit(val fontSize: TextUnit, val maxLines: Int, val ellipsize: Boolean)
+private val WordBoundaryRegex = Regex("\\s+|(?<=[-/])")
 
 /**
  * Text composable that never cuts off a translated label while keeping a readable font size.
@@ -221,7 +222,7 @@ private class AutoSizeLayouter(
         measurables: List<IntrinsicMeasurable>,
         height: Int
     ): Int {
-        val longestWord = text.split(Regex("\\s+|(?<=[-/])")).maxByOrNull { it.length } ?: text
+        val longestWord = text.split(WordBoundaryRegex).maxByOrNull { it.length } ?: text
         return measurer.measure(
             text = AnnotatedString(longestWord),
             style = style.copy(fontSize = AbsoluteMinFontSize),
@@ -272,7 +273,7 @@ private fun computeFit(
     val constraints = Constraints(maxWidth = widthPx)
     val annotated = AnnotatedString(text)
     // Split on whitespace and after hyphens/slashes, which are valid line-break points.
-    val words = text.split(Regex("\\s+|(?<=[-/])")).filter { it.isNotEmpty() }
+    val words = text.split(WordBoundaryRegex).filter { it.isNotEmpty() }
 
     fun measure(size: Float, softWrap: Boolean, lines: Int) = measurer.measure(
         text = annotated,
@@ -307,26 +308,32 @@ private fun computeFit(
         return !result.didOverflowHeight && !result.didOverflowWidth
     }
 
-    fun sizes(from: Float, to: Float): Sequence<Float> = generateSequence(from) { it - step }
-        .takeWhile { it >= to - 0.001f }
-        .map { it.coerceAtLeast(to) }
+    fun findLargestFit(from: Float, to: Float, fits: (Float) -> Boolean): Float? {
+        var size = from
+        while (size >= to - 0.001f) {
+            val candidate = size.coerceAtLeast(to)
+            if (fits(candidate)) return candidate
+            size -= step
+        }
+        return null
+    }
 
     val absMin = AbsoluteMinFontSize.value
     val maxFont = maxFont.coerceAtLeast(absMin)
     val preferredMin = preferredMin.coerceIn(absMin, maxFont)
 
     if (maxLines <= 1) {
-        sizes(maxFont, preferredMin).firstOrNull { fitsSingleLine(it) }
+        findLargestFit(maxFont, preferredMin, ::fitsSingleLine)
             ?.let { return TextFit(it.sp, 1, false) }
         if (fallbackLines > 1) {
-            sizes(maxFont, preferredMin).firstOrNull { fitsWrapped(it, fallbackLines) }
+            findLargestFit(maxFont, preferredMin) { fitsWrapped(it, fallbackLines) }
                 ?.let { return TextFit(it.sp, fallbackLines, false) }
-            sizes(preferredMin, absMin).firstOrNull { fitsWrapped(it, fallbackLines) }
+            findLargestFit(preferredMin, absMin) { fitsWrapped(it, fallbackLines) }
                 ?.let { return TextFit(it.sp, fallbackLines, false) }
         }
-        sizes(preferredMin, absMin).firstOrNull { fitsSingleLine(it) }
+        findLargestFit(preferredMin, absMin, ::fitsSingleLine)
             ?.let { return TextFit(it.sp, 1, false) }
-        val wordFitSize = sizes(preferredMin, absMin).firstOrNull { wordsFit(it) } ?: absMin
+        val wordFitSize = findLargestFit(preferredMin, absMin, ::wordsFit) ?: absMin
         return if (ellipsize) {
             TextFit(wordFitSize.sp, 1, true)
         } else {
@@ -335,17 +342,17 @@ private fun computeFit(
     }
 
     // Multi-line text: try fitting into maxLines down to preferredMin first.
-    sizes(maxFont, preferredMin).firstOrNull { fitsWrapped(it, maxLines) }
+    findLargestFit(maxFont, preferredMin) { fitsWrapped(it, maxLines) }
         ?.let { return TextFit(it.sp, maxLines, false) }
 
     if (ellipsize) {
-        sizes(preferredMin, absMin).firstOrNull { fitsWrapped(it, maxLines) }
+        findLargestFit(preferredMin, absMin) { fitsWrapped(it, maxLines) }
             ?.let { return TextFit(it.sp, maxLines, false) }
         return TextFit(absMin.sp, maxLines, true)
     }
 
     // Keep at least preferredMin (shrinking only if a single word is wider than the container)
     // and allow as many lines as needed instead of shrinking paragraphs to 6sp.
-    val readableSize = sizes(preferredMin, absMin).firstOrNull { wordsFit(it) } ?: absMin
+    val readableSize = findLargestFit(preferredMin, absMin, ::wordsFit) ?: absMin
     return TextFit(readableSize.sp, Int.MAX_VALUE, false)
 }

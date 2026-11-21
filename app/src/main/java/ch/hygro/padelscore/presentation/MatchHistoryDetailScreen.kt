@@ -92,7 +92,13 @@ internal fun MatchHistoryDetailScreen(entry: MatchHistoryEntry, onBack: () -> Un
     }
     val pointScore = stopped?.let { pointText(it, Team.US) + " : " + pointText(it, Team.OPPONENT) }
     val gameGroups = remember(entry.pointHistory) {
-        entry.pointHistory.groupBy { it.setNumber to it.gameNumber }.values.toList()
+        val groups = LinkedHashMap<Long, MutableList<GamePoint>>()
+        for (point in entry.pointHistory) {
+            val key = (point.setNumber.toLong() shl 32) or
+                (point.gameNumber.toLong() and 0xffffffffL)
+            groups.getOrPut(key) { ArrayList() }.add(point)
+        }
+        groups.values.toList()
     }
     var chartGameIndex by rememberSaveable(entry.matchId) { mutableIntStateOf(0) }
     val chartIndex = chartGameIndex.coerceIn(0, maxOf(0, gameGroups.lastIndex))

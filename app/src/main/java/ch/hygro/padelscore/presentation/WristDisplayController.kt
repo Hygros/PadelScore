@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.SystemClock
 import android.util.Log
-import kotlin.math.acos
 import kotlin.math.exp
 import kotlin.math.sqrt
 
@@ -35,6 +34,7 @@ class WristDisplayController(
     private var interactionUntil = 0L
 
     fun setEnabled(value: Boolean) {
+        if (enabled == value) return
         enabled = value
         updateRegistration()
         if (!value) {
@@ -74,7 +74,9 @@ class WristDisplayController(
             previousTimestamp = 0L
             candidate = null
             registered = manager.registerListener(this, sensor, 50_000)
-            Log.d("PadelWrist", "sensor=${sensor.name} registered=$registered")
+            if (Log.isLoggable("PadelWrist", Log.DEBUG)) {
+                Log.d("PadelWrist", "sensor=${sensor.name} registered=$registered")
+            }
         } else if (!shouldRegister && registered) {
             manager.unregisterListener(this)
             registered = false
@@ -89,8 +91,10 @@ class WristDisplayController(
 
     override fun onSensorChanged(event: SensorEvent) {
         if (!enabled || !resumed || event.values.size < 3) return
-        val raw = floatArrayOf(event.values[0], event.values[1], event.values[2])
-        val magnitude = length(raw)
+        val rawX = event.values[0]
+        val rawY = event.values[1]
+        val rawZ = event.values[2]
+        val magnitude = length(rawX, rawY, rawZ)
         if (!magnitude.isFinite() || magnitude < 1f) return
         // Reject strong linear acceleration on the fallback sensor.
         if (event.sensor.type == Sensor.TYPE_ACCELEROMETER &&
@@ -104,8 +108,13 @@ class WristDisplayController(
             ((event.timestamp - previousTimestamp) / 1_000_000_000.0).coerceIn(0.0, 0.5)
         previousTimestamp = event.timestamp
         val alpha = (1.0 - exp(-dt / 0.10)).toFloat()
-        val filtered = if (previous == null) raw else FloatArray(3) { i ->
-            previous[i] + alpha * (raw[i] - previous[i])
+        val filtered = if (previous == null) {
+            floatArrayOf(rawX, rawY, rawZ)
+        } else {
+            previous[0] += alpha * (rawX - previous[0])
+            previous[1] += alpha * (rawY - previous[1])
+            previous[2] += alpha * (rawZ - previous[2])
+            previous
         }
         gravity = filtered
         val baseline = reference
@@ -121,10 +130,9 @@ class WristDisplayController(
         if (denominator < 1f) return
         val cosine = ((baseline[0] * filtered[0] + baseline[1] * filtered[1] +
             baseline[2] * filtered[2]) / denominator).coerceIn(-1f, 1f)
-        val degrees = Math.toDegrees(acos(cosine.toDouble()))
         val desired = when {
-            !lowered && degrees >= LOWER_ANGLE_DEGREES -> true
-            lowered && degrees <= RAISE_ANGLE_DEGREES -> false
+            !lowered && cosine <= LOWER_ANGLE_COSINE -> true
+            lowered && cosine >= RAISE_ANGLE_COSINE -> false
             else -> { candidate = null; return }
         }
         if (candidate != desired) {
@@ -133,7 +141,9 @@ class WristDisplayController(
             return
         }
         if (event.timestamp - candidateSince >= STABLE_NANOS) {
-            Log.d("PadelWrist", "lowered=$desired angle=${degrees.toInt()}")
+            if (Log.isLoggable("PadelWrist", Log.DEBUG)) {
+                Log.d("PadelWrist", "lowered=$desired cosine=$cosine")
+            }
             publish(desired)
             candidate = null
         }
@@ -151,10 +161,12 @@ class WristDisplayController(
         vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]
     )
 
+    private fun length(x: Float, y: Float, z: Float): Float = sqrt(x * x + y * y + z * z)
+
     companion object {
         // Initial heuristic values, not device-validated gesture thresholds.
-        private const val LOWER_ANGLE_DEGREES = 40.0
-        private const val RAISE_ANGLE_DEGREES = 25.0
+        private const val LOWER_ANGLE_COSINE = 0.76604444f
+        private const val RAISE_ANGLE_COSINE = 0.9063078f
         private const val STABLE_NANOS = 150_000_000L
     }
 }

@@ -102,19 +102,28 @@ class LocalWorkoutRepository internal constructor(
     fun recordedSampleAverage(): Int? {
         synchronized(repositoryLock) {
             val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
-            val values = (0 until samples.length()).mapNotNull { i ->
-                samples.optJSONObject(i)?.optInt("bpm", 0)?.takeIf { bpm -> bpm in 30..240 }
+            var sum = 0L
+            var count = 0
+            for (index in 0 until samples.length()) {
+                val bpm = samples.optJSONObject(index)?.optInt("bpm", 0) ?: continue
+                if (bpm in 30..240) {
+                    sum += bpm
+                    count++
+                }
             }
-            return values.takeIf { it.isNotEmpty() }?.average()?.toInt()
+            return if (count > 0) (sum / count).toInt() else null
         }
     }
 
     fun lastSampleTime(): Long {
         synchronized(repositoryLock) {
             val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
-            return (0 until samples.length()).maxOfOrNull {
-                samples.optJSONObject(it)?.optLong("timeMillis", 0L) ?: 0L
-            } ?: activeMatchId()
+            var latest = 0L
+            for (index in 0 until samples.length()) {
+                val timeMillis = samples.optJSONObject(index)?.optLong("timeMillis", 0L) ?: 0L
+                if (timeMillis > latest) latest = timeMillis
+            }
+            return latest.takeIf { it > 0L } ?: preferences.getLong("active_start", 0L)
         }
     }
 
@@ -123,8 +132,14 @@ class LocalWorkoutRepository internal constructor(
             if (startTimeMillis <= 0L || isDeleted(startTimeMillis)) return
             if (preferences.getLong("active_start", 0L) == startTimeMillis) return
             val completed = JSONArray(preferences.getString("completed_workouts", "[]"))
-            val previous = (0 until completed.length()).mapNotNull { completed.optJSONObject(it) }
-                .firstOrNull { it.optLong("startTimeMillis", 0L) == startTimeMillis }
+            var previous: JSONObject? = null
+            for (index in 0 until completed.length()) {
+                val candidate = completed.optJSONObject(index) ?: continue
+                if (candidate.optLong("startTimeMillis", 0L) == startTimeMillis) {
+                    previous = candidate
+                    break
+                }
+            }
             if (previous == null) stepPreferences.edit { remove(startTimeMillis.toString()) }
             preferences.edit {
                 putLong("active_start", startTimeMillis)
@@ -139,15 +154,17 @@ class LocalWorkoutRepository internal constructor(
 
     fun addSamples(values: List<Pair<Long, Int>>) {
         synchronized(repositoryLock) {
-            if (preferences.getLong("active_start", 0L) <= 0L || values.isEmpty()) return
+            val activeStart = preferences.getLong("active_start", 0L)
+            if (activeStart <= 0L || values.isEmpty()) return
+            val activeEnd = preferences.getLong("active_end", Long.MAX_VALUE)
             val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
             val seen = HashSet<Long>()
             for (i in 0 until samples.length()) {
                 seen.add(samples.optJSONObject(i)?.optLong("timeMillis", 0L) ?: 0L)
             }
             for ((timeMillis, bpm) in values) {
-                if (bpm in 30..240 && timeMillis >= activeMatchId() &&
-                    timeMillis < preferences.getLong("active_end", Long.MAX_VALUE) &&
+                if (bpm in 30..240 && timeMillis >= activeStart &&
+                    timeMillis < activeEnd &&
                     samples.length() < 20000 && seen.add(timeMillis)) {
                     samples.put(JSONObject().put("timeMillis", timeMillis).put("bpm", bpm))
                 }
@@ -210,15 +227,25 @@ class LocalWorkoutRepository internal constructor(
             val cutoff = preferences.getLong("active_end", endTimeMillis).coerceAtLeast(start + 1L)
             val rawSamples = JSONArray(preferences.getString("active_samples", "[]"))
             val samples = JSONArray()
+            var heartRateSum = 0L
+            var validHeartRateCount = 0
+            var maximum = 0
             for (i in 0 until rawSamples.length()) {
                 val sample = rawSamples.optJSONObject(i) ?: continue
-                if (sample.optLong("timeMillis") in start until cutoff) samples.put(sample)
+                if (sample.optLong("timeMillis") !in start until cutoff) continue
+                samples.put(sample)
+                val bpm = sample.optInt("bpm", 0)
+                if (bpm !in 30..240) continue
+                heartRateSum += bpm
+                validHeartRateCount++
+                if (bpm > maximum) maximum = bpm
             }
             // Arithmetic mean of retained, valid samples across all recording segments.
-            val average = if (samples.length() > 0) {
-                (0 until samples.length()).map { samples.getJSONObject(it).getInt("bpm") }.average().toInt()
-            } else preferences.getInt("active_average", 0)
-            val maximum = (0 until samples.length()).maxOfOrNull { i -> samples.getJSONObject(i).optInt("bpm", 0) } ?: 0
+            val average = if (validHeartRateCount > 0) {
+                (heartRateSum / validHeartRateCount).toInt()
+            } else {
+                preferences.getInt("active_average", 0)
+            }
             val revision = preferences.getLong("revision_$start", 0L) + 1L
             val workout = JSONObject()
                 .put("revision", revision)
@@ -285,9 +312,12 @@ class LocalWorkoutRepository internal constructor(
             if (matchId <= 0L || isDeleted(matchId)) return null
             if (preferences.getLong("active_start", 0L) == matchId) {
                 val samples = JSONArray(preferences.getString("active_samples", "[]") ?: "[]")
-                return (0 until samples.length())
-                    .maxOfOrNull { samples.optJSONObject(it)?.optInt("bpm", 0) ?: 0 }
-                    ?.takeIf { it > 0 }
+                var maximum = 0
+                for (index in 0 until samples.length()) {
+                    val bpm = samples.optJSONObject(index)?.optInt("bpm", 0) ?: continue
+                    if (bpm in 30..240 && bpm > maximum) maximum = bpm
+                }
+                return maximum.takeIf { it > 0 }
             }
             return workoutMetricsMap()[matchId]?.maximumHeartRate
         }

@@ -103,9 +103,10 @@ class MainActivity : ComponentActivity() {
         ) {
             wristDisplayController.onInteraction()
         }
-        if (event.actionMasked == MotionEvent.ACTION_DOWN ||
-            event.actionMasked == MotionEvent.ACTION_UP ||
-            event.actionMasked == MotionEvent.ACTION_CANCEL
+        if (Log.isLoggable("PadelInput", Log.DEBUG) &&
+            (event.actionMasked == MotionEvent.ACTION_DOWN ||
+                event.actionMasked == MotionEvent.ACTION_UP ||
+                event.actionMasked == MotionEvent.ACTION_CANCEL)
         ) {
             Log.d("PadelInput", "touch=${event.actionMasked} x=${event.x.toInt()} y=${event.y.toInt()}")
         }
@@ -175,19 +176,30 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        supporterBillingManager.start()
+        window.decorView.postOnAnimation {
+            if (!isFinishing && !isDestroyed) {
+                supporterBillingManager.start()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        supporterBillingManager.refresh()
-        matchQuietMode.onResume()
-        ongoingMatch.refresh()
         wristDisplayController.onResume()
         wristGestureController.onResume()
-        syncExecutor.execute {
-            try { WorkoutDataSender(applicationContext).publishAll() }
-            catch (e: Exception) { Log.w("PadelScoreSync", "Pending sync deferred", e) }
+        window.decorView.postOnAnimation {
+            if (!isFinishing && !isDestroyed) {
+                matchQuietMode.onResume()
+                if (!syncExecutor.isShutdown) {
+                    syncExecutor.execute {
+                        try {
+                            WorkoutDataSender(applicationContext).publishAll()
+                        } catch (e: Exception) {
+                            Log.w("PadelScoreSync", "Pending sync deferred", e)
+                        }
+                    }
+                }
+            }
         }
     }
 

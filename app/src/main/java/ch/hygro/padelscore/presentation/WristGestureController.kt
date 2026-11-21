@@ -41,6 +41,7 @@ class WristGestureController(
     private var enabled = false
     private var resumed = false
     private var registered = false
+    private var displayRotation = Surface.ROTATION_0
 
     fun setEnabled(value: Boolean) {
         if (enabled == value) return
@@ -71,6 +72,7 @@ class WristGestureController(
         val shouldRegister = enabled && resumed && gravitySensor != null && sensorManager != null
         if (shouldRegister && !registered) {
             detector.reset()
+            displayRotation = currentDisplayRotation()
             registered = sensorManager.registerListener(
                 this,
                 gravitySensor,
@@ -83,10 +85,12 @@ class WristGestureController(
                     SensorManager.SENSOR_DELAY_GAME
                 )
             }
-            Log.d(
-                "PadelGesture",
-                "gravity=${gravitySensor.name} gyro=${gyroSensor?.name ?: "none"} registered=$registered"
-            )
+            if (Log.isLoggable("PadelGesture", Log.DEBUG)) {
+                Log.d(
+                    "PadelGesture",
+                    "gravity=${gravitySensor.name} gyro=${gyroSensor?.name ?: "none"} registered=$registered"
+                )
+            }
         } else if (!shouldRegister && registered) {
             sensorManager?.unregisterListener(this)
             registered = false
@@ -96,19 +100,35 @@ class WristGestureController(
 
     override fun onSensorChanged(event: SensorEvent) {
         if (!enabled || !resumed || event.values.size < 3) return
-        val rotation = currentDisplayRotation()
-        val (sx, sy, sz) = remapToScreenAxes(
-            x = event.values[0],
-            y = event.values[1],
-            z = event.values[2],
-            rotation = rotation
-        )
+        val x = event.values[0]
+        val y = event.values[1]
+        val z = event.values[2]
+        val sx: Float
+        val sy: Float
+        when (displayRotation) {
+            Surface.ROTATION_90 -> {
+                sx = -y
+                sy = x
+            }
+            Surface.ROTATION_180 -> {
+                sx = -x
+                sy = -y
+            }
+            Surface.ROTATION_270 -> {
+                sx = y
+                sy = -x
+            }
+            else -> {
+                sx = x
+                sy = y
+            }
+        }
         when (event.sensor.type) {
             Sensor.TYPE_GYROSCOPE -> {
                 detector.onGyroSample(
                     wx = sx,
                     wy = sy,
-                    wz = sz,
+                    wz = z,
                     timestampNanos = event.timestamp
                 )
             }
@@ -118,12 +138,14 @@ class WristGestureController(
                 val triggeredTeam = detector.onGravitySample(
                     x = sx,
                     y = sy,
-                    z = sz,
+                    z = z,
                     timestampNanos = event.timestamp,
                     isAccelerometer = isAccelerometer
                 )
                 if (triggeredTeam != null) {
-                    Log.d("PadelGesture", "gesture scored team=$triggeredTeam")
+                    if (Log.isLoggable("PadelGesture", Log.DEBUG)) {
+                        Log.d("PadelGesture", "gesture scored team=$triggeredTeam")
+                    }
                     onGesturePoint(triggeredTeam)
                 }
             }
@@ -157,6 +179,10 @@ class WristGestureController(
 }
 
 internal class WristGestureDetector {
+    private val debugLoggingEnabled = runCatching {
+        Log.isLoggable("PadelGesture", Log.DEBUG)
+    }.getOrDefault(false)
+
     private sealed interface State {
         data object Idle : State
         data class Arming(val sinceNanos: Long, val initialRollDeg: Float) : State
@@ -403,7 +429,9 @@ internal class WristGestureDetector {
     }
 
     private fun logDebug(message: String) {
-        runCatching { Log.d("PadelGesture", message) }
+        if (debugLoggingEnabled) {
+            Log.d("PadelGesture", message)
+        }
     }
 
     private fun isViewingPose(gx: Float, gy: Float, gz: Float, rollDeg: Float): Boolean {

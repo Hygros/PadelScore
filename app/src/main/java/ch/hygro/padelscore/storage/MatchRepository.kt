@@ -8,6 +8,8 @@ import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.ArrayDeque
+import java.util.IdentityHashMap
 
 /**
  * Persists the active match state and bounded undo history in local `SharedPreferences`.
@@ -18,6 +20,9 @@ import org.json.JSONObject
 class MatchRepository internal constructor(
     private val preferences: SharedPreferences
 ) {
+    private val encodedStateCache = IdentityHashMap<MatchState, JSONObject>()
+    private val encodedStateOrder = ArrayDeque<MatchState>()
+
     constructor(context: Context) : this(
         preferences = context.getSharedPreferences(
             PREFERENCES_NAME,
@@ -61,17 +66,30 @@ class MatchRepository internal constructor(
         val limitedHistory = undoHistory.takeLast(MAX_PERSISTED_HISTORY)
         val snapshot = JSONObject()
             .put(KEY_SCHEMA_VERSION, SCHEMA_VERSION)
-            .put(KEY_CURRENT_STATE, encodeState(currentState))
+            .put(KEY_CURRENT_STATE, cachedEncodedState(currentState))
             .put(
                 KEY_UNDO_HISTORY,
                 JSONArray().apply {
-                    limitedHistory.forEach { put(encodeState(it)) }
+                    limitedHistory.forEach { put(cachedEncodedState(it)) }
                 }
             )
 
         preferences.edit {
             putString(KEY_SNAPSHOT_JSON, snapshot.toString())
         }
+    }
+
+    private fun cachedEncodedState(state: MatchState): JSONObject {
+        encodedStateCache[state]?.let { return it }
+
+        val encoded = encodeState(state)
+        encodedStateCache[state] = encoded
+        encodedStateOrder.addLast(state)
+
+        while (encodedStateOrder.size > MAX_ENCODED_STATE_CACHE) {
+            encodedStateCache.remove(encodedStateOrder.removeFirst())
+        }
+        return encoded
     }
 
     private fun decodeSnapshot(json: JSONObject): MatchSnapshot {
@@ -241,6 +259,7 @@ class MatchRepository internal constructor(
         internal const val KEY_UNDO_HISTORY = "undoHistory"
         private const val SCHEMA_VERSION = 1
         private const val MAX_PERSISTED_HISTORY = 100
+        private const val MAX_ENCODED_STATE_CACHE = MAX_PERSISTED_HISTORY + 1
     }
 }
 

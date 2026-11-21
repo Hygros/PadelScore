@@ -152,12 +152,20 @@ class MatchHistoryRepository internal constructor(
         if (!preferences.contains(KEY_HISTORY_JSON)) return emptyList()
         val storedJson = preferences.getString(KEY_HISTORY_JSON, null)
             ?: error("Could not read match history")
-        val array = JSONArray(storedJson)
-        return buildList {
-            for (index in 0 until array.length()) {
-                add(decodeEntry(array.getJSONObject(index)))
+        val snapshot = cachedHistorySnapshot
+        val baseEntries = if (snapshot != null && snapshot.first == storedJson) {
+            snapshot.second
+        } else {
+            val array = JSONArray(storedJson)
+            buildList {
+                for (index in 0 until array.length()) {
+                    add(decodeEntry(array.getJSONObject(index)))
+                }
+            }.also { decoded ->
+                cachedHistorySnapshot = storedJson to decoded
             }
-        }.map { entry ->
+        }
+        return baseEntries.map { entry ->
             entry.copy(
                 averageHeartRate = workouts.averageHeartRateForMatch(entry.matchId)
                     ?: entry.averageHeartRate,
@@ -173,8 +181,10 @@ class MatchHistoryRepository internal constructor(
 
     private fun saveEntries(entries: List<MatchHistoryEntry>) {
         val array = JSONArray().apply { entries.forEach { put(encodeEntry(it)) } }
-        val result = preferences.edit().putString(KEY_HISTORY_JSON, array.toString()).commit()
+        val storedJson = array.toString()
+        val result = preferences.edit().putString(KEY_HISTORY_JSON, storedJson).commit()
         check(result) { "Could not persist match history" }
+        cachedHistorySnapshot = storedJson to entries
         scheduleHistorySync()
     }
 

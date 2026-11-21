@@ -25,6 +25,21 @@ class OngoingMatchController(context: Context) {
     private var active = false
     private var state: MatchState? = null
     private var errorShown = false
+    private var lastPostedSummary: String? = null
+    private val touchIntent: PendingIntent by lazy {
+        val returnIntent = Intent(context, MainActivity::class.java).apply {
+            putExtra(EXTRA_RESUME_MATCH, true)
+        }
+        PendingIntent.getActivity(
+            context,
+            NOTIFICATION_ID,
+            returnIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+    private val notificationTitle by lazy {
+        context.getString(R.string.ongoing_match_title)
+    }
 
     init {
         val channel = NotificationChannel(
@@ -54,24 +69,31 @@ class OngoingMatchController(context: Context) {
     fun update(active: Boolean, state: MatchState) {
         this.active = active
         this.state = state
-        if (!active) errorShown = false
-        refresh()
+        if (!active) {
+            errorShown = false
+            if (lastPostedSummary != null) {
+                manager.cancel(NOTIFICATION_ID)
+                lastPostedSummary = null
+            }
+            return
+        }
+        postNotification(force = false)
     }
 
     fun refresh() {
         if (!active) {
-            manager.cancel(NOTIFICATION_ID)
+            if (lastPostedSummary != null) {
+                manager.cancel(NOTIFICATION_ID)
+                lastPostedSummary = null
+            }
             return
         }
+        postNotification(force = true)
+    }
+
+    private fun postNotification(force: Boolean) {
         val match = state ?: return
         if (!canPostNotifications()) return
-        val returnIntent = Intent(context, MainActivity::class.java).apply {
-            putExtra(EXTRA_RESUME_MATCH, true)
-        }
-        val touchIntent = PendingIntent.getActivity(
-            context, NOTIFICATION_ID, returnIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
         val summary = context.getString(
             R.string.ongoing_match_summary,
             match.ourGames,
@@ -79,9 +101,10 @@ class OngoingMatchController(context: Context) {
             match.ourSets,
             match.opponentSets
         )
+        if (!force && summary == lastPostedSummary) return
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_ongoing_match)
-            .setContentTitle(context.getString(R.string.ongoing_match_title))
+            .setContentTitle(notificationTitle)
             .setContentText(summary)
             .setContentIntent(touchIntent)
             .setCategory(NotificationCompat.CATEGORY_WORKOUT)
@@ -101,6 +124,7 @@ class OngoingMatchController(context: Context) {
                 .build()
                 .apply(context)
             manager.notify(NOTIFICATION_ID, builder.build())
+            lastPostedSummary = summary
         } catch (exception: RuntimeException) {
             Log.w("OngoingMatch", "Could not post ongoing match", exception)
             if (!errorShown) {

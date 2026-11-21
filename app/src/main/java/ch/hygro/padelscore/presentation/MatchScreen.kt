@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +59,7 @@ import ch.hygro.padelscore.storage.SettingsRepository
 import ch.hygro.padelscore.vibration.HapticFeedbackManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -84,6 +86,7 @@ fun PadelScoreContent(
     val hapticFeedbackManager = remember(view) {
         HapticFeedbackManager(view)
     }
+    val coroutineScope = rememberCoroutineScope()
     val ambientModeManager = checkNotNull(LocalAmbientModeManager.current)
     val isAmbientMode = ambientModeManager.currentAmbientMode is AmbientMode.Ambient
 
@@ -159,10 +162,14 @@ fun PadelScoreContent(
 
         val now = SystemClock.elapsedRealtime()
         if (now - lastAcceptedPointAtMillis < POINT_INPUT_LOCK_MILLIS) {
-            Log.d("PadelInput", "point rejected: debounce team=$team")
+            if (Log.isLoggable("PadelInput", Log.DEBUG)) {
+                Log.d("PadelInput", "point rejected: debounce team=$team")
+            }
             return
         }
-        Log.d("PadelInput", "point accepted team=$team ambient=$isAmbientMode")
+        if (Log.isLoggable("PadelInput", Log.DEBUG)) {
+            Log.d("PadelInput", "point accepted team=$team ambient=$isAmbientMode")
+        }
 
         val previousState = matchState
         val newState = PadelScoreEngine.awardPoint(previousState, team)
@@ -311,8 +318,10 @@ fun PadelScoreContent(
         }
     }
     LaunchedEffect(matchHistoryRepository, showMatchHistory) {
-        matchHistoryEntries = withContext(Dispatchers.IO) {
-            matchHistoryRepository.loadEntries()
+        if (showMatchHistory) {
+            matchHistoryEntries = withContext(Dispatchers.IO) {
+                matchHistoryRepository.loadEntries()
+            }
         }
     }
     LaunchedEffect(showConfiguration, showResumePrompt, showMatchHistory, showSupporter, showSettings) {
@@ -352,7 +361,9 @@ fun PadelScoreContent(
     }
     // Keep the clock current in interactive mode, aligned to full minutes.
     LaunchedEffect(isAmbientMode) {
-        Log.d("PadelInput", "ambient=$isAmbientMode activeMatch=$isActiveMatch")
+        if (Log.isLoggable("PadelInput", Log.DEBUG)) {
+            Log.d("PadelInput", "ambient=$isAmbientMode activeMatch=$isActiveMatch")
+        }
         ambientClock = formatClock(context)
         while (!isAmbientMode) {
             delay((60_000L - System.currentTimeMillis() % 60_000L).milliseconds)
@@ -393,17 +404,21 @@ fun PadelScoreContent(
         MatchHistoryScreen(
             entries = matchHistoryEntries,
             onDeleteMatch = { matchId ->
-                try {
-                    matchHistoryRepository.removeByMatchId(matchId)
-                } catch (exception: Exception) {
-                    Log.e("PadelScore", "Could not delete match", exception)
-                    Toast.makeText(
-                        context,
-                        deleteMatchFailedMessage,
-                        Toast.LENGTH_LONG
-                    ).show()
+                coroutineScope.launch {
+                    try {
+                        matchHistoryEntries = withContext(Dispatchers.IO) {
+                            matchHistoryRepository.removeByMatchId(matchId)
+                            matchHistoryRepository.loadEntries()
+                        }
+                    } catch (exception: Exception) {
+                        Log.e("PadelScore", "Could not delete match", exception)
+                        Toast.makeText(
+                            context,
+                            deleteMatchFailedMessage,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
-                matchHistoryEntries = matchHistoryRepository.loadEntries()
             },
             onBack = { showMatchHistory = false }
         )

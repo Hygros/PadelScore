@@ -56,9 +56,12 @@ class PadelPongEngine {
         Obstacle(0.65f, 0.40f, -0.05f, 0.08f, 0.5f, COURT_RIGHT, COURT_TOP, 0.48f)
     )
 
-    // Gegnerpositionen: X/Y als Bildschirmanteile.
-    val obstaclePositions: List<Pair<Float, Float>>
-        get() = obstacles.map { it.x to it.y }
+    val obstacleCount: Int
+        get() = obstacles.size
+
+    fun obstacleX(index: Int): Float = obstacles[index].x
+
+    fun obstacleY(index: Int): Float = obstacles[index].y
 
     fun setFieldSize(width: Float, height: Float) {
         if (width > 0f && height > 0f) {

@@ -81,6 +81,20 @@ internal fun GameScoreChart(
         maxOf(1, points.maxOf { maxOf(chartScoreLevel(it.ourScore, true) ?: 0,
             chartScoreLevel(it.opponentScore, true) ?: 0) })
     } else 5
+    val ourLevels = remember(points, numeric) {
+        IntArray(points.size) { index ->
+            recordedScore(points, index, true)
+                ?.let { chartScoreLevel(it, numeric) }
+                ?: -1
+        }
+    }
+    val opponentLevels = remember(points, numeric) {
+        IntArray(points.size) { index ->
+            recordedScore(points, index, false)
+                ?.let { chartScoreLevel(it, numeric) }
+                ?: -1
+        }
+    }
     val yTicks = if (numeric) listOf(0, maximum / 2, maximum).distinct() else (0..5).toList()
     val density = LocalDensity.current
     val labelPixels = with(density) { 8.sp.toPx() }
@@ -181,13 +195,13 @@ internal fun GameScoreChart(
             }
             // Draw lines for both series
             points.forEachIndexed { index, point ->
-                val valUs = recordedScore(points, index, true)?.let { chartScoreLevel(it, numeric) }
-                val valOpp = recordedScore(points, index, false)?.let { chartScoreLevel(it, numeric) }
+                val valUs = ourLevels[index].takeIf { it >= 0 }
+                val valOpp = opponentLevels[index].takeIf { it >= 0 }
 
                 if (index > 0 && point.number == points[index - 1].number + 1) {
                     val previous = points[index - 1]
-                    val prevValUs = recordedScore(points, index - 1, true)?.let { chartScoreLevel(it, numeric) }
-                    val prevValOpp = recordedScore(points, index - 1, false)?.let { chartScoreLevel(it, numeric) }
+                    val prevValUs = ourLevels[index - 1].takeIf { it >= 0 }
+                    val prevValOpp = opponentLevels[index - 1].takeIf { it >= 0 }
 
                     // Horizontal lines
                     if (prevValUs != null && prevValOpp != null && prevValUs == prevValOpp) {
@@ -230,15 +244,15 @@ internal fun GameScoreChart(
             // Draw points for both series. A marker is split whenever both coloured
             // line segments occupy its position, not only when both current scores are equal.
             points.forEachIndexed { index, point ->
-                val valUs = recordedScore(points, index, true)?.let { chartScoreLevel(it, numeric) }
-                val valOpp = recordedScore(points, index, false)?.let { chartScoreLevel(it, numeric) }
+                val valUs = ourLevels[index].takeIf { it >= 0 }
+                val valOpp = opponentLevels[index].takeIf { it >= 0 }
                 val hasContiguousPrevious = index > 0 &&
                         point.number == points[index - 1].number + 1
                 val prevValUs = if (hasContiguousPrevious) {
-                    recordedScore(points, index - 1, true)?.let { chartScoreLevel(it, numeric) }
+                    ourLevels[index - 1].takeIf { it >= 0 }
                 } else null
                 val prevValOpp = if (hasContiguousPrevious) {
-                    recordedScore(points, index - 1, false)?.let { chartScoreLevel(it, numeric) }
+                    opponentLevels[index - 1].takeIf { it >= 0 }
                 } else null
                 val radius = 2.4.dp.toPx()
 

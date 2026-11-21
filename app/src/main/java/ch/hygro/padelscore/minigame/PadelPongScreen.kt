@@ -142,9 +142,10 @@ fun PadelPongScreen(onExit: () -> Unit) {
                 })
             }
     ) {
-        val redraw = frame
         Canvas(Modifier.fillMaxSize()) {
-            // frame ist hier eine beobachtete Eingabe fuer die Draw-Phase.
+            // Read frame in the draw phase so animation frames invalidate only
+            // the canvas instead of recomposing the complete game overlay.
+            val redraw = frame
             if (redraw >= 0) {
                 val w = size.width
                 val h = size.height
@@ -170,7 +171,9 @@ fun PadelPongScreen(onExit: () -> Unit) {
                     val x = left + width * i / 11f
                     drawLine(Color.White.copy(alpha = 0.35f), Offset(x, h * 0.49f), Offset(x, h * 0.51f), 1.dp.toPx())
                 }
-                for ((x, y) in engine.obstaclePositions) {
+                for (index in 0 until engine.obstacleCount) {
+                    val x = engine.obstacleX(index)
+                    val y = engine.obstacleY(index)
                     drawCircle(Color(0xFFFF6B62), scale * PadelPongEngine.OPPONENT_RADIUS, Offset(x * w, y * h))
                     drawCircle(Color.White, scale * 0.017f, Offset(x * w, y * h))
                 }

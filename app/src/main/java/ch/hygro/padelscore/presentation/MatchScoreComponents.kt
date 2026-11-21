@@ -291,7 +291,7 @@ fun CenterScoreArea(
             holdDuration = 0L
             val startTime = SystemClock.elapsedRealtime()
             while (holdDuration < RESET_HOLD_DURATION_MILLIS && isResetHolding) {
-                delay(16.milliseconds) // ~60fps update rate
+                delay(33.milliseconds) // ~30fps is sufficient for the small watch indicator.
                 holdDuration = SystemClock.elapsedRealtime() - startTime
             }
             if (isResetHolding) {

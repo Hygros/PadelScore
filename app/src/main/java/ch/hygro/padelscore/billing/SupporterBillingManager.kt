@@ -117,7 +117,6 @@ class SupporterBillingManager(
         if (closed) return
 
         if (!billingClient.isReady) {
-            connectionStarted = false
             start()
             return
         }
@@ -620,6 +619,7 @@ class SupporterBillingManager(
 
     private fun updateState(newState: SupporterBillingState) {
         if (closed) return
+        if (state == newState) return
 
         state = newState
         onStateChanged(newState)
