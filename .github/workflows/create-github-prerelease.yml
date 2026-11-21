@@ -58,6 +58,60 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Calculate next GitHub release version
+        id: release-version
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+
+          next_version="$(
+            gh release list \
+              --repo "${GITHUB_REPOSITORY}" \
+              --limit 100 \
+              --json name \
+            | python3 -c '
+          import json
+          import re
+          import sys
+
+          versions = []
+
+          for release in json.load(sys.stdin):
+              name = release.get("name") or ""
+              match = re.fullmatch(
+                  r"PadelScore (\d+)\.(\d+)(?:\.(\d+))?",
+                  name,
+              )
+
+              if match:
+                  versions.append(
+                      (
+                          int(match.group(1)),
+                          int(match.group(2)),
+                          int(match.group(3) or 0),
+                      )
+                  )
+
+          if not versions:
+              raise RuntimeError(
+                  "No existing PadelScore GitHub release version found."
+              )
+
+          major, minor, patch = max(versions)
+          print(f"{major}.{minor}.{patch + 1}")
+          '
+          )"
+
+          if [ -z "${next_version}" ]; then
+            echo "Next GitHub release version could not be calculated."
+            exit 1
+          fi
+
+          echo "version_name=${next_version}" >> "${GITHUB_OUTPUT}"
+          echo "Next GitHub release version: ${next_version}"
+
       - name: Run unit tests and release lint
         run: |
           ./gradlew \
@@ -243,6 +297,7 @@ jobs:
           PADELSCORE_UPLOAD_KEY_PASSWORD: ${{ secrets.PADELSCORE_UPLOAD_KEY_PASSWORD }}
           WEAR_VERSION_CODE: ${{ steps.versions.outputs.wear_version_code }}
           MOBILE_VERSION_CODE: ${{ steps.versions.outputs.mobile_version_code }}
+          VERSION_NAME: ${{ steps.release-version.outputs.version_name }}
         shell: bash
         run: |
           set -o pipefail
@@ -252,6 +307,7 @@ jobs:
             :mobile:assembleRelease \
             "-PpadelscoreWearVersionCode=${WEAR_VERSION_CODE}" \
             "-PpadelscoreMobileVersionCode=${MOBILE_VERSION_CODE}" \
+            "-PpadelscoreVersionName=${VERSION_NAME}" \
             --stacktrace
 
       - name: Verify and prepare release assets

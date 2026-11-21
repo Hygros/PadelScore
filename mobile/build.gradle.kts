@@ -31,7 +31,7 @@ android {
         minSdk = 28
         targetSdk = 37
         versionCode = providers.gradleProperty("padelscoreMobileVersionCode").orNull?.toInt() ?: 13
-        versionName = "1.3"
+        versionName = providers.gradleProperty("padelscoreVersionName").orNull ?: "1.3"
     }
     signingConfigs {
         if (hasUploadSigningConfiguration) {

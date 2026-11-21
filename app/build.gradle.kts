@@ -35,7 +35,7 @@ android {
         minSdk = 30
         targetSdk = 37
         versionCode = providers.gradleProperty("padelscoreWearVersionCode").orNull?.toInt() ?: 12
-        versionName = "1.3"
+        versionName = providers.gradleProperty("padelscoreVersionName").orNull ?: "1.3"
     }
 
     signingConfigs {
