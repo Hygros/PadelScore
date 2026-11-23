@@ -221,6 +221,28 @@ h3 {
   gap: 12px;
 }
 
+.hero-copy > .actions {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: stretch;
+}
+
+.hero-copy > .actions .button-primary {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+@media (max-width: 520px) {
+  .hero-copy > .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-copy > .actions .button-primary {
+    grid-column: auto;
+    justify-self: stretch;
+  }
+}
+
 .button {
   display: inline-flex;
   min-height: 50px;
