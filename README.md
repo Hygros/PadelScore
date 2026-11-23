@@ -11,6 +11,7 @@
 </p>
 
 <p align="center">
+  <a href="https://hygros.github.io/PadelScore/"><img src="https://img.shields.io/badge/Website-GitHub%20Pages-20c86b?style=flat-square" alt="Padel Score website" /></a>
   <a href="https://github.com/Hygros/PadelScore/releases"><img src="https://img.shields.io/github/v/release/Hygros/PadelScore?color=2e7d32&label=Latest%20Release&style=flat-square" alt="Latest release" /></a>
   <a href="https://developer.android.com/wear"><img src="https://img.shields.io/badge/Platform-Wear%20OS%203%2B-00C853?style=flat-square&logo=wearos&logoColor=white" alt="Wear OS 3 or newer" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square" alt="Apache License 2.0" /></a>
