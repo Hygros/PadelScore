@@ -436,6 +436,10 @@ h3 {
   font-weight: 650;
 }
 
+.screenshot-row .phone-preview {
+  border-radius: 24px;
+}
+
 .stats-section,
 .fitness-section,
 .install-section {
