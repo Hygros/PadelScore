@@ -179,4 +179,16 @@
   <string name="watch_settings">Paramètres de la montre</string>
   <string name="open_settings_manually">Ouvrir les paramètres manuellement</string>
   <string name="start_padel_match_content_desc">Démarrer un match de padel</string>
+  <string name="first_server_us">NOTRE SERVEUR</string>
+  <string name="first_server_opponent">SERVEUR ADVERSE</string>
+  <string name="player_me">MOI</string>
+  <string name="player_partner">PARTENAIRE</string>
+  <string name="player_opponent_1">ADVERSAIRE 1</string>
+  <string name="player_opponent_2">ADVERSAIRE 2</string>
+  <string name="choose_return_side">CHOISIR LE CÔTÉ DE RETOUR</string>
+  <string name="serve_from_right">SERVICE À DROITE</string>
+  <string name="serve_from_left">SERVICE À GAUCHE</string>
+  <string name="confirm_server_order">CONFIRMER L’ORDRE DE SERVICE</string>
+  <string name="confirm">CONFIRMER</string>
+  <string name="correct_server">CORRIGER LE SERVEUR</string>
 </resources>

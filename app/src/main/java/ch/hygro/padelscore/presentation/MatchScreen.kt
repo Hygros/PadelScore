@@ -50,6 +50,8 @@ import ch.hygro.padelscore.minigame.PadelPongScreen
 import ch.hygro.padelscore.model.MatchHistoryEntry
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.ColorTeamOpponent
 import ch.hygro.padelscore.presentation.theme.ColorTeamUs
@@ -128,6 +130,13 @@ fun PadelScoreContent(
     var showSupporter by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
     var showPadelPong by remember { mutableStateOf(false) }
+    var showServerCorrection by remember { mutableStateOf(false) }
+    var pendingFirstServerForUs by remember {
+        mutableStateOf(initialState.nextServerForUs)
+    }
+    var pendingFirstServerForOpponent by remember {
+        mutableStateOf(initialState.nextServerForOpponent)
+    }
     var draftConfiguration by remember { mutableStateOf(initialState.configuration) }
     val bodySensorPermissionsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -498,6 +507,49 @@ fun PadelScoreContent(
         return
     }
 
+    if (!matchState.setOpeningServersConfirmed) {
+        SetServerOrderScreen(
+            firstServingTeam = matchState.servingTeam,
+            firstServerForUs = pendingFirstServerForUs,
+            firstServerForOpponent = pendingFirstServerForOpponent,
+            onFirstServerForUsChanged = {
+                pendingFirstServerForUs = it
+            },
+            onFirstServerForOpponentChanged = {
+                pendingFirstServerForOpponent = it
+            },
+            onConfirm = {
+                saveCurrentStateToHistory()
+                updateMatch(
+                    PadelScoreEngine.configureSetOpeningServers(
+                        state = matchState,
+                        firstServerForUs = pendingFirstServerForUs,
+                        firstServerForOpponent = pendingFirstServerForOpponent
+                    )
+                )
+            }
+        )
+        return
+    }
+
+    if (showServerCorrection) {
+        ServerCorrectionScreen(
+            servingTeam = matchState.servingTeam,
+            servingPlayer = matchState.servingPlayer,
+            onPlayerSelected = { player: PlayerSlot ->
+                saveCurrentStateToHistory()
+                updateMatch(
+                    PadelScoreEngine.correctServingPlayer(matchState, player)
+                )
+                showServerCorrection = false
+            },
+            onCancel = {
+                showServerCorrection = false
+            }
+        )
+        return
+    }
+
     if (matchState.phase == MatchPhase.MATCH_FINISHED) {
         MatchFinishedScreen(
             matchState = matchState,
@@ -561,7 +613,14 @@ fun PadelScoreContent(
         },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val isDeuceCourt = ServeCalculator.isDeuceCourtServe(matchState.pointsInCurrentGame)
+        val serviceAssignment = ServeCalculator.serviceAssignment(matchState)
+        val pointInputEnabled =
+            serviceAssignment.court != ServiceCourt.RECEIVER_CHOICE
+
+        fun selectServiceCourt(court: ServiceCourt) {
+            saveCurrentStateToHistory()
+            updateMatch(PadelScoreEngine.selectDecidingPointCourt(matchState, court))
+        }
 
         ScoreArea(
             modifier = Modifier.fillMaxWidth().weight(1f),
@@ -571,11 +630,16 @@ fun PadelScoreContent(
             sets = matchState.opponentSets,
             backgroundColor = ColorTeamOpponent,
             isServing = matchState.servingTeam == Team.OPPONENT,
-            isDeuceCourt = isDeuceCourt,
+            serviceCourt = serviceAssignment.court,
+            servingPlayer = serviceAssignment.player,
             statsAtTop = true,
-            enabled = !matchFinished,
+            enabled = !matchFinished && pointInputEnabled,
             swipeGesturesEnabled = swipeGesturesEnabled,
             ambient = isReducedDisplay,
+            onServiceCourtSelected = ::selectServiceCourt,
+            onServingPlayerLongClick = {
+                showServerCorrection = true
+            },
             onClick = { addPoint(Team.OPPONENT) }
         )
 
@@ -605,11 +669,16 @@ fun PadelScoreContent(
             sets = matchState.ourSets,
             backgroundColor = ColorTeamUs,
             isServing = matchState.servingTeam == Team.US,
-            isDeuceCourt = isDeuceCourt,
+            serviceCourt = serviceAssignment.court,
+            servingPlayer = serviceAssignment.player,
             statsAtTop = false,
-            enabled = !matchFinished,
+            enabled = !matchFinished && pointInputEnabled,
             swipeGesturesEnabled = swipeGesturesEnabled,
             ambient = isReducedDisplay,
+            onServiceCourtSelected = ::selectServiceCourt,
+            onServingPlayerLongClick = {
+                showServerCorrection = true
+            },
             onClick = { addPoint(Team.US) }
         )
     }

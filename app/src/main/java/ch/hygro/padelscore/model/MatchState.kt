@@ -34,7 +34,16 @@ data class MatchState(
     val isStarPointActive: Boolean = false,
 
     val servingTeam: Team = configuration.firstServingTeam,
+    val servingPlayer: PlayerSlot = when (configuration.firstServingTeam) {
+        Team.US -> configuration.firstServerForUs
+        Team.OPPONENT -> configuration.firstServerForOpponent
+    },
+    val nextServerForUs: PlayerSlot = configuration.firstServerForUs,
+    val nextServerForOpponent: PlayerSlot = configuration.firstServerForOpponent,
     val tieBreakFirstServingTeam: Team? = null,
+    val tieBreakFirstServingPlayer: PlayerSlot? = null,
+    val setOpeningServersConfirmed: Boolean = true,
+    val selectedDecidingPointCourt: ServiceCourt? = null,
 
     val completedSets: List<SetResult> = emptyList(),
 

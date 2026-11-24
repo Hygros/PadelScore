@@ -179,4 +179,16 @@
   <string name="watch_settings">Horloge-instellingen</string>
   <string name="open_settings_manually">Instellingen handmatig openen</string>
   <string name="start_padel_match_content_desc">Padelwedstrijd starten</string>
+  <string name="first_server_us">ONZE SERVEERDER</string>
+  <string name="first_server_opponent">SERVEERDER TEGENSTANDER</string>
+  <string name="player_me">IK</string>
+  <string name="player_partner">PARTNER</string>
+  <string name="player_opponent_1">TEGENSTANDER 1</string>
+  <string name="player_opponent_2">TEGENSTANDER 2</string>
+  <string name="choose_return_side">KIES ONTVANGSTZIJDE</string>
+  <string name="serve_from_right">SERVICE VAN RECHTS</string>
+  <string name="serve_from_left">SERVICE VAN LINKS</string>
+  <string name="confirm_server_order">SERVICEVOLGORDE BEVESTIGEN</string>
+  <string name="confirm">BEVESTIGEN</string>
+  <string name="correct_server">SERVEERDER CORRIGEREN</string>
 </resources>

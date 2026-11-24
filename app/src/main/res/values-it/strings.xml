@@ -179,4 +179,16 @@
   <string name="watch_settings">Impostazioni orologio</string>
   <string name="open_settings_manually">Apri impostazioni manualmente</string>
   <string name="start_padel_match_content_desc">Inizia partita di padel</string>
+  <string name="first_server_us">NOSTRO BATTITORE</string>
+  <string name="first_server_opponent">BATTITORE AVVERSARIO</string>
+  <string name="player_me">IO</string>
+  <string name="player_partner">COMPAGNO</string>
+  <string name="player_opponent_1">AVVERSARIO 1</string>
+  <string name="player_opponent_2">AVVERSARIO 2</string>
+  <string name="choose_return_side">SCEGLI LATO DI RISPOSTA</string>
+  <string name="serve_from_right">SERVIZIO DA DESTRA</string>
+  <string name="serve_from_left">SERVIZIO DA SINISTRA</string>
+  <string name="confirm_server_order">CONFERMA ORDINE DI SERVIZIO</string>
+  <string name="confirm">CONFERMA</string>
+  <string name="correct_server">CORREGGI BATTITORE</string>
 </resources>

@@ -179,4 +179,16 @@
   <string name="watch_settings">إعدادات الساعة</string>
   <string name="open_settings_manually">فتح الإعدادات يدوياً</string>
   <string name="start_padel_match_content_desc">بدء مباراة بادل</string>
+  <string name="first_server_us">مرسلنا</string>
+  <string name="first_server_opponent">مرسل الخصم</string>
+  <string name="player_me">أنا</string>
+  <string name="player_partner">الشريك</string>
+  <string name="player_opponent_1">الخصم 1</string>
+  <string name="player_opponent_2">الخصم 2</string>
+  <string name="choose_return_side">اختر جهة الاستقبال</string>
+  <string name="serve_from_right">إرسال من اليمين</string>
+  <string name="serve_from_left">إرسال من اليسار</string>
+  <string name="confirm_server_order">تأكيد ترتيب الإرسال</string>
+  <string name="confirm">تأكيد</string>
+  <string name="correct_server">تصحيح المرسل</string>
 </resources>

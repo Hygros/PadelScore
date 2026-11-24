@@ -179,4 +179,16 @@
   <string name="watch_settings">Klockinställningar</string>
   <string name="open_settings_manually">Öppna inställningar manuellt</string>
   <string name="start_padel_match_content_desc">Starta padelmatch</string>
+  <string name="first_server_us">VÅR SERVARE</string>
+  <string name="first_server_opponent">MOTSTÅNDARENS SERVARE</string>
+  <string name="player_me">JAG</string>
+  <string name="player_partner">PARTNER</string>
+  <string name="player_opponent_1">MOTSTÅNDARE 1</string>
+  <string name="player_opponent_2">MOTSTÅNDARE 2</string>
+  <string name="choose_return_side">VÄLJ RETURSIDA</string>
+  <string name="serve_from_right">SERVE FRÅN HÖGER</string>
+  <string name="serve_from_left">SERVE FRÅN VÄNSTER</string>
+  <string name="confirm_server_order">BEKRÄFTA SERVEORDNING</string>
+  <string name="confirm">BEKRÄFTA</string>
+  <string name="correct_server">KORRIGERA SERVARE</string>
 </resources>

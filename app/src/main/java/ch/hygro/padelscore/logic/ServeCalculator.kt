@@ -2,59 +2,135 @@ package ch.hygro.padelscore.logic
 
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.model.Team
 
+data class ServiceAssignment(
+    val player: PlayerSlot,
+    val court: ServiceCourt
+)
+
 /**
- * Computes court side (Deuce/Advantage), side changes, and tie-break service rotation.
+ * Computes the concrete server, service court and court changes.
  */
 object ServeCalculator {
 
     fun isDeuceCourtServe(pointsInCurrentGame: Int): Boolean {
+        require(pointsInCurrentGame >= 0) {
+            "pointsInCurrentGame must not be negative"
+        }
         return pointsInCurrentGame % 2 == 0
+    }
+
+    fun serviceAssignment(state: MatchState): ServiceAssignment {
+        require(state.servingPlayer.team == state.servingTeam) {
+            "servingPlayer must belong to servingTeam"
+        }
+
+        val court = state.selectedDecidingPointCourt ?: when {
+            state.isGoldenPointActive || state.isStarPointActive -> {
+                ServiceCourt.RECEIVER_CHOICE
+            }
+            isDeuceCourtServe(state.pointsInCurrentGame) -> {
+                ServiceCourt.DEUCE
+            }
+            else -> {
+                ServiceCourt.ADVANTAGE
+            }
+        }
+
+        return ServiceAssignment(
+            player = state.servingPlayer,
+            court = court
+        )
+    }
+
+    fun servingPlayerForNextTieBreakPoint(
+        firstServingPlayer: PlayerSlot,
+        firstServerForUs: PlayerSlot,
+        firstServerForOpponent: PlayerSlot,
+        pointsPlayed: Int
+    ): PlayerSlot {
+        require(pointsPlayed >= 0) {
+            "pointsPlayed must not be negative"
+        }
+        require(firstServerForUs.team == Team.US) {
+            "firstServerForUs must belong to Team.US"
+        }
+        require(firstServerForOpponent.team == Team.OPPONENT) {
+            "firstServerForOpponent must belong to Team.OPPONENT"
+        }
+
+        if (pointsPlayed == 0) {
+            return firstServingPlayer
+        }
+
+        val blockIndex = (pointsPlayed - 1) / 2
+        val servingTeam = if (blockIndex % 2 == 0) {
+            firstServingPlayer.team.other()
+        } else {
+            firstServingPlayer.team
+        }
+        val teamServiceTurn = if (servingTeam == firstServingPlayer.team) {
+            (blockIndex + 1) / 2
+        } else {
+            blockIndex / 2
+        }
+        val firstServer = when (servingTeam) {
+            Team.US -> firstServerForUs
+            Team.OPPONENT -> firstServerForOpponent
+        }
+
+        return if (teamServiceTurn % 2 == 0) {
+            firstServer
+        } else {
+            firstServer.teammate()
+        }
     }
 
     fun isCourtChange(previousState: MatchState, newState: MatchState): Boolean {
         if (newState.phase == MatchPhase.MATCH_FINISHED) return false
 
-        // Check tie-break point total change (change sides every 6 points in tie-break)
         if (newState.isTieBreak || newState.phase == MatchPhase.MATCH_TIE_BREAK) {
-            val tbPoints = if (newState.phase == MatchPhase.MATCH_TIE_BREAK) {
+            val tieBreakPoints = if (newState.phase == MatchPhase.MATCH_TIE_BREAK) {
                 newState.opponentMatchTieBreakPoints + newState.ourMatchTieBreakPoints
             } else {
                 newState.opponentTieBreakPoints + newState.ourTieBreakPoints
             }
-            val prevTbPoints = if (previousState.phase == MatchPhase.MATCH_TIE_BREAK) {
-                previousState.opponentMatchTieBreakPoints + previousState.ourMatchTieBreakPoints
-            } else {
-                previousState.opponentTieBreakPoints + previousState.ourTieBreakPoints
-            }
+            val previousTieBreakPoints =
+                if (previousState.phase == MatchPhase.MATCH_TIE_BREAK) {
+                    previousState.opponentMatchTieBreakPoints +
+                        previousState.ourMatchTieBreakPoints
+                } else {
+                    previousState.opponentTieBreakPoints +
+                        previousState.ourTieBreakPoints
+                }
 
-            if (tbPoints > prevTbPoints && tbPoints > 0 && tbPoints % 6 == 0) {
+            if (
+                tieBreakPoints > previousTieBreakPoints &&
+                tieBreakPoints > 0 &&
+                tieBreakPoints % 6 == 0
+            ) {
                 return true
             }
         }
 
-        // Check if a game was completed
         if (newState.totalGamesPlayed > previousState.totalGamesPlayed) {
-            // Check if a set was completed
             if (newState.completedSets.size > previousState.completedSets.size) {
                 val lastSet = newState.completedSets.last()
-                val totalGamesInLastSet = lastSet.opponentGames + lastSet.ourGames
+                val totalGamesInLastSet =
+                    lastSet.opponentGames + lastSet.ourGames
                 return totalGamesInLastSet % 2 != 0
-            } else {
-                // Set continues: total games in current set
-                val gamesInSet = newState.opponentGames + newState.ourGames
-                return gamesInSet % 2 != 0
             }
+
+            val gamesInSet = newState.opponentGames + newState.ourGames
+            return gamesInSet % 2 != 0
         }
 
         return false
     }
 
-    /**
-     * Returns the server for the next tie-break point using the standard 1-2-2 sequence:
-     * [firstServingTeam] serves point 0 (the first point), then teams alternate every two points.
-     */
     fun servingTeamForNextTieBreakPoint(
         firstServingTeam: Team,
         pointsPlayed: Int

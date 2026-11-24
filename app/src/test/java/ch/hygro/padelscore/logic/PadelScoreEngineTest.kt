@@ -5,6 +5,7 @@ import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.ScoringMode
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.model.Team
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -103,7 +104,7 @@ class PadelScoreEngineTest {
         val state = starState(
             deuceReturnCount = 2,
             isStarPointActive = true
-        )
+        ).copy(selectedDecidingPointCourt = ServiceCourt.DEUCE)
 
         val result = PadelScoreEngine.awardPoint(state, Team.US)
 
@@ -193,7 +194,7 @@ class PadelScoreEngineTest {
         val result = PadelScoreEngine.awardPoint(
             goldenState(
                 isGoldenPointActive = true
-            ),
+            ).copy(selectedDecidingPointCourt = ServiceCourt.DEUCE),
             Team.US
         )
 
@@ -210,7 +211,7 @@ class PadelScoreEngineTest {
         val result = PadelScoreEngine.awardPoint(
             goldenState(
                 isGoldenPointActive = true
-            ),
+            ).copy(selectedDecidingPointCourt = ServiceCourt.ADVANTAGE),
             Team.OPPONENT
         )
 
@@ -230,7 +231,8 @@ class PadelScoreEngineTest {
                 advantageTeam = Team.US,
                 deuceReturnCount = 2,
                 isGoldenPointActive = true,
-                isStarPointActive = true
+                isStarPointActive = true,
+                selectedDecidingPointCourt = ServiceCourt.DEUCE
             ),
             Team.US
         )
@@ -301,7 +303,15 @@ class PadelScoreEngineTest {
         assertEquals(13, result.totalGamesPlayed)
         assertEquals(7, result.completedSets.first().opponentTieBreakPoints)
         assertEquals(3, result.completedSets.first().ourTieBreakPoints)
-        val nextPointState = PadelScoreEngine.awardPoint(result, Team.US)
+        assertFalse(result.setOpeningServersConfirmed)
+        assertEquals(result, PadelScoreEngine.awardPoint(result, Team.US))
+
+        val confirmedState = PadelScoreEngine.configureSetOpeningServers(
+            state = result,
+            firstServerForUs = result.configuration.firstServerForUs,
+            firstServerForOpponent = result.configuration.firstServerForOpponent
+        )
+        val nextPointState = PadelScoreEngine.awardPoint(confirmedState, Team.US)
         assertEquals(2, nextPointState.pointHistory.last().setNumber)
         assertEquals(14, nextPointState.pointHistory.last().gameNumber)
     }

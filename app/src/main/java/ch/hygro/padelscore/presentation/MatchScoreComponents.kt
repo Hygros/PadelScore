@@ -48,6 +48,8 @@ import androidx.wear.compose.material3.ProgressIndicatorDefaults
 import androidx.wear.compose.material3.Text
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.presentation.theme.ColorCourtChange
 import ch.hygro.padelscore.presentation.theme.ColorResetButtonBg
 import ch.hygro.padelscore.presentation.theme.ColorResetButtonBgHolding
@@ -66,11 +68,14 @@ fun ScoreArea(
     sets: Int,
     backgroundColor: Color,
     isServing: Boolean,
-    isDeuceCourt: Boolean,
+    serviceCourt: ServiceCourt,
+    servingPlayer: PlayerSlot,
     statsAtTop: Boolean,
     enabled: Boolean,
     swipeGesturesEnabled: Boolean = false,
     ambient: Boolean,
+    onServiceCourtSelected: (ServiceCourt) -> Unit = {},
+    onServingPlayerLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
     val isRound = LocalConfiguration.current.isScreenRound
@@ -139,10 +144,16 @@ fun ScoreArea(
             }
         }
 
-        // Serve indicator: full screen width matching CenterScoreArea horizontal coordinate system, offset by 21dp for ScoreStatistics
         if (isServing) {
-            // The opponent (top) faces us, so their deuce court (their right) is on our left.
-            val dotOnRight = if (statsAtTop) !isDeuceCourt else isDeuceCourt
+            val playerLabel = when (servingPlayer) {
+                PlayerSlot.US_1 -> "I"
+                PlayerSlot.US_2 -> "P"
+                PlayerSlot.OPPONENT_1 -> "1"
+                PlayerSlot.OPPONENT_2 -> "2"
+            }
+            val deuceOnRight = !statsAtTop
+            val showBoth = serviceCourt == ServiceCourt.RECEIVER_CHOICE
+
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -157,14 +168,18 @@ fun ScoreArea(
                     modifier = Modifier.width(46.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (!dotOnRight) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(
-                                    color = if (ambient) Color.White else ColorServeIndicator,
-                                    shape = CircleShape
-                                )
+                    val leftCourt = if (deuceOnRight) {
+                        ServiceCourt.ADVANTAGE
+                    } else {
+                        ServiceCourt.DEUCE
+                    }
+                    if (showBoth || serviceCourt == leftCourt) {
+                        ServeIndicator(
+                            label = playerLabel,
+                            ambient = ambient,
+                            selectable = showBoth,
+                            onClick = { onServiceCourtSelected(leftCourt) },
+                            onLongClick = onServingPlayerLongClick
                         )
                     }
                 }
@@ -175,14 +190,18 @@ fun ScoreArea(
                     modifier = Modifier.width(46.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (dotOnRight) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(
-                                    color = if (ambient) Color.White else ColorServeIndicator,
-                                    shape = CircleShape
-                                )
+                    val rightCourt = if (deuceOnRight) {
+                        ServiceCourt.DEUCE
+                    } else {
+                        ServiceCourt.ADVANTAGE
+                    }
+                    if (showBoth || serviceCourt == rightCourt) {
+                        ServeIndicator(
+                            label = playerLabel,
+                            ambient = ambient,
+                            selectable = showBoth,
+                            onClick = { onServiceCourtSelected(rightCourt) },
+                            onLongClick = onServingPlayerLongClick
                         )
                     }
                 }
@@ -222,6 +241,40 @@ fun ScoreArea(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ServeIndicator(
+    label: String,
+    ambient: Boolean,
+    selectable: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .background(
+                color = if (ambient) Color.White else ColorServeIndicator,
+                shape = CircleShape
+            )
+            .pointerInput(selectable, ambient) {
+                if (!ambient) {
+                    detectTapGestures(
+                        onTap = { if (selectable) onClick() },
+                        onLongPress = { onLongClick() }
+                    )
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            color = Color.Black,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

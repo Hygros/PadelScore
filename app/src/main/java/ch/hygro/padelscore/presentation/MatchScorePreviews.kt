@@ -11,6 +11,8 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.ColorTeamOpponent
 import ch.hygro.padelscore.presentation.theme.ColorTeamUs
@@ -32,7 +34,8 @@ private fun MatchLayoutForPreview(state: MatchState) {
                 sets = 1,
                 backgroundColor = ColorTeamOpponent,
                 isServing = false,
-                isDeuceCourt = true,
+                serviceCourt = ServiceCourt.DEUCE,
+                servingPlayer = PlayerSlot.OPPONENT_1,
                 statsAtTop = true,
                 enabled = true,
                 ambient = false,
@@ -55,7 +58,8 @@ private fun MatchLayoutForPreview(state: MatchState) {
                 sets = 1,
                 backgroundColor = ColorTeamUs,
                 isServing = true,
-                isDeuceCourt = true,
+                serviceCourt = ServiceCourt.DEUCE,
+                servingPlayer = PlayerSlot.US_1,
                 statsAtTop = false,
                 enabled = true,
                 ambient = false,

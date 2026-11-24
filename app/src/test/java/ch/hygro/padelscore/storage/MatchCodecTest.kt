@@ -28,7 +28,9 @@ class MatchCodecTest {
         "tieBreakAtGames":4,
         "tieBreakPointsToWin":7,
         "matchTieBreakPointsToWin":10,
-        "firstServingTeam":"OPPONENT"
+        "firstServingTeam":"OPPONENT",
+        "firstServerForUs":"US_1",
+        "firstServerForOpponent":"OPPONENT_1"
     }"""
 
     private val expectedConfiguration = MatchConfiguration(

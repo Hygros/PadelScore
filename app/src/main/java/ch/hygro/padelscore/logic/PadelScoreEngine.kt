@@ -4,6 +4,7 @@ import ch.hygro.padelscore.model.GamePoint
 import ch.hygro.padelscore.model.MatchFormat
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
 import ch.hygro.padelscore.model.ScoringMode
 import ch.hygro.padelscore.model.SetResult
 import ch.hygro.padelscore.model.Team
@@ -18,7 +19,11 @@ import ch.hygro.padelscore.model.Team
 object PadelScoreEngine {
 
     fun awardPoint(state: MatchState, team: Team): MatchState {
-        if (isMatchFinished(state)) return state
+        if (isMatchFinished(state) || !state.setOpeningServersConfirmed) return state
+        if (
+            (state.isGoldenPointActive || state.isStarPointActive) &&
+            state.selectedDecidingPointCourt == null
+        ) return state
         val next = awardPointInternal(state, team)
         val setNumber = state.completedSets.size + 1
         val gameNumber = state.totalGamesPlayed + 1
@@ -81,6 +86,52 @@ object PadelScoreEngine {
             ScoringMode.GOLDEN_POINT -> awardGoldenPoint(state, team)
             ScoringMode.STAR_POINT -> awardStarPoint(state, team)
         }
+    }
+
+    fun selectDecidingPointCourt(
+        state: MatchState,
+        court: ch.hygro.padelscore.model.ServiceCourt
+    ): MatchState {
+        require(court != ch.hygro.padelscore.model.ServiceCourt.RECEIVER_CHOICE)
+        if (!state.isGoldenPointActive && !state.isStarPointActive) return state
+        return state.copy(selectedDecidingPointCourt = court)
+    }
+
+    fun correctServingPlayer(state: MatchState, player: PlayerSlot): MatchState {
+        require(player.team == state.servingTeam)
+        return when (player.team) {
+            Team.US -> state.copy(
+                servingPlayer = player,
+                nextServerForUs = player.teammate()
+            )
+            Team.OPPONENT -> state.copy(
+                servingPlayer = player,
+                nextServerForOpponent = player.teammate()
+            )
+        }
+    }
+
+    fun configureSetOpeningServers(
+        state: MatchState,
+        firstServerForUs: PlayerSlot,
+        firstServerForOpponent: PlayerSlot
+    ): MatchState {
+        require(firstServerForUs.team == Team.US)
+        require(firstServerForOpponent.team == Team.OPPONENT)
+        val servingPlayer = if (state.servingTeam == Team.US) {
+            firstServerForUs
+        } else {
+            firstServerForOpponent
+        }
+        return state.copy(
+            servingPlayer = servingPlayer,
+            nextServerForUs = firstServerForUs,
+            nextServerForOpponent = firstServerForOpponent,
+            tieBreakFirstServingPlayer = if (
+                state.phase == MatchPhase.MATCH_TIE_BREAK
+            ) servingPlayer else null,
+            setOpeningServersConfirmed = true
+        )
     }
 
     fun isMatchFinished(state: MatchState): Boolean {
@@ -206,10 +257,31 @@ object PadelScoreEngine {
         }
     }
 
+    private fun nextServerForTeam(state: MatchState, team: Team): PlayerSlot {
+        return when (team) {
+            Team.US -> state.nextServerForUs
+            Team.OPPONENT -> state.nextServerForOpponent
+        }
+    }
+
+    private fun advanceServerForTeam(state: MatchState, team: Team): MatchState {
+        return when (team) {
+            Team.US -> state.copy(
+                nextServerForUs = state.servingPlayer.teammate()
+            )
+            Team.OPPONENT -> state.copy(
+                nextServerForOpponent = state.servingPlayer.teammate()
+            )
+        }
+    }
+
     private fun awardGame(state: MatchState, winner: Team): MatchState {
         val opponentGames = state.opponentGames + if (winner == Team.OPPONENT) 1 else 0
         val ourGames = state.ourGames + if (winner == Team.US) 1 else 0
-        val nextServer = state.servingTeam.other()
+        val currentServingTeam = state.servingTeam
+        val nextServer = currentServingTeam.other()
+        val advancedState = advanceServerForTeam(state, currentServingTeam)
+        val nextServingPlayer = nextServerForTeam(advancedState, nextServer)
         val totalGames = state.totalGamesPlayed + 1
         val configuration = state.configuration
 
@@ -232,7 +304,12 @@ object PadelScoreEngine {
                 isGoldenPointActive = false,
                 isStarPointActive = false,
                 servingTeam = nextServer,
+                servingPlayer = nextServingPlayer,
+                nextServerForUs = advancedState.nextServerForUs,
+                nextServerForOpponent = advancedState.nextServerForOpponent,
                 tieBreakFirstServingTeam = nextServer,
+                tieBreakFirstServingPlayer = nextServingPlayer,
+                selectedDecidingPointCourt = null,
                 totalGamesPlayed = totalGames,
                 pointsInCurrentGame = 0
             )
@@ -266,6 +343,12 @@ object PadelScoreEngine {
             isGoldenPointActive = false,
             isStarPointActive = false,
             servingTeam = nextServer,
+            servingPlayer = nextServingPlayer,
+            nextServerForUs = advancedState.nextServerForUs,
+            nextServerForOpponent = advancedState.nextServerForOpponent,
+            tieBreakFirstServingTeam = null,
+            tieBreakFirstServingPlayer = null,
+            selectedDecidingPointCourt = null,
             totalGamesPlayed = totalGames,
             pointsInCurrentGame = 0
         )
@@ -280,17 +363,30 @@ object PadelScoreEngine {
         val totalPoints = state.totalPointsPlayed + 1
 
         if (winner == null) {
-            val firstServer = state.tieBreakFirstServingTeam ?: state.servingTeam
+            val firstPlayer = state.tieBreakFirstServingPlayer ?: state.servingPlayer
             val pointsPlayed = opponentPoints + ourPoints
+            val nextPlayer = ServeCalculator.servingPlayerForNextTieBreakPoint(
+                firstServingPlayer = firstPlayer,
+                firstServerForUs = if (firstPlayer.team == Team.US) {
+                    firstPlayer
+                } else {
+                    state.nextServerForUs
+                },
+                firstServerForOpponent = if (firstPlayer.team == Team.OPPONENT) {
+                    firstPlayer
+                } else {
+                    state.nextServerForOpponent
+                },
+                pointsPlayed = pointsPlayed
+            )
 
             return state.copy(
                 opponentTieBreakPoints = opponentPoints,
                 ourTieBreakPoints = ourPoints,
-                servingTeam = ServeCalculator.servingTeamForNextTieBreakPoint(
-                    firstServingTeam = firstServer,
-                    pointsPlayed = pointsPlayed
-                ),
-                tieBreakFirstServingTeam = firstServer,
+                servingTeam = nextPlayer.team,
+                servingPlayer = nextPlayer,
+                tieBreakFirstServingTeam = firstPlayer.team,
+                tieBreakFirstServingPlayer = firstPlayer,
                 totalPointsPlayed = totalPoints,
                 pointsInCurrentGame = state.pointsInCurrentGame + 1
             )
@@ -353,11 +449,15 @@ object PadelScoreEngine {
             isGoldenPointActive = false,
             isStarPointActive = false,
             servingTeam = nextServingTeam,
+            servingPlayer = state.configuration.firstServerFor(nextServingTeam),
             tieBreakFirstServingTeam = if (nextPhase == MatchPhase.MATCH_TIE_BREAK) {
                 nextServingTeam
             } else {
                 null
             },
+            tieBreakFirstServingPlayer = null,
+            setOpeningServersConfirmed = finished,
+            selectedDecidingPointCourt = null,
             completedSets = state.completedSets + result,
             totalGamesPlayed = totalGamesPlayed,
             pointsInCurrentGame = 0,
@@ -396,17 +496,30 @@ object PadelScoreEngine {
         val totalPoints = state.totalPointsPlayed + 1
 
         if (winner == null) {
-            val firstServer = state.tieBreakFirstServingTeam ?: state.servingTeam
+            val firstPlayer = state.tieBreakFirstServingPlayer ?: state.servingPlayer
             val pointsPlayed = opponentPoints + ourPoints
+            val nextPlayer = ServeCalculator.servingPlayerForNextTieBreakPoint(
+                firstServingPlayer = firstPlayer,
+                firstServerForUs = if (firstPlayer.team == Team.US) {
+                    firstPlayer
+                } else {
+                    state.nextServerForUs
+                },
+                firstServerForOpponent = if (firstPlayer.team == Team.OPPONENT) {
+                    firstPlayer
+                } else {
+                    state.nextServerForOpponent
+                },
+                pointsPlayed = pointsPlayed
+            )
 
             return state.copy(
                 opponentMatchTieBreakPoints = opponentPoints,
                 ourMatchTieBreakPoints = ourPoints,
-                servingTeam = ServeCalculator.servingTeamForNextTieBreakPoint(
-                    firstServingTeam = firstServer,
-                    pointsPlayed = pointsPlayed
-                ),
-                tieBreakFirstServingTeam = firstServer,
+                servingTeam = nextPlayer.team,
+                servingPlayer = nextPlayer,
+                tieBreakFirstServingTeam = firstPlayer.team,
+                tieBreakFirstServingPlayer = firstPlayer,
                 totalPointsPlayed = totalPoints,
                 pointsInCurrentGame = state.pointsInCurrentGame + 1
             )

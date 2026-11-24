@@ -21,9 +21,12 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import ch.hygro.padelscore.R
+import ch.hygro.padelscore.logic.ServeCalculator
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
 
@@ -35,6 +38,9 @@ fun AmbientMatchScreen(
     isMatchFinished: Boolean
 ) {
     val isRound = LocalConfiguration.current.isScreenRound
+    val serviceAssignment = ServeCalculator.serviceAssignment(matchState)
+    val pointInputEnabled = serviceAssignment.court != ServiceCourt.RECEIVER_CHOICE &&
+        matchState.setOpeningServersConfirmed
 
     Column(
         modifier = Modifier
@@ -52,7 +58,10 @@ fun AmbientMatchScreen(
             games = matchState.opponentGames,
             sets = matchState.opponentSets,
             isServing = matchState.servingTeam == Team.OPPONENT,
-            enabled = !isMatchFinished,
+            servingPlayer = serviceAssignment.player,
+            serviceCourt = serviceAssignment.court,
+            statsAtTop = true,
+            enabled = !isMatchFinished && pointInputEnabled,
             isRound = isRound,
             onClick = onAddPointOpponent
         )
@@ -71,7 +80,10 @@ fun AmbientMatchScreen(
             games = matchState.ourGames,
             sets = matchState.ourSets,
             isServing = matchState.servingTeam == Team.US,
-            enabled = !isMatchFinished,
+            servingPlayer = serviceAssignment.player,
+            serviceCourt = serviceAssignment.court,
+            statsAtTop = false,
+            enabled = !isMatchFinished && pointInputEnabled,
             isRound = isRound,
             onClick = onAddPointOur
         )
@@ -84,6 +96,9 @@ private fun AmbientTeamScore(
     games: Int,
     sets: Int,
     isServing: Boolean,
+    servingPlayer: PlayerSlot,
+    serviceCourt: ServiceCourt,
+    statsAtTop: Boolean,
     enabled: Boolean,
     isRound: Boolean,
     onClick: () -> Unit
@@ -92,8 +107,19 @@ private fun AmbientTeamScore(
         modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val serverLabel = when (servingPlayer) {
+            PlayerSlot.US_1 -> "I"
+            PlayerSlot.US_2 -> "P"
+            PlayerSlot.OPPONENT_1 -> "1"
+            PlayerSlot.OPPONENT_2 -> "2"
+        }
+        val courtLabel = when (serviceCourt) {
+            ServiceCourt.DEUCE -> if (statsAtTop) "←" else "→"
+            ServiceCourt.ADVANTAGE -> if (statsAtTop) "→" else "←"
+            ServiceCourt.RECEIVER_CHOICE -> "↔"
+        }
         Text(
-            text = if (isServing) "•  $points" else points,
+            text = if (isServing) "$courtLabel $serverLabel  $points" else points,
             color = Color(0xFFBDBDBD),
             fontSize = if (isRound) 40.sp else 45.sp,
             lineHeight = if (isRound) 41.sp else 46.sp,

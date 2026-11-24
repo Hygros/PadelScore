@@ -1,4 +1,4 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Padel Score</string>
     <string name="back">ZURÜCK</string>
@@ -179,4 +179,16 @@
     <string name="watch_settings">Uhr-Einstellungen</string>
     <string name="open_settings_manually">Einstellungen manuell öffnen</string>
     <string name="start_padel_match_content_desc">Padel-Match starten</string>
+  <string name="first_server_us">UNSER AUFSCHLÄGER</string>
+  <string name="first_server_opponent">GEGNER-AUFSCHLÄGER</string>
+  <string name="player_me">ICH</string>
+  <string name="player_partner">PARTNER</string>
+  <string name="player_opponent_1">GEGNER 1</string>
+  <string name="player_opponent_2">GEGNER 2</string>
+  <string name="choose_return_side">RÜCKSCHLAGSEITE WÄHLEN</string>
+  <string name="serve_from_right">AUFSCHLAG VON RECHTS</string>
+  <string name="serve_from_left">AUFSCHLAG VON LINKS</string>
+  <string name="confirm_server_order">AUFSCHLAGREIHENFOLGE BESTÄTIGEN</string>
+  <string name="confirm">BESTÄTIGEN</string>
+  <string name="correct_server">AUFSCHLÄGER KORRIGIEREN</string>
 </resources>

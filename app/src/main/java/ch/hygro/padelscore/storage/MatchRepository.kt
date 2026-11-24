@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import ch.hygro.padelscore.model.MatchPhase
 import ch.hygro.padelscore.model.MatchState
+import ch.hygro.padelscore.model.PlayerSlot
+import ch.hygro.padelscore.model.ServiceCourt
 import ch.hygro.padelscore.model.Team
 import org.json.JSONArray
 import org.json.JSONObject
@@ -136,9 +138,21 @@ class MatchRepository internal constructor(
             .put("isGoldenPointActive", state.isGoldenPointActive)
             .put("isStarPointActive", state.isStarPointActive)
             .put("servingTeam", state.servingTeam.name)
+            .put("servingPlayer", state.servingPlayer.name)
+            .put("nextServerForUs", state.nextServerForUs.name)
+            .put("nextServerForOpponent", state.nextServerForOpponent.name)
             .put(
                 "tieBreakFirstServingTeam",
                 state.tieBreakFirstServingTeam?.name
+            )
+            .put(
+                "tieBreakFirstServingPlayer",
+                state.tieBreakFirstServingPlayer?.name
+            )
+            .put("setOpeningServersConfirmed", state.setOpeningServersConfirmed)
+            .put(
+                "selectedDecidingPointCourt",
+                state.selectedDecidingPointCourt?.name
             )
             .put(
                 "completedSets",
@@ -167,6 +181,11 @@ class MatchRepository internal constructor(
                 }
             }
         }
+        val servingTeam = MatchJsonCodec.enumValueOrDefault(
+            json.optString("servingTeam"),
+            configuration.firstServingTeam
+        )
+        val defaultServingPlayer = configuration.firstServerFor(servingTeam)
 
         return MatchState(
             opponentPoints = json.optInt("opponentPoints", 0),
@@ -197,13 +216,33 @@ class MatchRepository internal constructor(
                 false
             ),
             isStarPointActive = json.optBoolean("isStarPointActive", false),
-            servingTeam = MatchJsonCodec.enumValueOrDefault(
-                json.optString("servingTeam"),
-                configuration.firstServingTeam
-            ),
+            servingTeam = servingTeam,
+            servingPlayer = MatchJsonCodec.enumValueOrDefault(
+                json.optString("servingPlayer"),
+                defaultServingPlayer
+            ).takeIf { it.team == servingTeam } ?: defaultServingPlayer,
+            nextServerForUs = MatchJsonCodec.enumValueOrDefault(
+                json.optString("nextServerForUs"),
+                configuration.firstServerForUs
+            ).takeIf { it.team == Team.US } ?: configuration.firstServerForUs,
+            nextServerForOpponent = MatchJsonCodec.enumValueOrDefault(
+                json.optString("nextServerForOpponent"),
+                configuration.firstServerForOpponent
+            ).takeIf { it.team == Team.OPPONENT }
+                ?: configuration.firstServerForOpponent,
             tieBreakFirstServingTeam = nullableEnumValue<Team>(
                 json.optString("tieBreakFirstServingTeam")
             ),
+            tieBreakFirstServingPlayer = nullableEnumValue<PlayerSlot>(
+                json.optString("tieBreakFirstServingPlayer")
+            ),
+            setOpeningServersConfirmed = json.optBoolean(
+                "setOpeningServersConfirmed",
+                true
+            ),
+            selectedDecidingPointCourt = nullableEnumValue<ServiceCourt>(
+                json.optString("selectedDecidingPointCourt")
+            )?.takeUnless { it == ServiceCourt.RECEIVER_CHOICE },
             completedSets = completedSets,
             pointsInCurrentGame = json.optInt("pointsInCurrentGame", 0),
             totalPointsPlayed = json.optInt("totalPointsPlayed", 0),

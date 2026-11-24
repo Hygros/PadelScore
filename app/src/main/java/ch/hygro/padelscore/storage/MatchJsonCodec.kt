@@ -2,6 +2,7 @@ package ch.hygro.padelscore.storage
 
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchFormat
+import ch.hygro.padelscore.model.PlayerSlot
 import ch.hygro.padelscore.model.ScoringMode
 import ch.hygro.padelscore.model.SetResult
 import ch.hygro.padelscore.model.Team
@@ -26,6 +27,8 @@ internal object MatchJsonCodec {
             .put("tieBreakPointsToWin", configuration.tieBreakPointsToWin)
             .put("matchTieBreakPointsToWin", configuration.matchTieBreakPointsToWin)
             .put("firstServingTeam", configuration.firstServingTeam.name)
+            .put("firstServerForUs", configuration.firstServerForUs.name)
+            .put("firstServerForOpponent", configuration.firstServerForOpponent.name)
     }
 
     fun decodeConfiguration(json: JSONObject): MatchConfiguration {
@@ -49,7 +52,15 @@ internal object MatchJsonCodec {
             firstServingTeam = enumValueOrDefault(
                 json.optString("firstServingTeam"),
                 Team.US
-            )
+            ),
+            firstServerForUs = enumValueOrDefault(
+                json.optString("firstServerForUs"),
+                PlayerSlot.US_1
+            ).takeIf { it.team == Team.US } ?: PlayerSlot.US_1,
+            firstServerForOpponent = enumValueOrDefault(
+                json.optString("firstServerForOpponent"),
+                PlayerSlot.OPPONENT_1
+            ).takeIf { it.team == Team.OPPONENT } ?: PlayerSlot.OPPONENT_1
         )
     }
 

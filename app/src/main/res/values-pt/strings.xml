@@ -179,4 +179,16 @@
   <string name="watch_settings">Definições do relógio</string>
   <string name="open_settings_manually">Abrir definições manualmente</string>
   <string name="start_padel_match_content_desc">Iniciar partida de padel</string>
+  <string name="first_server_us">NOSSO SACADOR</string>
+  <string name="first_server_opponent">SACADOR ADVERSÁRIO</string>
+  <string name="player_me">EU</string>
+  <string name="player_partner">PARCEIRO</string>
+  <string name="player_opponent_1">ADVERSÁRIO 1</string>
+  <string name="player_opponent_2">ADVERSÁRIO 2</string>
+  <string name="choose_return_side">ESCOLHER LADO DE RECEÇÃO</string>
+  <string name="serve_from_right">SERVIÇO DA DIREITA</string>
+  <string name="serve_from_left">SERVIÇO DA ESQUERDA</string>
+  <string name="confirm_server_order">CONFIRMAR ORDEM DE SERVIÇO</string>
+  <string name="confirm">CONFIRMAR</string>
+  <string name="correct_server">CORRIGIR SACADOR</string>
 </resources>

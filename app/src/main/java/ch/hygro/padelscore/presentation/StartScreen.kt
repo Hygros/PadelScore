@@ -46,6 +46,7 @@ import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import ch.hygro.padelscore.R
 import ch.hygro.padelscore.model.MatchConfiguration
 import ch.hygro.padelscore.model.MatchFormat
+import ch.hygro.padelscore.model.PlayerSlot
 import ch.hygro.padelscore.model.ScoringMode
 import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.ColorPrimary
@@ -75,12 +76,37 @@ fun StartScreen(
     var firstServingTeam by remember(initialConfiguration) {
         mutableStateOf(initialConfiguration.firstServingTeam)
     }
+    var firstServerForUs by remember(initialConfiguration) {
+        mutableStateOf(initialConfiguration.firstServerForUs)
+    }
+    var firstServerForOpponent by remember(initialConfiguration) {
+        mutableStateOf(initialConfiguration.firstServerForOpponent)
+    }
 
-    LaunchedEffect(scoringMode, matchFormat, shortSet, firstServingTeam) {
+    LaunchedEffect(
+        scoringMode,
+        matchFormat,
+        shortSet,
+        firstServingTeam,
+        firstServerForUs,
+        firstServerForOpponent
+    ) {
         val draft = if (shortSet) {
-            MatchConfiguration.shortSet(scoringMode, matchFormat, firstServingTeam)
+            MatchConfiguration.shortSet(
+                scoringMode,
+                matchFormat,
+                firstServingTeam,
+                firstServerForUs,
+                firstServerForOpponent
+            )
         } else {
-            MatchConfiguration.normalSet(scoringMode, matchFormat, firstServingTeam)
+            MatchConfiguration.normalSet(
+                scoringMode,
+                matchFormat,
+                firstServingTeam,
+                firstServerForUs,
+                firstServerForOpponent
+            )
         }
         if (draft != initialConfiguration) onConfigurationChanged(draft)
     }
@@ -228,6 +254,44 @@ fun StartScreen(
 
             item {
                 val itemScope = this
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.90f else 1f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 1.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    ConfigurationField(
+                        modifier = Modifier.weight(1f),
+                        title = stringResource(R.string.first_server_us),
+                        value = if (firstServerForUs == PlayerSlot.US_1) {
+                            stringResource(R.string.player_me)
+                        } else {
+                            stringResource(R.string.player_partner)
+                        },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            firstServerForUs = firstServerForUs.teammate()
+                        }
+                    )
+                    ConfigurationField(
+                        modifier = Modifier.weight(1f),
+                        title = stringResource(R.string.first_server_opponent),
+                        value = if (firstServerForOpponent == PlayerSlot.OPPONENT_1) {
+                            stringResource(R.string.player_opponent_1)
+                        } else {
+                            stringResource(R.string.player_opponent_2)
+                        },
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            firstServerForOpponent = firstServerForOpponent.teammate()
+                        }
+                    )
+                }
+            }
+
+            item {
+                val itemScope = this
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(if (isRound) 0.90f else 0.92f)
@@ -248,13 +312,17 @@ fun StartScreen(
                                 MatchConfiguration.shortSet(
                                     scoringMode,
                                     matchFormat,
-                                    firstServingTeam
+                                    firstServingTeam,
+                                    firstServerForUs,
+                                    firstServerForOpponent
                                 )
                             } else {
                                 MatchConfiguration.normalSet(
                                     scoringMode,
                                     matchFormat,
-                                    firstServingTeam
+                                    firstServingTeam,
+                                    firstServerForUs,
+                                    firstServerForOpponent
                                 )
                             }
                             onStartMatch(configuration)
