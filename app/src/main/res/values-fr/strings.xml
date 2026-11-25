@@ -189,6 +189,9 @@
   <string name="serve_from_right">SERVICE À DROITE</string>
   <string name="serve_from_left">SERVICE À GAUCHE</string>
   <string name="confirm_server_order">CONFIRMER L’ORDRE DE SERVICE</string>
+  <string name="server_order_help">Choisissez qui sert en premier. Appuyez longuement sur l\'icône de service pendant le match pour changer.</string>
+  <string name="server_order_start_hint">Appuyez longuement sur l\'icône de service pendant le match pour changer.</string>
   <string name="confirm">CONFIRMER</string>
   <string name="correct_server">CORRIGER LE SERVEUR</string>
+  <string name="correct_server_hint">Sélectionnez qui sert actuellement.</string>
 </resources>

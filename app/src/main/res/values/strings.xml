@@ -23,8 +23,11 @@
   <string name="serve_from_right">SERVE FROM RIGHT</string>
   <string name="serve_from_left">SERVE FROM LEFT</string>
   <string name="confirm_server_order">CONFIRM SERVER ORDER</string>
+  <string name="server_order_help">Select who starts serving. Long-press the server icon during match to change.</string>
+  <string name="server_order_start_hint">Long-press the server icon during match to change.</string>
   <string name="confirm">CONFIRM</string>
   <string name="correct_server">CORRECT SERVER</string>
+  <string name="correct_server_hint">Select who is currently serving.</string>
   <string name="our_team">US</string>
   <string name="opponent_team">OPPONENT</string>
   <string name="matches_history">MATCHES</string>

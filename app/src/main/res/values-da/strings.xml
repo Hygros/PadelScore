@@ -189,6 +189,9 @@
   <string name="serve_from_right">SERV FRA HØJRE</string>
   <string name="serve_from_left">SERV FRA VENSTRE</string>
   <string name="confirm_server_order">BEKRÆFT SERVERÆKKEFØLGE</string>
+  <string name="server_order_help">Vælg hvem der server først. Hold server-ikonet nede under kampen for at ændre.</string>
+  <string name="server_order_start_hint">Hold server-ikonet nede under kampen for at ændre.</string>
   <string name="confirm">BEKRÆFT</string>
   <string name="correct_server">RET SERVER</string>
+  <string name="correct_server_hint">Vælg hvem der server nu.</string>
 </resources>

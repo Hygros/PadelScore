@@ -189,6 +189,9 @@
   <string name="serve_from_right">SERVIZIO DA DESTRA</string>
   <string name="serve_from_left">SERVIZIO DA SINISTRA</string>
   <string name="confirm_server_order">CONFERMA ORDINE DI SERVIZIO</string>
+  <string name="server_order_help">Scegli chi serve per primo. Tieni premuto l\'icona del servizio durante la partita per cambiare.</string>
+  <string name="server_order_start_hint">Tieni premuto l\'icona del servizio durante la partita per cambiare.</string>
   <string name="confirm">CONFERMA</string>
   <string name="correct_server">CORREGGI BATTITORE</string>
+  <string name="correct_server_hint">Seleziona chi sta servendo attualmente.</string>
 </resources>

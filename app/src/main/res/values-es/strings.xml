@@ -189,6 +189,9 @@
   <string name="serve_from_right">SAQUE DESDE LA DERECHA</string>
   <string name="serve_from_left">SAQUE DESDE LA IZQUIERDA</string>
   <string name="confirm_server_order">CONFIRMAR ORDEN DE SAQUE</string>
+  <string name="server_order_help">Elige quién saca primero. Mantén presionado el icono de saque durante el juego para cambiar.</string>
+  <string name="server_order_start_hint">Mantén presionado el icono de saque durante el partido para cambiar.</string>
   <string name="confirm">CONFIRMAR</string>
   <string name="correct_server">CORREGIR SACADOR</string>
+  <string name="correct_server_hint">Selecciona quién está sacando actualmente.</string>
 </resources>

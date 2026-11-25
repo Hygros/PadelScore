@@ -189,6 +189,9 @@
   <string name="serve_from_right">AUFSCHLAG VON RECHTS</string>
   <string name="serve_from_left">AUFSCHLAG VON LINKS</string>
   <string name="confirm_server_order">AUFSCHLAGREIHENFOLGE BESTÄTIGEN</string>
+  <string name="server_order_help">Wähle die ersten Aufschläger. Zum Ändern während des Spiels Aufschlag-Icon gedrückt halten.</string>
+  <string name="server_order_start_hint">Aufschlag-Icon während des Spiels gedrückt halten, um Aufschläger zu ändern.</string>
   <string name="confirm">BESTÄTIGEN</string>
   <string name="correct_server">AUFSCHLÄGER KORRIGIEREN</string>
+  <string name="correct_server_hint">Wähle, wer aktuell aufschlägt.</string>
 </resources>

@@ -292,6 +292,27 @@ fun StartScreen(
 
             item {
                 val itemScope = this
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isRound) 0.88f else 1f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AutoSizeText(
+                        text = stringResource(R.string.server_order_start_hint),
+                        color = Color.LightGray,
+                        maxFontSize = 8.5.sp,
+                        minFontSize = 7.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
+                    )
+                }
+            }
+
+            item {
+                val itemScope = this
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(if (isRound) 0.90f else 0.92f)

@@ -189,6 +189,9 @@
   <string name="serve_from_right">إرسال من اليمين</string>
   <string name="serve_from_left">إرسال من اليسار</string>
   <string name="confirm_server_order">تأكيد ترتيب الإرسال</string>
+  <string name="server_order_help">اختر من يرسل أولاً. اضغط مطولاً على أيقونة الإرسال أثناء اللعب للتغيير.</string>
+  <string name="server_order_start_hint">اضغط مطولاً على أيقونة الإرسال أثناء المباراة لتغيير المرسل.</string>
   <string name="confirm">تأكيد</string>
   <string name="correct_server">تصحيح المرسل</string>
+  <string name="correct_server_hint">اختر من يرسل حالياً.</string>
 </resources>

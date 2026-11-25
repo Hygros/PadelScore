@@ -189,6 +189,9 @@
   <string name="serve_from_right">SERVICE VAN RECHTS</string>
   <string name="serve_from_left">SERVICE VAN LINKS</string>
   <string name="confirm_server_order">SERVICEVOLGORDE BEVESTIGEN</string>
+  <string name="server_order_help">Kies wie eerst serveert. Houd het icoon voor de service ingedrukt tijdens de wedstrijd om te wijzigen.</string>
+  <string name="server_order_start_hint">Houd het icoon voor de service ingedrukt tijdens de wedstrijd om te wijzigen.</string>
   <string name="confirm">BEVESTIGEN</string>
   <string name="correct_server">SERVEERDER CORRIGEREN</string>
+  <string name="correct_server_hint">Selecteer wie momenteel serveert.</string>
 </resources>
