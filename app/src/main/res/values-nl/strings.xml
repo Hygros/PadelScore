@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">Synchroniseer wedstrijden en statistieken met je telefoon. Bij uitschakelen wordt de kopie op de telefoon gewist.</string>
   <string name="open_settings_manually_message">Dit horloge kan de instellingen niet vanuit Padel Score openen. Open zelf de horloge-instellingen of het snelle paneel en schakel Niet storen in voordat je gaat spelen. Schakel het daarna weer uit als je het niet meer nodig hebt.</string>
   <string name="manual_quiet_mode_title">Handmatige stille modus</string>
-  <string name="quiet_rule_message">Deze regel dempt oproepen en meldingen zolang een wedstrijd geopend is in Padel Score. Wekkers blijven toegestaan. De regel stopt wanneer de wedstrijd eindigt, je terugkeert naar start of de app verlaat. Je kunt de regel uitschakelen of verwijderen in je horloge-instellingen. Als de app crasht, open deze dan opnieuw om de regel te wissen of schakel hem handmatig uit.</string>
-  <string name="continue_action">Doorgaan</string>
+  <string name="quiet_rule_message">Deze regel dempt oproepen en meldingen gedurende de hele actieve wedstrijd in Padel Score, ook wanneer het scherm dimt of het horloge de wijzerplaat toont. Wekkers blijven toegestaan. De regel stopt wanneer de wedstrijd eindigt, je terugkeert naar start of de app sluit. Je kunt de regel uitschakelen of verwijderen in je horloge-instellingen. Als de app crasht, open deze dan opnieuw om de regel te wissen of schakel hem handmatig uit.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Games %1$d:%2$d | Sets %3$d:%4$d</string>
   <string name="start_match_tile">Wedstrijd starten</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">Toegang tot Niet storen is al verleend. De stille modus wordt alleen tijdens wedstrijden geactiveerd wanneer deze instelling is ingeschakeld.</string>
   <string name="dnd_allow_now_message">Sta nu toegang tot Niet storen toe zodat Padel Score onderbrekingen tijdens wedstrijden kan dempen. Deze instelling wordt automatisch ingeschakeld.</string>
   <string name="open_settings">Instellingen openen</string>
-  <string name="watch_settings">Horloge-instellingen</string>
   <string name="open_settings_manually">Instellingen handmatig openen</string>
   <string name="start_padel_match_content_desc">Padelwedstrijd starten</string>
   <string name="first_server_us">ONZE SERVEERDER</string>
@@ -194,4 +192,17 @@
   <string name="confirm">BEVESTIGEN</string>
   <string name="correct_server">SERVEERDER CORRIGEREN</string>
   <string name="correct_server_hint">Selecteer wie momenteel serveert.</string>
+  <string name="open_dnd_settings">Niet storen openen</string>
+  <string name="dont_ask_again">Niet meer vragen</string>
+  <string name="dnd_manual_launch_message">Padel Score kan Niet storen niet automatisch inschakelen op dit horloge. Open de Niet storen-instellingen van het horloge of het snelle paneel voordat je gaat spelen en zet het na de wedstrijd weer uit.</string>
+  <string name="display_settings">Weergave-instellingen</string>
+  <string name="keep_screen_on_in_match">Scherm aan tijdens wedstrijd</string>
+  <string name="aod_prompt_title">Always-On-display</string>
+  <string name="aod_prompt_message">Het Always-On-display van het horloge staat uit, waardoor de score tijdens wedstrijden kan verdwijnen. Open de weergave-instellingen om het in te schakelen of laat Padel Score het wedstrijdscherm aan houden.</string>
+  <string name="aod_settings_blocked_title">Instellingen niet beschikbaar</string>
+  <string name="aod_settings_blocked_message">Dit horloge kan de weergave-instellingen niet vanuit Padel Score openen. Open de horloge-instellingen en schakel daar het Always-On-display in.</string>
+  <string name="watch_aod_status_on">Always-On horloge: Aan</string>
+  <string name="watch_aod_status_off">Always-On horloge: Uit</string>
+  <string name="watch_aod_status_unknown">Always-On horloge: Onbekend</string>
+  <string name="aod_reminder_reenable">Always-On-herinnering opnieuw tonen</string>
 </resources>

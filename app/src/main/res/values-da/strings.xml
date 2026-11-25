@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">Synkroniser kampe og statistik til din telefon. Hvis du slår det fra, ryddes kopien på telefonen.</string>
   <string name="open_settings_manually_message">Dette ur kan ikke åbne indstillinger fra Padel Score. Åbn selv urets indstillinger eller kvikpanelet, og slå Forstyr ikke til, før du spiller. Slå det fra bagefter, hvis du ikke længere har brug for det.</string>
   <string name="manual_quiet_mode_title">Manuel stilletilstand</string>
-  <string name="quiet_rule_message">Denne regel slår lyden fra for opkald og notifikationer, mens en kamp er åben i Padel Score. Alarmer er fortsat tilladt. Den stopper, når kampen slutter, du vender tilbage til start eller forlader appen. Du kan deaktivere eller slette reglen i urets indstillinger. Hvis appen går ned, skal du åbne den igen for at rydde reglen eller deaktivere den manuelt.</string>
-  <string name="continue_action">Fortsæt</string>
+  <string name="quiet_rule_message">Denne regel slår lyden fra for opkald og notifikationer i hele den aktive kamp i Padel Score, også når skærmen dæmpes, eller uret viser urskiven. Alarmer er fortsat tilladt. Den stopper, når kampen slutter, du vender tilbage til start eller lukker appen. Du kan deaktivere eller slette reglen i urets indstillinger. Hvis appen går ned, skal du åbne den igen for at rydde reglen eller deaktivere den manuelt.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Partier %1$d:%2$d | Sæt %3$d:%4$d</string>
   <string name="start_match_tile">Start kamp</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">Adgang til Forstyr ikke er allerede givet. Stilletilstand aktiveres kun under kampe, når denne indstilling er slået til.</string>
   <string name="dnd_allow_now_message">Tillad adgang til Forstyr ikke nu, så Padel Score kan slå lyden fra for afbrydelser under kampe. Denne indstilling slås automatisk til.</string>
   <string name="open_settings">Åbn indstillinger</string>
-  <string name="watch_settings">Urindstillinger</string>
   <string name="open_settings_manually">Åbn indstillinger manuelt</string>
   <string name="start_padel_match_content_desc">Start padelkamp</string>
   <string name="first_server_us">VORES SERVER</string>
@@ -194,4 +192,17 @@
   <string name="confirm">BEKRÆFT</string>
   <string name="correct_server">RET SERVER</string>
   <string name="correct_server_hint">Vælg hvem der server nu.</string>
+  <string name="open_dnd_settings">Åbn Forstyr ikke</string>
+  <string name="dont_ask_again">Spørg ikke igen</string>
+  <string name="dnd_manual_launch_message">Padel Score kan ikke slå Forstyr ikke til automatisk på dette ur. Åbn urets indstillinger for Forstyr ikke eller kvikpanelet før du spiller, og slå det fra efter kampen.</string>
+  <string name="display_settings">Displayindstillinger</string>
+  <string name="keep_screen_on_in_match">Behold skærmen under kampen</string>
+  <string name="aod_prompt_title">Always-On-display</string>
+  <string name="aod_prompt_message">Urets Always-On-display er slået fra, så stillingen kan forsvinde under kampe. Åbn displayindstillingerne for at slå det til, eller lad Padel Score holde kampskærmen aktiv.</string>
+  <string name="aod_settings_blocked_title">Indstillinger utilgængelige</string>
+  <string name="aod_settings_blocked_message">Dette ur kan ikke åbne displayindstillingerne fra Padel Score. Åbn urets indstillinger, og slå Always-On-display til der.</string>
+  <string name="watch_aod_status_on">Ur-Always-On: Til</string>
+  <string name="watch_aod_status_off">Ur-Always-On: Fra</string>
+  <string name="watch_aod_status_unknown">Ur-Always-On: Ukendt</string>
+  <string name="aod_reminder_reenable">Vis Always-On-påmindelse igen</string>
 </resources>

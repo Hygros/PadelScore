@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">Synkronisera matcher och statistik till din telefon. Om du stänger av raderas kopian på telefonen.</string>
   <string name="open_settings_manually_message">Den här klockan kan inte öppna inställningar från Padel Score. Öppna klockans inställningar eller snabbpanelen själv och aktivera Stör ej innan du spelar. Stäng av det efteråt om du inte längre behöver det.</string>
   <string name="manual_quiet_mode_title">Manuellt tyst läge</string>
-  <string name="quiet_rule_message">Den här regeln tystar samtal och aviseringar medan en match är öppen i Padel Score. Larm är fortfarande tillåtna. Den avslutas när matchen slutar, du går tillbaka till start eller lämnar appen. Du kan inaktivera eller ta bort regeln i klockans inställningar. Om appen kraschar öppnar du den igen för att rensa regeln eller inaktiverar den manuellt.</string>
-  <string name="continue_action">Fortsätt</string>
+  <string name="quiet_rule_message">Den här regeln tystar samtal och aviseringar under hela den aktiva matchen i Padel Score, även när skärmen dämpas eller klockan visar urtavlan. Larm är fortfarande tillåtna. Den avslutas när matchen slutar, du går tillbaka till start eller stänger appen. Du kan inaktivera eller ta bort regeln i klockans inställningar. Om appen kraschar öppnar du den igen för att rensa regeln eller inaktiverar den manuellt.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Gem %1$d:%2$d | Set %3$d:%4$d</string>
   <string name="start_match_tile">Starta match</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">Åtkomst till Stör ej har redan beviljats. Tyst läge aktiveras endast under matcher när den här inställningen är påslagen.</string>
   <string name="dnd_allow_now_message">Tillåt åtkomst till Stör ej nu så att Padel Score kan tysta avbrott under matcher. Den här inställningen slås på automatiskt.</string>
   <string name="open_settings">Öppna inställningar</string>
-  <string name="watch_settings">Klockinställningar</string>
   <string name="open_settings_manually">Öppna inställningar manuellt</string>
   <string name="start_padel_match_content_desc">Starta padelmatch</string>
   <string name="first_server_us">VÅR SERVARE</string>
@@ -194,4 +192,17 @@
   <string name="confirm">BEKRÄFTA</string>
   <string name="correct_server">KORRIGERA SERVARE</string>
   <string name="correct_server_hint">Välj vem som servar just nu.</string>
+  <string name="open_dnd_settings">Öppna Stör ej</string>
+  <string name="dont_ask_again">Fråga inte igen</string>
+  <string name="dnd_manual_launch_message">Padel Score kan inte slå på Stör ej automatiskt på den här klockan. Öppna klockans inställningar för Stör ej eller snabbpanelen innan du spelar och stäng av det efter matchen.</string>
+  <string name="display_settings">Skärminställningar</string>
+  <string name="keep_screen_on_in_match">Behåll skärmen under match</string>
+  <string name="aod_prompt_title">Always-On-display</string>
+  <string name="aod_prompt_message">Klockans Always-On-display är av, så ställningen kan försvinna under matcher. Öppna skärminställningarna för att slå på det eller låt Padel Score hålla matchskärmen aktiv.</string>
+  <string name="aod_settings_blocked_title">Inställningar otillgängliga</string>
+  <string name="aod_settings_blocked_message">Den här klockan kan inte öppna skärminställningarna från Padel Score. Öppna klockans inställningar och slå på Always-On-display där.</string>
+  <string name="watch_aod_status_on">Always-On klocka: På</string>
+  <string name="watch_aod_status_off">Always-On klocka: Av</string>
+  <string name="watch_aod_status_unknown">Always-On klocka: Okänt</string>
+  <string name="aod_reminder_reenable">Visa Always-On-påminnelsen igen</string>
 </resources>

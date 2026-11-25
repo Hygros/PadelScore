@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">Sincroniza partidas e estatísticas com o telemóvel. Desativar apaga a cópia no telemóvel.</string>
   <string name="open_settings_manually_message">Este relógio não consegue abrir as definições a partir do Padel Score. Abre manualmente as definições do relógio ou o painel rápido e ativa Não incomodar antes de jogar. Desativa-o depois se já não precisares.</string>
   <string name="manual_quiet_mode_title">Modo silencioso manual</string>
-  <string name="quiet_rule_message">Esta regra silencia chamadas e notificações enquanto uma partida está aberta no Padel Score. Os alarmes continuam permitidos. Termina quando a partida acaba, voltas ao início ou sais da aplicação. Podes desativar ou eliminar a regra nas definições do relógio. Se a aplicação falhar, volta a abri-la para limpar a regra ou desativa-a manualmente.</string>
-  <string name="continue_action">Continuar</string>
+  <string name="quiet_rule_message">Esta regra silencia chamadas e notificações durante toda a partida ativa no Padel Score, mesmo quando o ecrã escurece ou o relógio mostra o mostrador. Os alarmes continuam permitidos. Termina quando a partida acaba, voltas ao início ou fechas a aplicação. Podes desativar ou eliminar a regra nas definições do relógio. Se a aplicação falhar, volta a abri-la para limpar a regra ou desativa-a manualmente.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Jogos %1$d:%2$d | Sets %3$d:%4$d</string>
   <string name="start_match_tile">Iniciar partida</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">O acesso a Não incomodar já foi concedido. O modo silencioso só é ativado durante as partidas quando esta definição está ativada.</string>
   <string name="dnd_allow_now_message">Permite agora o acesso a Não incomodar para que o Padel Score possa silenciar interrupções durante as partidas. Esta definição será ativada automaticamente.</string>
   <string name="open_settings">Abrir definições</string>
-  <string name="watch_settings">Definições do relógio</string>
   <string name="open_settings_manually">Abrir definições manualmente</string>
   <string name="start_padel_match_content_desc">Iniciar partida de padel</string>
   <string name="first_server_us">NOSSO SACADOR</string>
@@ -194,4 +192,17 @@
   <string name="confirm">CONFIRMAR</string>
   <string name="correct_server">CORRIGIR SACADOR</string>
   <string name="correct_server_hint">Selecione quem está sacando atualmente.</string>
+  <string name="open_dnd_settings">Abrir Não incomodar</string>
+  <string name="dont_ask_again">Não perguntar novamente</string>
+  <string name="dnd_manual_launch_message">O Padel Score não consegue ativar Não incomodar automaticamente neste relógio. Abre as definições Não incomodar do relógio ou o painel rápido antes de jogar e desativa-o depois da partida.</string>
+  <string name="display_settings">Definições de ecrã</string>
+  <string name="keep_screen_on_in_match">Manter ecrã na partida</string>
+  <string name="aod_prompt_title">Ecrã Always-On</string>
+  <string name="aod_prompt_message">O ecrã Always-On do relógio está desativado, por isso a pontuação pode desaparecer durante as partidas. Abre as definições de ecrã para o ativar ou deixa o Padel Score manter o ecrã da partida ligado.</string>
+  <string name="aod_settings_blocked_title">Definições indisponíveis</string>
+  <string name="aod_settings_blocked_message">Este relógio não consegue abrir as definições de ecrã a partir do Padel Score. Abre as definições do relógio e ativa aí o ecrã Always-On.</string>
+  <string name="watch_aod_status_on">Always-On do relógio: Ativado</string>
+  <string name="watch_aod_status_off">Always-On do relógio: Desativado</string>
+  <string name="watch_aod_status_unknown">Always-On do relógio: Desconhecido</string>
+  <string name="aod_reminder_reenable">Mostrar novamente o aviso Always-On</string>
 </resources>

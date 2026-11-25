@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">Synchroniser les matchs et statistiques sur votre téléphone. La désactivation efface la copie sur le téléphone.</string>
   <string name="open_settings_manually_message">Cette montre ne peut pas ouvrir les paramètres depuis Padel Score. Ouvrez vous-même les paramètres de la montre ou le volet rapide et activez Ne pas déranger avant de jouer. Désactivez-le ensuite si vous n\'en avez plus besoin.</string>
   <string name="manual_quiet_mode_title">Mode silencieux manuel</string>
-  <string name="quiet_rule_message">Cette règle coupe le son des appels et des notifications lorsqu\'un match est ouvert dans Padel Score. Les alarmes restent autorisées. Elle s\'arrête lorsque le match se termine, que vous revenez à l\'accueil ou que vous quittez l\'application. Vous pouvez désactiver ou supprimer la règle dans les paramètres de la montre. Si l\'application plante, rouvrez-la pour effacer la règle ou désactivez-la manuellement.</string>
-  <string name="continue_action">Continuer</string>
+  <string name="quiet_rule_message">Cette règle coupe le son des appels et des notifications pendant toute la durée du match actif dans Padel Score, même lorsque l\'écran s\'assombrit ou que la montre affiche son cadran. Les alarmes restent autorisées. Elle s\'arrête lorsque le match se termine, que vous revenez à l\'accueil ou que vous fermez l\'application. Vous pouvez désactiver ou supprimer la règle dans les paramètres de la montre. Si l\'application plante, rouvrez-la pour effacer la règle ou désactivez-la manuellement.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Jeux %1$d:%2$d | Sets %3$d:%4$d</string>
   <string name="start_match_tile">Démarrer un match</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">L\'accès à Ne pas déranger est déjà accordé. Le mode silencieux s\'active uniquement pendant les matchs lorsque ce paramètre est activé.</string>
   <string name="dnd_allow_now_message">Autorisez l\'accès à Ne pas déranger maintenant pour que Padel Score puisse couper les interruptions pendant les matchs. Ce paramètre s\'activera automatiquement.</string>
   <string name="open_settings">Ouvrir les paramètres</string>
-  <string name="watch_settings">Paramètres de la montre</string>
   <string name="open_settings_manually">Ouvrir les paramètres manuellement</string>
   <string name="start_padel_match_content_desc">Démarrer un match de padel</string>
   <string name="first_server_us">NOTRE SERVEUR</string>
@@ -194,4 +192,17 @@
   <string name="confirm">CONFIRMER</string>
   <string name="correct_server">CORRIGER LE SERVEUR</string>
   <string name="correct_server_hint">Sélectionnez qui sert actuellement.</string>
+  <string name="open_dnd_settings">Ouvrir Ne pas déranger</string>
+  <string name="dont_ask_again">Ne plus demander</string>
+  <string name="dnd_manual_launch_message">Padel Score ne peut pas activer Ne pas déranger automatiquement sur cette montre. Ouvrez les paramètres Ne pas déranger de la montre ou le volet rapide avant de jouer, puis désactivez-le après le match.</string>
+  <string name="display_settings">Paramètres d\'affichage</string>
+  <string name="keep_screen_on_in_match">Garder l\'écran en match</string>
+  <string name="aod_prompt_title">Écran Always-On</string>
+  <string name="aod_prompt_message">L\'écran Always-On de la montre est désactivé, le score peut donc disparaître pendant les matchs. Ouvrez les paramètres d\'affichage pour l\'activer, ou laissez Padel Score garder l\'écran du match allumé.</string>
+  <string name="aod_settings_blocked_title">Paramètres indisponibles</string>
+  <string name="aod_settings_blocked_message">Cette montre ne peut pas ouvrir les paramètres d\'affichage depuis Padel Score. Ouvrez les paramètres de la montre et activez-y l\'écran Always-On.</string>
+  <string name="watch_aod_status_on">Always-On montre : Activé</string>
+  <string name="watch_aod_status_off">Always-On montre : Désactivé</string>
+  <string name="watch_aod_status_unknown">Always-On montre : Inconnu</string>
+  <string name="aod_reminder_reenable">Réafficher le rappel Always-On</string>
 </resources>

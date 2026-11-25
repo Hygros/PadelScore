@@ -8,6 +8,7 @@ import android.app.AutomaticZenRule
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.service.notification.Condition
@@ -25,8 +26,11 @@ class MatchQuietModeController(private val activity: Activity) {
     private val conditionId = "condition://${activity.packageName}/active-match".toUri()
     private var matchActive = false
     private var resumed = false
-    private var prompted = false
     private var errorShown = false
+    private var launchPromptShown = false
+    private var promptFinished = false
+    private var promptFinishedCallback: (() -> Unit)? = null
+    private var externalSettingsOpened = false
     private var dialog: AlertDialog? = null
     private var manualDialogPending = false
 
@@ -36,45 +40,63 @@ class MatchQuietModeController(private val activity: Activity) {
         if (matchActive == active) return
         matchActive = active
         if (!active) {
-            prompted = false
             errorShown = false
-            dialog?.dismiss()
-            dialog = null
+            manualDialogPending = false
+            dismissPrompt()
         }
         synchronize()
     }
 
-    fun onResume() {
+    /**
+     * Runs on every resume. [onPromptFinished] is invoked once when no prompt is in the
+     * way, so callers can chain the Always-On guidance without stacking dialogs.
+     */
+    fun onResume(onPromptFinished: () -> Unit = {}) {
         resumed = true
-        if (enabled() && !preferences.getBoolean("quiet_onboarding_seen", false)) {
-            preferences.edit { putBoolean("quiet_onboarding_seen", true) }
-            if (!manager.isNotificationPolicyAccessGranted &&
-                !activity.isFinishing && !activity.isDestroyed
-            ) {
-                showPermissionExplanation()
-                return
-            }
+        promptFinished = false
+        promptFinishedCallback = onPromptFinished
+        externalSettingsOpened = false
+        if (dialog?.isShowing == true) {
+            // A prompt is still visible (for example after a system overlay); leave it
+            // alone and chain the caller when it is dismissed.
+            return
         }
         if (manualDialogPending && matchActive) {
             manualDialogPending = false
             showManualModeDialog()
-        } else {
-            synchronize()
+            return
         }
+        if (WatchDisplayGuidance.shouldPromptForQuietMode(
+                quietModeEnabled = enabled(),
+                accessGranted = manager.isNotificationPolicyAccessGranted,
+                manualAcknowledged = preferences.getBoolean("manual_mode_acknowledged", false),
+                systemDndActive = isSystemDndActive(),
+                matchActive = matchActive,
+                promptShownThisSession = launchPromptShown
+            )
+        ) {
+            launchPromptShown = true
+            showLaunchPrompt()
+            return
+        }
+        synchronize()
+        finishPrompt()
     }
 
     fun onPause() {
         resumed = false
-        setRuleActive(false)
+        // Do not disarm the rule here: a dimmed screen or the watch face must not let
+        // notifications through in the middle of a match. The rule ends when the match
+        // ends or in close().
     }
 
     fun close() {
-        dialog?.dismiss()
+        dismissPrompt()
         setRuleActive(false)
     }
 
     fun requestSetup() {
-        if (!resumed || activity.isFinishing || activity.isDestroyed) return
+        if (activity.isFinishing || activity.isDestroyed) return
         if (manager.isNotificationPolicyAccessGranted) {
             AlertDialog.Builder(activity)
                 .setTitle(activity.getString(R.string.quiet_mode_title))
@@ -90,18 +112,79 @@ class MatchQuietModeController(private val activity: Activity) {
         synchronize()
     }
 
+    private fun showLaunchPrompt() {
+        val supportsAccessScreen = supportsPolicyAccessScreen()
+        if (supportsAccessScreen) {
+            showQuietPrompt(
+                title = activity.getString(R.string.quiet_mode_title),
+                message = activity.getString(R.string.dnd_allow_now_message),
+                primaryText = activity.getString(R.string.open_settings),
+                chainOnDismiss = true
+            ) {
+                externalSettingsOpened = true
+                openNotificationPolicySettings()
+            }
+        } else {
+            showQuietPrompt(
+                title = activity.getString(R.string.manual_quiet_mode_title),
+                message = activity.getString(R.string.dnd_manual_launch_message),
+                primaryText = activity.getString(R.string.open_dnd_settings),
+                chainOnDismiss = true
+            ) {
+                externalSettingsOpened = true
+                openDndSettings()
+            }
+        }
+    }
+
     private fun showPermissionExplanation() {
+        if (!supportsPolicyAccessScreen()) {
+            showManualModeDialog()
+            return
+        }
+        showQuietPrompt(
+            title = activity.getString(R.string.quiet_mode_title),
+            message = activity.getString(R.string.dnd_allow_now_message),
+            primaryText = activity.getString(R.string.open_settings),
+            chainOnDismiss = false
+        ) {
+            externalSettingsOpened = true
+            openNotificationPolicySettings()
+        }
+    }
+
+    private fun showQuietPrompt(
+        title: String,
+        message: String,
+        primaryText: String,
+        chainOnDismiss: Boolean,
+        onPrimary: () -> Unit
+    ) {
+        if (!resumed || activity.isFinishing || activity.isDestroyed) {
+            manualDialogPending = true
+            return
+        }
+        dialog?.setOnDismissListener(null)
         dialog?.dismiss()
-        dialog = AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.quiet_mode_title))
-            .setMessage(activity.getString(R.string.dnd_allow_now_message))
-            .setPositiveButton(activity.getString(R.string.open_settings)) { _, _ -> openSettings() }
+        val prompt = AlertDialog.Builder(activity)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(primaryText) { _, _ -> onPrimary() }
             .setNegativeButton(activity.getString(R.string.not_now), null)
-            .show()
+            .setNeutralButton(activity.getString(R.string.dont_ask_again)) { _, _ ->
+                acknowledgeManualMode()
+            }
+            .create()
+        prompt.setOnDismissListener {
+            if (dialog === prompt) dialog = null
+            if (chainOnDismiss && !externalSettingsOpened) finishPrompt()
+        }
+        dialog = prompt
+        prompt.show()
     }
 
     private fun synchronize() {
-        if (!matchActive || !resumed || !enabled()) {
+        if (!WatchDisplayGuidance.ruleShouldBeActive(matchActive, enabled())) {
             setRuleActive(false)
             return
         }
@@ -110,11 +193,52 @@ class MatchQuietModeController(private val activity: Activity) {
         }
     }
 
-    private fun openSettings() {
-        // Start directly rather than relying on resolveActivity: package visibility
-        // can hide handlers from queries even when startActivity would succeed.
-        if (tryOpenSettings(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))) return
-        showManualModeDialog()
+    private fun finishPrompt() {
+        if (promptFinished) return
+        promptFinished = true
+        val callback = promptFinishedCallback
+        promptFinishedCallback = null
+        callback?.invoke()
+    }
+
+    private fun dismissPrompt() {
+        dialog?.setOnDismissListener(null)
+        dialog?.dismiss()
+        dialog = null
+    }
+
+    private fun isSystemDndActive(): Boolean = try {
+        Settings.Global.getInt(activity.contentResolver, "zen_mode", 0) > 0
+    } catch (exception: Exception) {
+        Log.i("MatchQuietMode", "Could not read the system Do Not Disturb state", exception)
+        false
+    }
+
+    /**
+     * On Wear OS the notification-policy screen often resolves to a generic Settings
+     * stub, so only treat it as usable when a real handler answers.
+     */
+    private fun supportsPolicyAccessScreen(): Boolean {
+        val intent = Intent(WatchDisplayGuidance.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+        val resolved = try {
+            activity.packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        } catch (exception: Exception) {
+            Log.i("MatchQuietMode", "Could not resolve the notification policy screen", exception)
+            null
+        }
+        return WatchDisplayGuidance.isRealSettingsHandler(resolved?.activityInfo?.name)
+    }
+
+    private fun openNotificationPolicySettings() {
+        if (tryOpenSettings(Intent(WatchDisplayGuidance.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))) return
+        openDndSettings()
+    }
+
+    private fun openDndSettings() {
+        for (action in WatchDisplayGuidance.dndSettingsActions()) {
+            if (tryOpenSettings(Intent(action))) return
+        }
+        showManualSettingsHint()
     }
 
     private fun tryOpenSettings(intent: Intent): Boolean {
@@ -131,16 +255,27 @@ class MatchQuietModeController(private val activity: Activity) {
     }
 
     private fun showManualModeDialog() {
-        if (!resumed || activity.isFinishing || activity.isDestroyed) {
-            manualDialogPending = true
-            return
+        showQuietPrompt(
+            title = activity.getString(R.string.manual_quiet_mode_title),
+            message = activity.getString(R.string.manual_quiet_mode_message),
+            primaryText = activity.getString(R.string.open_dnd_settings),
+            chainOnDismiss = false
+        ) {
+            externalSettingsOpened = true
+            openDndSettings()
         }
+    }
+
+    private fun showManualSettingsHint() {
+        if (!resumed || activity.isFinishing || activity.isDestroyed) return
+        dialog?.setOnDismissListener(null)
         dialog?.dismiss()
         dialog = AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.manual_quiet_mode_title))
-            .setMessage(activity.getString(R.string.manual_quiet_mode_message))
-            .setPositiveButton(activity.getString(R.string.watch_settings)) { _, _ -> openManualSettings() }
-            .setNegativeButton(activity.getString(R.string.continue_action)) { _, _ -> acknowledgeManualMode() }
+            .setTitle(activity.getString(R.string.open_settings_manually))
+            .setMessage(activity.getString(R.string.open_settings_manually_message))
+            .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
+                acknowledgeManualMode()
+            }
             .show()
     }
 
@@ -148,22 +283,7 @@ class MatchQuietModeController(private val activity: Activity) {
         // Remember the choice; do not repeatedly interrupt matches on watches
         // that do not expose the policy-access screen. Access is still checked
         // on every resume, so a later grant enables automatic mode.
-        preferences.edit { putBoolean("manual_mode_acknowledged", true)}
-    }
-
-    private fun openManualSettings() {
-        val opened = tryOpenSettings(Intent(Settings.ACTION_SOUND_SETTINGS)) ||
-            tryOpenSettings(Intent(Settings.ACTION_SETTINGS))
-        if (opened) {
-            acknowledgeManualMode()
-            return
-        }
-        if (!resumed || activity.isFinishing || activity.isDestroyed) return
-        dialog = AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.open_settings_manually))
-            .setMessage(activity.getString(R.string.open_settings_manually_message))
-            .setPositiveButton(activity.getString(R.string.ok)) { _, _ -> acknowledgeManualMode() }
-            .show()
+        preferences.edit { putBoolean("manual_mode_acknowledged", true) }
     }
 
     private fun setRuleActive(active: Boolean) {
