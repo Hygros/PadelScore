@@ -27,6 +27,7 @@ import ch.hygro.padelscore.health.WorkoutDataSender
 import ch.hygro.padelscore.model.MatchState
 import ch.hygro.padelscore.model.Team
 import ch.hygro.padelscore.presentation.theme.PadelScoreTheme
+import ch.hygro.padelscore.storage.SettingsRepository
 import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
@@ -36,11 +37,17 @@ class MainActivity : ComponentActivity() {
     private val supporterBillingState = mutableStateOf(SupporterBillingState())
 
     private lateinit var matchQuietMode: MatchQuietModeController
+    private lateinit var matchDisplayMode: MatchDisplayModeController
+    private lateinit var settingsRepository: SettingsRepository
     private lateinit var ongoingMatch: OngoingMatchController
     private lateinit var wristDisplayController: WristDisplayController
     private lateinit var wristGestureController: WristGestureController
     private var onWristGesturePoint: ((Team) -> Unit)? = null
+    private var resumeToken = 0
     val wristLowered = mutableStateOf(false)
+
+    /** Last read watch Always-On state; `null` when the watch does not expose it. */
+    val watchAlwaysOn = mutableStateOf<Boolean?>(null)
 
     fun setWristDetectionEnabled(enabled: Boolean) {
         if (::wristDisplayController.isInitialized) {
@@ -133,11 +140,18 @@ class MainActivity : ComponentActivity() {
         if (::matchQuietMode.isInitialized) matchQuietMode.setMatchActive(active)
     }
 
+    /** Opens the watch display settings so the system Always-On display can be enabled. */
+    fun openWatchDisplaySettings() {
+        if (::matchDisplayMode.isInitialized) matchDisplayMode.openDisplaySettings()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         
+        settingsRepository = SettingsRepository(applicationContext)
         matchQuietMode = MatchQuietModeController(this)
+        matchDisplayMode = MatchDisplayModeController(this, settingsRepository)
         ongoingMatch = OngoingMatchController(this)
         wristDisplayController = WristDisplayController(this, wristLowered::value::set)
         wristGestureController = WristGestureController(this) { team ->
@@ -187,9 +201,18 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         wristDisplayController.onResume()
         wristGestureController.onResume()
+        val token = ++resumeToken
         window.decorView.postOnAnimation {
             if (!isFinishing && !isDestroyed) {
-                matchQuietMode.onResume()
+                watchAlwaysOn.value = matchDisplayMode.readSystemAlwaysOn()
+                matchQuietMode.onResume {
+                    // Chain the Always-On guidance only when the quiet-mode prompt is
+                    // finished for this resume, so the two never overlap.
+                    if (token == resumeToken && !isFinishing && !isDestroyed) {
+                        watchAlwaysOn.value = matchDisplayMode.readSystemAlwaysOn()
+                        matchDisplayMode.onResume()
+                    }
+                }
                 if (!syncExecutor.isShutdown) {
                     syncExecutor.execute {
                         try {
@@ -214,6 +237,7 @@ class MainActivity : ComponentActivity() {
         wristGestureController.close()
         wristDisplayController.close()
         matchQuietMode.close()
+        matchDisplayMode.close()
         supporterBillingManager.close()
         syncExecutor.shutdown()
         super.onDestroy()

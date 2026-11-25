@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">مزامنة المباريات والإحصائيات مع هاتفك. يؤدي إيقافه إلى مسح النسخة الموجودة على الهاتف.</string>
   <string name="open_settings_manually_message">لا يمكن لهذه الساعة فتح الإعدادات من Padel Score. افتح إعدادات الساعة أو اللوحة السريعة بنفسك وفعّل وضع \"عدم الإزعاج\" قبل اللعب، ثم أوقفه بعد الانتهاء إذا لم تعد بحاجة إليه.</string>
   <string name="manual_quiet_mode_title">الوضع الهادئ اليدوي</string>
-  <string name="quiet_rule_message">تكتم هذه القاعدة المكالمات والإشعارات أثناء فتح مباراة في Padel Score. تظل المنبهات مسموحاً بها. يتوقف الوضع عند انتهاء المباراة أو العودة للرئيسية أو مغادرة التطبيق. يمكنك تعطيل القاعدة أو حذفها من إعدادات الساعة. إذا تعطل التطبيق، أعد فتحه لمسح القاعدة أو عطّلها يدوياً.</string>
-  <string name="continue_action">متابعة</string>
+  <string name="quiet_rule_message">تكتم هذه القاعدة المكالمات والإشعارات طوال المباراة النشطة في Padel Score، حتى عند خفوت الشاشة أو عرض واجهة الساعة. تظل المنبهات مسموحاً بها. يتوقف الوضع عند انتهاء المباراة أو العودة للرئيسية أو إغلاق التطبيق. يمكنك تعطيل القاعدة أو حذفها من إعدادات الساعة. إذا تعطل التطبيق، أعد فتحه لمسح القاعدة أو عطّلها يدوياً.</string>
   <string name="ok">موافق</string>
   <string name="ongoing_match_summary">الأشواط %1$d:%2$d | المجموعات %3$d:%4$d</string>
   <string name="start_match_tile">بدء مباراة</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">تم منح إذن \"عدم الإزعاج\" بالفعل. يتم تفعيل الوضع الهادئ فقط أثناء المباريات عندما يكون هذا الإعداد مفعلاً.</string>
   <string name="dnd_allow_now_message">اسمح بالوصول إلى \"عدم الإزعاج\" الآن حتى يتمكن Padel Score من كتم المقاطعات أثناء المباريات. سيتم تفعيل هذا الإعداد تلقائياً.</string>
   <string name="open_settings">فتح الإعدادات</string>
-  <string name="watch_settings">إعدادات الساعة</string>
   <string name="open_settings_manually">فتح الإعدادات يدوياً</string>
   <string name="start_padel_match_content_desc">بدء مباراة بادل</string>
   <string name="first_server_us">مرسلنا</string>
@@ -191,4 +189,17 @@
   <string name="confirm_server_order">تأكيد ترتيب الإرسال</string>
   <string name="confirm">تأكيد</string>
   <string name="correct_server">تصحيح المرسل</string>
+  <string name="open_dnd_settings">فتح \"عدم الإزعاج\"</string>
+  <string name="dont_ask_again">عدم السؤال مجدداً</string>
+  <string name="dnd_manual_launch_message">لا يستطيع Padel Score تشغيل \"عدم الإزعاج\" تلقائياً على هذه الساعة. افتح إعدادات \"عدم الإزعاج\" في الساعة أو اللوحة السريعة قبل اللعب، ثم أوقفه بعد المباراة.</string>
+  <string name="display_settings">إعدادات الشاشة</string>
+  <string name="keep_screen_on_in_match">إبقاء الشاشة أثناء المباراة</string>
+  <string name="aod_prompt_title">شاشة Always-On</string>
+  <string name="aod_prompt_message">شاشة Always-On في الساعة متوقفة، لذا قد تختفي النتيجة أثناء المباريات. افتح إعدادات الشاشة لتفعيلها، أو دع Padel Score يبقي شاشة المباراة قيد التشغيل.</string>
+  <string name="aod_settings_blocked_title">الإعدادات غير متاحة</string>
+  <string name="aod_settings_blocked_message">لا يمكن لهذه الساعة فتح إعدادات الشاشة من Padel Score. افتح إعدادات الساعة وفعّل شاشة Always-On هناك.</string>
+  <string name="watch_aod_status_on">Always-On في الساعة: مفعّل</string>
+  <string name="watch_aod_status_off">Always-On في الساعة: متوقف</string>
+  <string name="watch_aod_status_unknown">Always-On في الساعة: غير معروف</string>
+  <string name="aod_reminder_reenable">إظهار تذكير Always-On مجدداً</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,6 +55,7 @@ fun SettingsScreen(
     val ambientModeEnabled by repository.ambientModeEnabled.collectAsState()
     val healthTrackingEnabled by repository.healthTrackingEnabled.collectAsState()
     val matchQuietModeEnabled by repository.matchQuietModeEnabled.collectAsState()
+    val aodPromptSuppressed by repository.aodPromptSuppressed.collectAsState()
     val healthSyncEnabled by repository.healthSyncEnabled.collectAsState()
     val historySyncEnabled by repository.matchHistorySyncEnabled.collectAsState()
     val syncScope = rememberCoroutineScope()
@@ -157,6 +159,71 @@ fun SettingsScreen(
                         secondaryLabel = { SettingsDescription(stringResource(R.string.ambient_mode_desc)) },
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+            }
+
+            item {
+                val itemScope = this
+                val watchAlwaysOn = (context as? MainActivity)?.watchAlwaysOn?.value
+                val watchAodStatus = when (watchAlwaysOn) {
+                    true -> stringResource(R.string.watch_aod_status_on)
+                    false -> stringResource(R.string.watch_aod_status_off)
+                    null -> stringResource(R.string.watch_aod_status_unknown)
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .transformedHeight(itemScope, transformationSpec)
+                        .padding(vertical = 2.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AutoSizeText(
+                        text = watchAodStatus,
+                        maxFontSize = 10.sp,
+                        minFontSize = 9.sp,
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Button(
+                        onClick = { (context as? MainActivity)?.openWatchDisplaySettings() },
+                        contentPadding = CompactButtonContentPadding,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        AutoSizeText(
+                            text = stringResource(R.string.display_settings),
+                            maxFontSize = 12.sp,
+                            minFontSize = 9.sp,
+                            maxLines = 2
+                        )
+                    }
+                }
+            }
+
+            if (aodPromptSuppressed) {
+                item {
+                    val itemScope = this
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .transformedHeight(itemScope, transformationSpec)
+                            .padding(vertical = 2.dp)
+                    ) {
+                        Button(
+                            onClick = { repository.setAodPromptSuppressed(false) },
+                            contentPadding = CompactButtonContentPadding,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            AutoSizeText(
+                                text = stringResource(R.string.aod_reminder_reenable),
+                                maxFontSize = 12.sp,
+                                minFontSize = 9.sp,
+                                maxLines = 2
+                            )
+                        }
+                    }
                 }
             }
 

@@ -130,8 +130,7 @@
     <string name="match_history_sync_desc">Matches und Statistiken mit dem Smartphone synchronisieren. Beim Ausschalten wird die Kopie auf dem Smartphone gelöscht.</string>
     <string name="open_settings_manually_message">Diese Uhr kann die Einstellungen nicht direkt aus Padel Score öffnen. Öffne die Uhreneinstellungen oder das Schnellmenü selbst und aktiviere „Nicht stören“ vor dem Spielen. Schalte es danach wieder aus, wenn du es nicht mehr brauchst.</string>
     <string name="manual_quiet_mode_title">Manueller Ruhemodus</string>
-    <string name="quiet_rule_message">Diese Regel schaltet Anrufe und Benachrichtigungen stumm, während ein Match in Padel Score geöffnet ist. Wecker bleiben erlaubt. Sie endet, wenn das Match endet, du zum Start zurückkehrst oder die App verlässt. Du kannst die Regel in den Uhreneinstellungen deaktivieren oder löschen. Falls die App abstürzt, öffne sie erneut, um die Regel aufzuheben, oder deaktiviere sie manuell.</string>
-    <string name="continue_action">Weiter</string>
+    <string name="quiet_rule_message">Diese Regel schaltet Anrufe und Benachrichtigungen für das gesamte aktive Match in Padel Score stumm, auch wenn der Bildschirm dimmt oder die Uhr das Zifferblatt anzeigt. Wecker bleiben erlaubt. Sie endet, wenn das Match endet, du zum Start zurückkehrst oder die App schließt. Du kannst die Regel in den Uhreneinstellungen deaktivieren oder löschen. Falls die App abstürzt, öffne sie erneut, um die Regel aufzuheben, oder deaktiviere sie manuell.</string>
     <string name="ok">OK</string>
     <string name="ongoing_match_summary">Games %1$d:%2$d | Sätze %3$d:%4$d</string>
     <string name="start_match_tile">Match starten</string>
@@ -176,7 +175,6 @@
     <string name="dnd_already_granted_message">Nicht stören ist bereits aktiviert. Der Ruhemodus wird nur während Matches aktiviert, wenn diese Einstellung eingeschaltet ist.</string>
     <string name="dnd_allow_now_message">Erlaube Nicht stören jetzt, damit Padel Score Unterbrechungen während Matches stummschalten kann. Diese Einstellung wird automatisch aktiviert.</string>
     <string name="open_settings">Einstellungen öffnen</string>
-    <string name="watch_settings">Uhr-Einstellungen</string>
     <string name="open_settings_manually">Einstellungen manuell öffnen</string>
     <string name="start_padel_match_content_desc">Padel-Match starten</string>
   <string name="first_server_us">UNSER AUFSCHLÄGER</string>
@@ -191,4 +189,17 @@
   <string name="confirm_server_order">AUFSCHLAGREIHENFOLGE BESTÄTIGEN</string>
   <string name="confirm">BESTÄTIGEN</string>
   <string name="correct_server">AUFSCHLÄGER KORRIGIEREN</string>
+  <string name="open_dnd_settings">Nicht stören öffnen</string>
+  <string name="dont_ask_again">Nicht mehr fragen</string>
+  <string name="dnd_manual_launch_message">Padel Score kann „Nicht stören“ auf dieser Uhr nicht automatisch einschalten. Öffne vor dem Spielen die „Nicht stören“-Einstellungen der Uhr oder das Schnellmenü und schalte es nach dem Match wieder aus.</string>
+  <string name="display_settings">Display-Einstellungen</string>
+  <string name="keep_screen_on_in_match">Im Match anlassen</string>
+  <string name="aod_prompt_title">Always-On-Display</string>
+  <string name="aod_prompt_message">Das Always-On-Display der Uhr ist aus, daher kann die Anzeige im Match verschwinden. Öffne die Display-Einstellungen, um es einzuschalten, oder lass Padel Score den Match-Screen aktiv halten.</string>
+  <string name="aod_settings_blocked_title">Einstellungen nicht verfügbar</string>
+  <string name="aod_settings_blocked_message">Diese Uhr kann die Display-Einstellungen nicht aus Padel Score öffnen. Öffne die Uhreneinstellungen und aktiviere dort das Always-On-Display.</string>
+  <string name="watch_aod_status_on">Uhr-Always-On: Ein</string>
+  <string name="watch_aod_status_off">Uhr-Always-On: Aus</string>
+  <string name="watch_aod_status_unknown">Uhr-Always-On: Unbekannt</string>
+  <string name="aod_reminder_reenable">Always-On-Erinnerung wieder anzeigen</string>
 </resources>

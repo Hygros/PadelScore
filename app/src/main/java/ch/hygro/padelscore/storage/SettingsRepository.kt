@@ -81,6 +81,36 @@ class SettingsRepository(context: Context) {
         _healthTrackingEnabled.value = enabled
     }
 
+    private val _aodPromptSuppressed = MutableStateFlow(
+        prefs.getBoolean(KEY_AOD_PROMPT_SUPPRESSED, false)
+    )
+    val aodPromptSuppressed: StateFlow<Boolean> = _aodPromptSuppressed.asStateFlow()
+
+    fun setAodPromptSuppressed(suppressed: Boolean) {
+        prefs.edit { putBoolean(KEY_AOD_PROMPT_SUPPRESSED, suppressed) }
+        _aodPromptSuppressed.value = suppressed
+    }
+
+    /**
+     * Several screens create their own repository instance. Mirror external writes so a
+     * change made by the Always-On prompt is visible in the match and settings screens.
+     */
+    private val preferenceListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when (key) {
+                KEY_AMBIENT_MODE ->
+                    _ambientModeEnabled.value = prefs.getBoolean(key, true)
+                KEY_MATCH_QUIET_MODE ->
+                    _matchQuietModeEnabled.value = prefs.getBoolean(key, true)
+                KEY_AOD_PROMPT_SUPPRESSED ->
+                    _aodPromptSuppressed.value = prefs.getBoolean(key, false)
+            }
+        }
+
+    init {
+        prefs.registerOnSharedPreferenceChangeListener(preferenceListener)
+    }
+
     companion object {
         private const val KEY_SWIPE_GESTURES = "swipe_gestures_enabled"
         private const val KEY_WRIST_GESTURES = "wrist_gestures_enabled"
@@ -88,5 +118,6 @@ class SettingsRepository(context: Context) {
         private const val KEY_HEALTH_TRACKING = "health_tracking_enabled"
         private const val KEY_HEALTH_SYNC = "health_sync_enabled"
         private const val KEY_MATCH_QUIET_MODE = "match_quiet_mode_enabled"
+        private const val KEY_AOD_PROMPT_SUPPRESSED = "aod_prompt_suppressed"
     }
 }

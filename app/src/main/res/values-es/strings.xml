@@ -130,8 +130,7 @@
   <string name="match_history_sync_desc">Sincroniza partidos y estadísticas con tu móvil. Al desactivarlo se borra la copia del móvil.</string>
   <string name="open_settings_manually_message">Este reloj no puede abrir los ajustes desde Padel Score. Abre tú mismo los ajustes del reloj o el panel rápido y activa No molestar antes de jugar. Desactívalo después si ya no lo necesitas.</string>
   <string name="manual_quiet_mode_title">Modo silencio manual</string>
-  <string name="quiet_rule_message">Esta regla silencia llamadas y notificaciones mientras hay un partido abierto en Padel Score. Las alarmas siguen permitidas. Se detiene cuando termina el partido, vuelves al inicio o sales de la aplicación. Puedes desactivar o eliminar la regla en los ajustes del reloj. Si la aplicación se cierra inesperadamente, vuelve a abrirla para borrar la regla o desactívala manualmente.</string>
-  <string name="continue_action">Continuar</string>
+  <string name="quiet_rule_message">Esta regla silencia llamadas y notificaciones durante todo el partido activo en Padel Score, incluso cuando la pantalla se atenúa o el reloj muestra la esfera. Las alarmas siguen permitidas. Se detiene cuando termina el partido, vuelves al inicio o cierras la aplicación. Puedes desactivar o eliminar la regla en los ajustes del reloj. Si la aplicación se cierra inesperadamente, vuelve a abrirla para borrar la regla o desactívala manualmente.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Juegos %1$d:%2$d | Sets %3$d:%4$d</string>
   <string name="start_match_tile">Iniciar partido</string>
@@ -176,7 +175,6 @@
   <string name="dnd_already_granted_message">El acceso a No molestar ya está concedido. El modo silencio solo se activa durante los partidos cuando este ajuste está activado.</string>
   <string name="dnd_allow_now_message">Permite ahora el acceso a No molestar para que Padel Score pueda silenciar las interrupciones durante los partidos. Este ajuste se activará automáticamente.</string>
   <string name="open_settings">Abrir ajustes</string>
-  <string name="watch_settings">Ajustes del reloj</string>
   <string name="open_settings_manually">Abrir ajustes manualmente</string>
   <string name="start_padel_match_content_desc">Iniciar partido de pádel</string>
   <string name="first_server_us">NUESTRO SACADOR</string>
@@ -191,4 +189,17 @@
   <string name="confirm_server_order">CONFIRMAR ORDEN DE SAQUE</string>
   <string name="confirm">CONFIRMAR</string>
   <string name="correct_server">CORREGIR SACADOR</string>
+  <string name="open_dnd_settings">Abrir No molestar</string>
+  <string name="dont_ask_again">No volver a preguntar</string>
+  <string name="dnd_manual_launch_message">Padel Score no puede activar No molestar automáticamente en este reloj. Abre los ajustes de No molestar del reloj o el panel rápido antes de jugar y desactívalo después del partido.</string>
+  <string name="display_settings">Ajustes de pantalla</string>
+  <string name="keep_screen_on_in_match">Mantener pantalla en el partido</string>
+  <string name="aod_prompt_title">Pantalla Always-On</string>
+  <string name="aod_prompt_message">La pantalla Always-On del reloj está desactivada, así que el marcador puede desaparecer durante los partidos. Abre los ajustes de pantalla para activarla o deja que Padel Score mantenga la pantalla del partido encendida.</string>
+  <string name="aod_settings_blocked_title">Ajustes no disponibles</string>
+  <string name="aod_settings_blocked_message">Este reloj no puede abrir los ajustes de pantalla desde Padel Score. Abre los ajustes del reloj y activa allí la pantalla Always-On.</string>
+  <string name="watch_aod_status_on">Always-On del reloj: Activado</string>
+  <string name="watch_aod_status_off">Always-On del reloj: Desactivado</string>
+  <string name="watch_aod_status_unknown">Always-On del reloj: Desconocido</string>
+  <string name="aod_reminder_reenable">Mostrar de nuevo el aviso Always-On</string>
 </resources>

@@ -12,6 +12,28 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:ignore="ForegroundServicesPolicy" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
 
+    <!-- Required on Android 11+ so resolveActivity() can see system settings screens. -->
+    <queries>
+        <intent>
+            <action android:name="android.settings.NOTIFICATION_POLICY_ACCESS_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.ZEN_MODE_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.ZEN_MODE_PRIORITY_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.SOUND_SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.SETTINGS" />
+        </intent>
+        <intent>
+            <action android:name="android.settings.DISPLAY_SETTINGS" />
+        </intent>
+    </queries>
+
 
     <application
         android:allowBackup="false"

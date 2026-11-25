@@ -142,8 +142,7 @@
   <string name="match_history_sync_desc">Sync matches and statistics to your phone. Turning off clears the phone copy.</string>
   <string name="open_settings_manually_message">This watch cannot open settings from Padel Score. Open the watch settings or quick panel yourself and enable Do Not Disturb before playing. Turn it off afterward if you no longer need it.</string>
   <string name="manual_quiet_mode_title">Manual quiet mode</string>
-  <string name="quiet_rule_message">This rule silences calls and notifications while a match is open in Padel Score. Alarms remain allowed. It stops when the match ends, you return home, or you leave the app. You can disable or delete the rule in your watch settings. If the app crashes, reopen it to clear the rule or disable it manually.</string>
-  <string name="continue_action">Continue</string>
+  <string name="quiet_rule_message">This rule silences calls and notifications for the entire active match in Padel Score, including when the screen dims or the watch shows its watch face. Alarms remain allowed. It stops when the match ends, you return home, or you close the app. You can disable or delete the rule in your watch settings. If the app crashes, reopen it to clear the rule or disable it manually.</string>
   <string name="ok">OK</string>
   <string name="ongoing_match_summary">Games %1$d:%2$d | Sets %3$d:%4$d</string>
   <string name="start_match_tile">Start Match</string>
@@ -188,7 +187,19 @@
   <string name="dnd_already_granted_message">Do Not Disturb access is already granted. Quiet mode activates only during matches when this setting is toggled on.</string>
   <string name="dnd_allow_now_message">Allow Do Not Disturb access now so Padel Score can silence interruptions during matches. This setting toggles on automatically.</string>
   <string name="open_settings">Open settings</string>
-  <string name="watch_settings">Watch settings</string>
   <string name="open_settings_manually">Open settings manually</string>
   <string name="start_padel_match_content_desc">Start Padel Match</string>
+  <string name="open_dnd_settings">Open Do Not Disturb</string>
+  <string name="dont_ask_again">Don\'t ask again</string>
+  <string name="dnd_manual_launch_message">Padel Score cannot turn on Do Not Disturb automatically on this watch. Open the watch\'s Do Not Disturb settings or use the quick panel before playing, then turn it off after the match.</string>
+  <string name="display_settings">Display settings</string>
+  <string name="keep_screen_on_in_match">Keep screen on in match</string>
+  <string name="aod_prompt_title">Always-On display</string>
+  <string name="aod_prompt_message">The watch Always-On display is off, so the score may disappear during matches. Open the display settings to enable it, or let Padel Score keep the match screen on.</string>
+  <string name="aod_settings_blocked_title">Settings unavailable</string>
+  <string name="aod_settings_blocked_message">This watch cannot open display settings from Padel Score. Open the watch settings and enable the Always-On display there.</string>
+  <string name="watch_aod_status_on">Watch Always-On: On</string>
+  <string name="watch_aod_status_off">Watch Always-On: Off</string>
+  <string name="watch_aod_status_unknown">Watch Always-On: Unknown</string>
+  <string name="aod_reminder_reenable">Show Always-On reminder again</string>
 </resources>
