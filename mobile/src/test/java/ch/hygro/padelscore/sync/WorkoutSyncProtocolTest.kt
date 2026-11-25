@@ -198,6 +198,13 @@ class WorkoutSyncProtocolTest {
 
         override suspend fun available(): Boolean = true
 
+        var stepsCounter = 0
+        var caloriesCounter = 0
+        var distanceCounter = 0
+        val deletedStepsUids = mutableListOf<String>()
+        val deletedCaloriesUids = mutableListOf<String>()
+        val deletedDistanceUids = mutableListOf<String>()
+
         override suspend fun insertHeartRate(
             record: androidx.health.connect.client.records.HeartRateRecord
         ): List<String> {
@@ -216,12 +223,45 @@ class WorkoutSyncProtocolTest {
             return listOf("session-$sessionCounter")
         }
 
+        override suspend fun insertSteps(
+            record: androidx.health.connect.client.records.StepsRecord
+        ): List<String> {
+            stepsCounter++
+            return listOf("steps-$stepsCounter")
+        }
+
+        override suspend fun insertActiveCalories(
+            record: androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+        ): List<String> {
+            caloriesCounter++
+            return listOf("calories-$caloriesCounter")
+        }
+
+        override suspend fun insertDistance(
+            record: androidx.health.connect.client.records.DistanceRecord
+        ): List<String> {
+            distanceCounter++
+            return listOf("distance-$distanceCounter")
+        }
+
         override suspend fun deleteHeartRateByUid(uid: String) {
             deletedHeartRateUids.add(uid)
         }
 
         override suspend fun deleteExerciseSessionByUid(uid: String) {
             deletedSessionUids.add(uid)
+        }
+
+        override suspend fun deleteStepsByUid(uid: String) {
+            deletedStepsUids.add(uid)
+        }
+
+        override suspend fun deleteActiveCaloriesByUid(uid: String) {
+            deletedCaloriesUids.add(uid)
+        }
+
+        override suspend fun deleteDistanceByUid(uid: String) {
+            deletedDistanceUids.add(uid)
         }
     }
 

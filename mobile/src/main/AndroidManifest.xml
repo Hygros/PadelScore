@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.health.WRITE_EXERCISE" tools:ignore="HealthConnectPolicy" />
     <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" tools:ignore="HealthConnectPolicy" />
+    <uses-permission android:name="android.permission.health.WRITE_STEPS" tools:ignore="HealthConnectPolicy" />
+    <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" tools:ignore="HealthConnectPolicy" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" tools:ignore="HealthConnectPolicy" />
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>

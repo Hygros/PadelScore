@@ -201,6 +201,46 @@ class LocalWorkoutRepository internal constructor(
         }
     }
 
+    fun updateCalories(total: Double) {
+        synchronized(repositoryLock) {
+            val matchId = preferences.getLong("active_start", 0L)
+            if (matchId <= 0L || total < 0.0 || isDeleted(matchId)) return
+            val key = "calories_$matchId"
+            val previous = stepPreferences.getFloat(key, -1f).toDouble()
+            if (total > previous) {
+                stepPreferences.edit { putFloat(key, total.toFloat()) }
+            }
+        }
+    }
+
+    fun caloriesForMatch(matchId: Long): Double? {
+        synchronized(repositoryLock) {
+            if (matchId <= 0L || isDeleted(matchId)) return null
+            val key = "calories_$matchId"
+            return stepPreferences.getFloat(key, -1f).takeIf { it >= 0f }?.toDouble()
+        }
+    }
+
+    fun updateDistance(total: Double) {
+        synchronized(repositoryLock) {
+            val matchId = preferences.getLong("active_start", 0L)
+            if (matchId <= 0L || total < 0.0 || isDeleted(matchId)) return
+            val key = "distance_$matchId"
+            val previous = stepPreferences.getFloat(key, -1f).toDouble()
+            if (total > previous) {
+                stepPreferences.edit { putFloat(key, total.toFloat()) }
+            }
+        }
+    }
+
+    fun distanceForMatch(matchId: Long): Double? {
+        synchronized(repositoryLock) {
+            if (matchId <= 0L || isDeleted(matchId)) return null
+            val key = "distance_$matchId"
+            return stepPreferences.getFloat(key, -1f).takeIf { it >= 0f }?.toDouble()
+        }
+    }
+
     fun setEndBoundary(endTimeMillis: Long) {
         synchronized(repositoryLock) {
             preferences.edit { putLong("active_end", endTimeMillis) }
@@ -216,9 +256,9 @@ class LocalWorkoutRepository internal constructor(
                 return
             }
             val expiredStepKeys = stepPreferences.all.keys
-                .mapNotNull { key -> key.toLongOrNull()?.let { key to it } }
+                .mapNotNull { key -> key.removePrefix("calories_").removePrefix("distance_").toLongOrNull()?.let { key to it } }
                 .sortedByDescending { it.second }
-                .drop(100)
+                .drop(300)
             if (expiredStepKeys.isNotEmpty()) {
                 stepPreferences.edit {
                     expiredStepKeys.forEach { (key, _) -> remove(key) }
@@ -247,6 +287,21 @@ class LocalWorkoutRepository internal constructor(
                 preferences.getInt("active_average", 0)
             }
             val revision = preferences.getLong("revision_$start", 0L) + 1L
+
+            val matchSteps = stepsForMatch(start)
+            val matchCalories = caloriesForMatch(start)
+            val matchDistance = distanceForMatch(start)
+
+            val durationHours = (cutoff - start).toDouble() / 3_600_000.0
+            val finalCalories = matchCalories ?: if (durationHours > 0.0) {
+                val baseRate = if (average in 30..240) (average * 3.5 - 200.0).coerceIn(300.0, 800.0) else 450.0
+                kotlin.math.round(baseRate * durationHours)
+            } else null
+
+            val finalDistance = matchDistance ?: if (matchSteps != null && matchSteps > 0L) {
+                kotlin.math.round(matchSteps * 0.75)
+            } else null
+
             val workout = JSONObject()
                 .put("revision", revision)
                 .put("startTimeMillis", start)
@@ -255,6 +310,17 @@ class LocalWorkoutRepository internal constructor(
                 .put("maximumHeartRate", maximum)
                 .put("sampleCount", samples.length())
                 .put("samples", samples)
+
+            if (matchSteps != null && matchSteps > 0L) {
+                workout.put("steps", matchSteps)
+            }
+            if (finalCalories != null && finalCalories > 0.0) {
+                workout.put("calories", finalCalories)
+            }
+            if (finalDistance != null && finalDistance > 0.0) {
+                workout.put("distanceMeters", finalDistance)
+            }
+
             val history = JSONArray(preferences.getString("completed_workouts", "[]"))
             val updated = JSONArray()
             updated.put(workout)
@@ -472,7 +538,8 @@ class LocalWorkoutRepository internal constructor(
         synchronized(repositoryLock) {
             if (matchIds.isEmpty()) return true
             var allPurged = true
-            val stepKeysToRemove = matchIds.map { it.toString() }.filter { stepPreferences.contains(it) }
+            val stepKeysToRemove = matchIds.flatMap { listOf(it.toString(), "calories_$it", "distance_$it") }
+                .filter { stepPreferences.contains(it) }
             if (stepKeysToRemove.isNotEmpty()) {
                 val stepEditor = stepPreferences.edit()
                 for (key in stepKeysToRemove) {

@@ -72,6 +72,12 @@ class FitnessTrackerManager internal constructor(
                 stepSensor.stop()
                 workoutRepository.updateSteps(healthStepsOffset + steps.total)
             }
+            update.latestMetrics.getData(DataType.CALORIES_TOTAL)?.let { calories ->
+                workoutRepository.updateCalories(calories.total)
+            }
+            update.latestMetrics.getData(DataType.DISTANCE_TOTAL)?.let { distance ->
+                workoutRepository.updateDistance(distance.total)
+            }
             val samples = update.latestMetrics.getData(DataType.HEART_RATE_BPM)
             val bootEpochMillis = System.currentTimeMillis() - SystemClock.elapsedRealtime()
             workoutRepository.addSamples(samples.map {
@@ -147,7 +153,7 @@ class FitnessTrackerManager internal constructor(
             val supportedDataTypes = capabilities.getExerciseTypeCapabilities(exerciseType).supportedDataTypes
             val requestedDataTypes = setOf(
                 DataType.HEART_RATE_BPM, DataType.HEART_RATE_BPM_STATS, DataType.CALORIES_TOTAL,
-                DataType.STEPS, DataType.STEPS_TOTAL
+                DataType.STEPS, DataType.STEPS_TOTAL, DataType.DISTANCE_TOTAL
             ).filterTo(mutableSetOf()) { it in supportedDataTypes }
             val config = ExerciseConfig(
                 exerciseType = exerciseType,

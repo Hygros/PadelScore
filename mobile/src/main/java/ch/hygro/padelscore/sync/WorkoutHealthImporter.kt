@@ -6,11 +6,16 @@ import android.util.Log
 import androidx.core.content.edit
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.Wearable
@@ -27,8 +32,14 @@ internal interface WorkoutHealthProvider {
     suspend fun available(): Boolean
     suspend fun insertHeartRate(record: HeartRateRecord): List<String>
     suspend fun insertExerciseSession(record: ExerciseSessionRecord): List<String>
+    suspend fun insertSteps(record: StepsRecord): List<String>
+    suspend fun insertActiveCalories(record: ActiveCaloriesBurnedRecord): List<String>
+    suspend fun insertDistance(record: DistanceRecord): List<String>
     suspend fun deleteHeartRateByUid(uid: String)
     suspend fun deleteExerciseSessionByUid(uid: String)
+    suspend fun deleteStepsByUid(uid: String)
+    suspend fun deleteActiveCaloriesByUid(uid: String)
+    suspend fun deleteDistanceByUid(uid: String)
 }
 
 /** One serialized, idempotent importer shared by DataItems, RPC and durable inbox replay. */
@@ -80,7 +91,10 @@ class WorkoutHealthImporter internal constructor(
         private val importMutex = Mutex()
         val permissions = setOf(
             HealthPermission.getWritePermission(ExerciseSessionRecord::class),
-            HealthPermission.getWritePermission(HeartRateRecord::class)
+            HealthPermission.getWritePermission(HeartRateRecord::class),
+            HealthPermission.getWritePermission(StepsRecord::class),
+            HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
+            HealthPermission.getWritePermission(DistanceRecord::class)
         )
     }
 
@@ -103,6 +117,15 @@ class WorkoutHealthImporter internal constructor(
         override suspend fun insertExerciseSession(record: ExerciseSessionRecord): List<String> =
             HealthConnectClient.getOrCreate(context).insertRecords(listOf(record)).recordIdsList
 
+        override suspend fun insertSteps(record: StepsRecord): List<String> =
+            HealthConnectClient.getOrCreate(context).insertRecords(listOf(record)).recordIdsList
+
+        override suspend fun insertActiveCalories(record: ActiveCaloriesBurnedRecord): List<String> =
+            HealthConnectClient.getOrCreate(context).insertRecords(listOf(record)).recordIdsList
+
+        override suspend fun insertDistance(record: DistanceRecord): List<String> =
+            HealthConnectClient.getOrCreate(context).insertRecords(listOf(record)).recordIdsList
+
         override suspend fun deleteHeartRateByUid(uid: String) {
             HealthConnectClient.getOrCreate(context).deleteRecords(
                 HeartRateRecord::class,
@@ -114,6 +137,30 @@ class WorkoutHealthImporter internal constructor(
         override suspend fun deleteExerciseSessionByUid(uid: String) {
             HealthConnectClient.getOrCreate(context).deleteRecords(
                 ExerciseSessionRecord::class,
+                recordIdsList = listOf(uid),
+                clientRecordIdsList = emptyList()
+            )
+        }
+
+        override suspend fun deleteStepsByUid(uid: String) {
+            HealthConnectClient.getOrCreate(context).deleteRecords(
+                StepsRecord::class,
+                recordIdsList = listOf(uid),
+                clientRecordIdsList = emptyList()
+            )
+        }
+
+        override suspend fun deleteActiveCaloriesByUid(uid: String) {
+            HealthConnectClient.getOrCreate(context).deleteRecords(
+                ActiveCaloriesBurnedRecord::class,
+                recordIdsList = listOf(uid),
+                clientRecordIdsList = emptyList()
+            )
+        }
+
+        override suspend fun deleteDistanceByUid(uid: String) {
+            HealthConnectClient.getOrCreate(context).deleteRecords(
+                DistanceRecord::class,
                 recordIdsList = listOf(uid),
                 clientRecordIdsList = emptyList()
             )
@@ -164,6 +211,21 @@ class WorkoutHealthImporter internal constructor(
                     check(commitPrefs { putBoolean("delete_hr_$id", true) }) {
                         "Cannot persist heart-rate deletion milestone"
                     }
+                }
+                val stepsUid = prefs.getString("record_steps_$id", null)
+                val caloriesUid = prefs.getString("record_calories_$id", null)
+                val distanceUid = prefs.getString("record_distance_$id", null)
+                if (!stepsUid.isNullOrBlank()) {
+                    runCatching { provider.deleteStepsByUid(stepsUid) }
+                    commitPrefs { remove("record_steps_$id") }
+                }
+                if (!caloriesUid.isNullOrBlank()) {
+                    runCatching { provider.deleteActiveCaloriesByUid(caloriesUid) }
+                    commitPrefs { remove("record_calories_$id") }
+                }
+                if (!distanceUid.isNullOrBlank()) {
+                    runCatching { provider.deleteDistanceByUid(distanceUid) }
+                    commitPrefs { remove("record_distance_$id") }
                 }
                 check(commitPrefs {
                     putBoolean("delete_done_$id", true)
@@ -387,6 +449,66 @@ class WorkoutHealthImporter internal constructor(
                         "Cannot persist Health Connect heart-rate record UID"
                     }
                     logI(str(R.string.log_hr_write_completed, id.toString(), heartRateIds.size))
+                }
+
+                val stepsCount = json.optLong("steps", 0L)
+                if (stepsCount > 0L) {
+                    val oldStepsUid = prefs.getString("record_steps_$id", null)
+                    if (!oldStepsUid.isNullOrBlank() && previousHash != null && previousHash != hash) {
+                        runCatching { provider.deleteStepsByUid(oldStepsUid) }
+                    }
+                    val stepsRecord = StepsRecord(
+                        startTime = Instant.ofEpochMilli(id), startZoneOffset = null,
+                        endTime = Instant.ofEpochMilli(end), endZoneOffset = null,
+                        count = stepsCount,
+                        metadata = Metadata.activelyRecorded(device = Device(type = Device.TYPE_WATCH),
+                            clientRecordId = "padelscore-steps-$id", clientRecordVersion = revision)
+                    )
+                    val stepsIds = provider.insertSteps(stepsRecord)
+                    if (stepsIds.isNotEmpty()) {
+                        commitPrefs { putString("record_steps_$id", stepsIds.single()) }
+                        logI("Steps write completed for workout $id: $stepsCount")
+                    }
+                }
+
+                val caloriesVal = json.optDouble("calories", 0.0)
+                if (caloriesVal > 0.0) {
+                    val oldCaloriesUid = prefs.getString("record_calories_$id", null)
+                    if (!oldCaloriesUid.isNullOrBlank() && previousHash != null && previousHash != hash) {
+                        runCatching { provider.deleteActiveCaloriesByUid(oldCaloriesUid) }
+                    }
+                    val caloriesRecord = ActiveCaloriesBurnedRecord(
+                        startTime = Instant.ofEpochMilli(id), startZoneOffset = null,
+                        endTime = Instant.ofEpochMilli(end), endZoneOffset = null,
+                        energy = Energy.kilocalories(caloriesVal),
+                        metadata = Metadata.activelyRecorded(device = Device(type = Device.TYPE_WATCH),
+                            clientRecordId = "padelscore-calories-$id", clientRecordVersion = revision)
+                    )
+                    val caloriesIds = provider.insertActiveCalories(caloriesRecord)
+                    if (caloriesIds.isNotEmpty()) {
+                        commitPrefs { putString("record_calories_$id", caloriesIds.single()) }
+                        logI("Calories write completed for workout $id: $caloriesVal kcal")
+                    }
+                }
+
+                val distanceVal = json.optDouble("distanceMeters", 0.0)
+                if (distanceVal > 0.0) {
+                    val oldDistanceUid = prefs.getString("record_distance_$id", null)
+                    if (!oldDistanceUid.isNullOrBlank() && previousHash != null && previousHash != hash) {
+                        runCatching { provider.deleteDistanceByUid(oldDistanceUid) }
+                    }
+                    val distanceRecord = DistanceRecord(
+                        startTime = Instant.ofEpochMilli(id), startZoneOffset = null,
+                        endTime = Instant.ofEpochMilli(end), endZoneOffset = null,
+                        distance = Length.meters(distanceVal),
+                        metadata = Metadata.activelyRecorded(device = Device(type = Device.TYPE_WATCH),
+                            clientRecordId = "padelscore-distance-$id", clientRecordVersion = revision)
+                    )
+                    val distanceIds = provider.insertDistance(distanceRecord)
+                    if (distanceIds.isNotEmpty()) {
+                        commitPrefs { putString("record_distance_$id", distanceIds.single()) }
+                        logI("Distance write completed for workout $id: $distanceVal m")
+                    }
                 }
                 val sessionRecords = records.filterIsInstance<ExerciseSessionRecord>()
                 check(sessionRecords.size == 1) { "Expected exactly one exercise session" }
