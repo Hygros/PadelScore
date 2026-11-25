@@ -18,7 +18,12 @@ class StringLengthAndCompletenessTest {
         "advantage_us" to 12,
         "golden_point_short" to 14,
         "star_point_short" to 14,
-        "change_sides_short" to 16
+        "change_sides_short" to 16,
+        // Start screen configuration tiles: label above, value below.
+        "short_set_label" to 10,
+        "normal_set_label" to 10,
+        "first_server_us" to 17,
+        "first_server_opponent" to 17
     )
 
     @Test

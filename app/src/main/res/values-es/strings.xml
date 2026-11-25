@@ -10,8 +10,8 @@
   <string name="scoring_mode">PUNTUACIÓN</string>
   <string name="match_format">PARTIDO</string>
   <string name="set_format">SET</string>
-  <string name="short_set_label">CORTO A 4</string>
-  <string name="normal_set_label">NORMAL A 6</string>
+  <string name="short_set_label">CORTO 4</string>
+  <string name="normal_set_label">NORMAL 6</string>
   <string name="first_serve">PRIMER SAQUE</string>
   <string name="our_team">NOSOTROS</string>
   <string name="opponent_team">RIVAL</string>

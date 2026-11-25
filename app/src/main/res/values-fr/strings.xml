@@ -10,8 +10,8 @@
   <string name="scoring_mode">DÉCOMPTE</string>
   <string name="match_format">MATCH</string>
   <string name="set_format">SET</string>
-  <string name="short_set_label">COURT EN 4</string>
-  <string name="normal_set_label">NORMAL EN 6</string>
+  <string name="short_set_label">COURT 4</string>
+  <string name="normal_set_label">NORMAL 6</string>
   <string name="first_serve">PREMIER SERVICE</string>
   <string name="our_team">NOUS</string>
   <string name="opponent_team">ADVERSAIRE</string>

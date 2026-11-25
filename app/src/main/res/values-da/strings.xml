@@ -10,8 +10,8 @@
   <string name="scoring_mode">POINTFORM</string>
   <string name="match_format">KAMP</string>
   <string name="set_format">SÆT</string>
-  <string name="short_set_label">KORT TIL 4</string>
-  <string name="normal_set_label">NORMALT TIL 6</string>
+  <string name="short_set_label">KORT 4</string>
+  <string name="normal_set_label">NORMAL 6</string>
   <string name="first_serve">FØRSTE SERV</string>
   <string name="our_team">OS</string>
   <string name="opponent_team">MODSTANDER</string>
@@ -178,7 +178,7 @@
   <string name="open_settings_manually">Åbn indstillinger manuelt</string>
   <string name="start_padel_match_content_desc">Start padelkamp</string>
   <string name="first_server_us">VORES SERVER</string>
-  <string name="first_server_opponent">MODSTANDERS SERVER</string>
+  <string name="first_server_opponent">DERES SERVER</string>
   <string name="player_me">MIG</string>
   <string name="player_partner">PARTNER</string>
   <string name="player_opponent_1">MODSTANDER 1</string>

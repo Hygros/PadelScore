@@ -10,8 +10,8 @@
   <string name="scoring_mode">SCORING</string>
   <string name="match_format">MATCH</string>
   <string name="set_format">SET</string>
-  <string name="short_set_label">SHORT TO 4</string>
-  <string name="normal_set_label">NORMAL TO 6</string>
+  <string name="short_set_label">SHORT 4</string>
+  <string name="normal_set_label">NORMAL 6</string>
   <string name="first_serve">FIRST SERVE</string>
   <string name="first_server_us">OUR SERVER</string>
   <string name="first_server_opponent">OPP SERVER</string>

@@ -10,8 +10,8 @@
     <string name="scoring_mode">ZÄHLWEISE</string>
     <string name="match_format">MATCH</string>
     <string name="set_format">SATZ</string>
-    <string name="short_set_label">KURZ BIS 4</string>
-    <string name="normal_set_label">NORMAL BIS 6</string>
+    <string name="short_set_label">KURZ 4</string>
+    <string name="normal_set_label">NORMAL 6</string>
     <string name="first_serve">ERSTER AUFSCHLAG</string>
     <string name="our_team">WIR</string>
     <string name="opponent_team">GEGNER</string>
@@ -177,8 +177,8 @@
     <string name="open_settings">Einstellungen öffnen</string>
     <string name="open_settings_manually">Einstellungen manuell öffnen</string>
     <string name="start_padel_match_content_desc">Padel-Match starten</string>
-  <string name="first_server_us">UNSER AUFSCHLÄGER</string>
-  <string name="first_server_opponent">GEGNER-AUFSCHLÄGER</string>
+  <string name="first_server_us">UNSER AUFSCHLAG</string>
+  <string name="first_server_opponent">GEGNER AUFSCHLAG</string>
   <string name="player_me">ICH</string>
   <string name="player_partner">PARTNER</string>
   <string name="player_opponent_1">GEGNER 1</string>

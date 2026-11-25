@@ -10,8 +10,8 @@
   <string name="scoring_mode">POÄNGRÄKNING</string>
   <string name="match_format">MATCH</string>
   <string name="set_format">SET</string>
-  <string name="short_set_label">KORT TILL 4</string>
-  <string name="normal_set_label">NORMALT TILL 6</string>
+  <string name="short_set_label">KORT 4</string>
+  <string name="normal_set_label">NORMALT 6</string>
   <string name="first_serve">FÖRSTA SERVE</string>
   <string name="our_team">VI</string>
   <string name="opponent_team">MOTSTÅNDARE</string>
@@ -178,7 +178,7 @@
   <string name="open_settings_manually">Öppna inställningar manuellt</string>
   <string name="start_padel_match_content_desc">Starta padelmatch</string>
   <string name="first_server_us">VÅR SERVARE</string>
-  <string name="first_server_opponent">MOTSTÅNDARENS SERVARE</string>
+  <string name="first_server_opponent">DERAS SERVARE</string>
   <string name="player_me">JAG</string>
   <string name="player_partner">PARTNER</string>
   <string name="player_opponent_1">MOTSTÅNDARE 1</string>

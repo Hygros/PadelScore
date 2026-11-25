@@ -10,8 +10,8 @@
   <string name="scoring_mode">نظام النقاط</string>
   <string name="match_format">المباراة</string>
   <string name="set_format">المجموعة</string>
-  <string name="short_set_label">قصيرة إلى 4</string>
-  <string name="normal_set_label">عادية إلى 6</string>
+  <string name="short_set_label">قصيرة 4</string>
+  <string name="normal_set_label">عادية 6</string>
   <string name="first_serve">الإرسال الأول</string>
   <string name="our_team">نحن</string>
   <string name="opponent_team">الخصم</string>
