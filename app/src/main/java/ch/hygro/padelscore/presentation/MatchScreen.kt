@@ -519,7 +519,6 @@ fun PadelScoreContent(
                 pendingFirstServerForOpponent = it
             },
             onConfirm = {
-                saveCurrentStateToHistory()
                 updateMatch(
                     PadelScoreEngine.configureSetOpeningServers(
                         state = matchState,
@@ -537,7 +536,6 @@ fun PadelScoreContent(
             servingTeam = matchState.servingTeam,
             servingPlayer = matchState.servingPlayer,
             onPlayerSelected = { player: PlayerSlot ->
-                saveCurrentStateToHistory()
                 updateMatch(
                     PadelScoreEngine.correctServingPlayer(matchState, player)
                 )
@@ -618,7 +616,6 @@ fun PadelScoreContent(
             serviceAssignment.court != ServiceCourt.RECEIVER_CHOICE
 
         fun selectServiceCourt(court: ServiceCourt) {
-            saveCurrentStateToHistory()
             updateMatch(PadelScoreEngine.selectDecidingPointCourt(matchState, court))
         }
 
